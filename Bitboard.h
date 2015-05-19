@@ -1,6 +1,6 @@
 #ifndef Bitboard_h_
 #define Bitboard_h_
-typedef unsigned long long int Bitboard;
+typedef unsigned long long int Bitboard;//Bitboard typedef
 Bitboard GeneralBoard[64] = {
         1, 2, 4, 8, 16, 32, 64, 128,
         256, 512, 1024, 2048, 4096, 8192, 16384, 32768,
