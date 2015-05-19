@@ -1,6 +1,8 @@
 #ifndef Bitboard_h_
 #define Bitboard_h_
-typedef unsigned long long int Bitboard;//Bitboard typedef
+typedef unsigned long long int Bitboard;
+
+//This is an array containing one bit set in each bitboard corresponding to the index of the array; the square A1 is the first (0th) element
 Bitboard GeneralBoard[64] = {
         1, 2, 4, 8, 16, 32, 64, 128,
         256, 512, 1024, 2048, 4096, 8192, 16384, 32768,
@@ -9,10 +11,10 @@ Bitboard GeneralBoard[64] = {
         4294967296, 8589934592, 17179869184, 34359738368, 68719476736, 137438953472, 274877906944, 549755813888,
         1099511627776, 2199023255552, 4398046511104, 8796093022208, 17592186044416, 35184372088832, 70368744177664, 140737488355328,
         281474976710656, 562949953421312, 1125899906842624, 2251799813685248, 4503599627370496, 9007199254740992, 18014398509481984, 36028797018963968,
-        72057594037927936, 144115188075855872, 288230376151711744, 576460752303423488, 1152921504606846976, 2305843009213693952, 4611686018427387904ULL, 9223372036854775808ULL
+        72057594037927936, 144115188075855872, 288230376151711744, 576460752303423488, 1152921504606846976, 2305843009213693952, 4611686018427387904, 9223372036854775808ULL
     };
-Bitboard Eigth_Rank_White = 18374686479671623680ULL;
-Bitboard Eigth_Rank_Black = 255;
+Bitboard Eigth_Rank_White = 18374686479671623680ULL;//For masking out pawn pushes to the eagth rank for each side--white and black
+Bitboard Eigth_Rank_Black = 255;//See last comment
 Bitboard White_Pieces = 65535;
 Bitboard Black_Pieces = 18446462598732840960ULL;
 Bitboard White_King = 16;
@@ -27,6 +29,8 @@ Bitboard Black_Rooks = 9295429630892703744ULL;
 Bitboard Black_Bishops = 2594073385365405696;
 Bitboard Black_Knights = 4755801206503243776;
 Bitboard Black_Pawns = 71776119061217280;
+
+//Contains the squares that a knight on a given index can move to. For example, the 0th element has the bits of b3 and c2 set
 Bitboard Knight_Lookup_Table[64] = {
     132096, 329728, 659712, 1319424, 2638848, 5277696, 10489856, 4202496,
     33816580, 84410376, 168886289, 337772578, 675545156, 1351090312, 2685403152, 1075839008,
@@ -38,6 +42,8 @@ Bitboard Knight_Lookup_Table[64] = {
     1128098930098176, 2257297371824128, 4796069720358912, 9592139440717824, 19184278881435648, 38368557762871296, 4679521487814656, 9077567998918656
 
 };
+
+//This one is the same as the Knight_Lookup_Table except that this one is for kings
 Bitboard King_Lookup_Table[64] = {
 770, 1797, 3594, 7188, 14376, 28752, 57504, 49216,
 197123, 460039, 920078, 1840156, 3680312, 7360624, 14721248, 12599488,
@@ -49,9 +55,10 @@ Bitboard King_Lookup_Table[64] = {
 144959613005987840, 362258295026614272, 724516590053228544, 1449033180106457088, 2898066360212914176, 5796132720425828352, 11592265440851656704ULL, 4665729213955833856
 };
  
- Bitboard H_Pawn_Mask = 36170086419038208;
- Bitboard A_Pawn_Mask = 282578800148736;
+ Bitboard H_Pawn_Mask = 36170086419038208;//For masking out A and H pawns so that they cannot capture off of the end of the board
+ Bitboard A_Pawn_Mask = 282578800148736;//Same as last comment
 
+//Contains a string representation of the squares of the chess board; for example, the 0th element in the array is "a1"
 string PlayerMoves[64] = 
 {
 
@@ -73,5 +80,6 @@ string PlayerMoves[64] =
 
 };
 
-#endif
+#endif//Bitboard.h
+
 
