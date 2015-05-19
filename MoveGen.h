@@ -1,6 +1,6 @@
 #ifndef H_Stooge
 #define H_Stooge
-int Generate_White_Knight_Moves();
+int Generate_White_Knight_Moves();//Function declarations
 int Generate_Black_Knight_Moves();
 int Generate_White_King_Moves();
 int Generate_Black_King_Moves();
@@ -12,18 +12,18 @@ int Generate_White_Bishop_Moves();
 int Generate_Black_Bishop_Moves();
 int Generate_White_Queen_Moves();
 int Generate_Black_Queen_Moves();
-bool White_Is_Legal(Bitboard From_Square, Bitboard To_Square, int Move_Type);
-bool Black_Is_Legal(Bitboard From_Square, Bitboard To_Square, int Move_Type);
+bool White_Is_Legal(Bitboard From_Square, Bitboard To_Square, int Move_Type);//Tests for legality
+bool Black_Is_Legal(Bitboard From_Square, Bitboard To_Square, int Move_Type);//Tests for legality
 
-Bitboard White_Move_From_Stack[70];
+Bitboard White_Move_From_Stack[70];//Move stack is just an array of Bitboards(64-bit integers) containing only one bit set in each--the from square or the to square
 Bitboard White_Move_To_Stack[70];
 Bitboard Black_Move_From_Stack[70];
 Bitboard Black_Move_To_Stack[70];
 
-int White_Move_Types[70];
+int White_Move_Types[70];//Array of normal integers that keeps track of the type of each move
 int Black_Move_Types[70];
 
-Bitboard WhiteKingCount[8];
+Bitboard WhiteKingCount[8];//Array which is large enough to contain as many legal moves at a time for all of the pieces of that type as possible
 Bitboard BlackKingCount[8];
 Bitboard WhiteKnightCount[40];
 Bitboard BlackKnightCount[40];
@@ -36,7 +36,7 @@ Bitboard BlackBishopCount[20];
 Bitboard WhiteQueenCount[28];
 Bitboard BlackQueenCount[28];
 
-int White_Knight_Spacer = 0;
+int White_Knight_Spacer = 0;//Keeps track of the number of psuedo legal moves for each type of piece
 int Black_Knight_Spacer = 0;
 int White_King_Spacer = 0;
 int Black_King_Spacer = 0;
@@ -49,7 +49,7 @@ int Black_Bishop_Spacer = 0;
 int White_Queen_Spacer = 0;
 int Black_Queen_Spacer = 0;
 
-int Stack_White_Knight_Moves();
+int Stack_White_Knight_Moves();//Function declarations
 int Stack_Black_Knight_Moves();
 int Stack_White_King_Moves();
 int Stack_Black_King_Moves();
@@ -62,7 +62,7 @@ int Stack_Black_Bishop_Moves();
 int Stack_White_Queen_Moves();
 int Stack_Black_Queen_Moves();
 
-int White_Move_Spacer = 0; // Keeps a "record" of the last move put on the stack so that it knows which position to put the next move in
+int White_Move_Spacer = 0; // Keeps a "record" of the last move put on the stack so that it knows which index of the array to put the next move in
 int Black_Move_Spacer = 0;
 
 // White Knight Move generation
@@ -70,32 +70,28 @@ int Black_Move_Spacer = 0;
 // *****************************************************************************************************************************************
 int Generate_White_Knight_Moves()
 {
-    if(White_Knights)
+    if(White_Knights)//If there are any white knights on the board
     {
         
    for(int i = 0; i < 64; i++)
 {
     if(White_Knights & (GeneralBoard[i])) // If a knight is found
     {
-        
-        //cout << "Knight is on " << PlayerMoves[i] << endl; // cout which square it is on
-              WhiteKnightCount[White_Knight_Spacer] = GeneralBoard[i]; // Put the Knight on the Knight Stack; Call the knight a "number of knights" e.g. the "first" knight
-           White_Knight_Spacer++;   
+           WhiteKnightCount[White_Knight_Spacer] = GeneralBoard[i]; // Put the Knight on the Knight Stack; Call the knight a "number of knights" e.g. the "first" knight
+           White_Knight_Spacer++;//Increment the knight move spacer 
     }
 }        
          White_Knight_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
          Stack_White_Knight_Moves(); // Puts all legal knight moves on stack
-    }
-    
+    }    
 return 0;
-
 }
 
 int Stack_White_Knight_Moves() // Puts all the legal knight moves on move stack 
 { 
-    int j = 0;
+    int j = 0;//Holds the index of the current knight
     int w = 0; // Use it in a for loop to keep track of the number of iterations
-        for(int w = 0; w <= White_Knight_Spacer; w++) // For eack knight found on KnightCount[]; at the beginning of the gAme it is only 2
+        for(int w = 0; w <= White_Knight_Spacer; w++) // For eack knight found on KnightCount[]; at the beginning of the game it is 2
     {
         
     for( int i = 0; i < 64; i++)
@@ -111,11 +107,11 @@ int Stack_White_Knight_Moves() // Puts all the legal knight moves on move stack
     Bitboard Spare3 = ((Spare ^ Spare2) ^ GeneralBoard[j]); // Knight_Pos is the final result
         for(int r = 0; r < 64; r++) // For each legal square found in Spare3 for the current knight
     {
-        if(GeneralBoard[r] & Spare3)
+        if(GeneralBoard[r] & Spare3)//If the for loop index of GeneralBoard  is a square the knight can move to 
         { 
-        int y = 4;
-        if(GeneralBoard[r] & Black_Pieces)
-        y--;
+        int y = 4;//This move will be a "Normal" knight move
+        if(GeneralBoard[r] & Black_Pieces)//If the move captures a black piece, it is a knight capture
+        y--;//So, decrement y to tell the MakeMove function that this move is a knight capture
 		if(White_Is_Legal(WhiteKnightCount[w], GeneralBoard[r], y))
 		{
 		//cout << "It can move to " << PlayerMoves[r] << endl;
@@ -1656,3 +1652,4 @@ switch(Move_Type)
 
 	
 #endif
+
