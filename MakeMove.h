@@ -1,3 +1,4 @@
+
 #ifndef The_Three_Stooges 
 #define The_Three_Stooges 
 
@@ -21,8 +22,8 @@
         {
         	if(GeneralBoard[h] & White_Move_From_Stack[q])//Get the index in GeneralBoard[] of the square the current pieces is moving from
         	{
-        	cout << "MY MOVE IS " << PlayerMoves[h];//Cout it to the user, but don't endl because we have to display the whole move squashed togather, e.g. d2d4
-        	Dave << PlayerMoves[h];//Put it out to the text file
+        	cout << "bestmove " << PlayerMoves[h];//Cout it to the GUI, but don't endl because we have to display the whole move squashed togather, e.g. d2d4
+        	Dave << "bestmove " << PlayerMoves[h];//Put it out to the text file
         }
 		}
 		for( int h = 0; h < 64; h++)
@@ -236,6 +237,7 @@
 			    White_Bishop_Spacer = 0;
 			    White_Queen_Spacer = 0;
 			    White_Move_Spacer = 0;
+			    Current_Turn = false;
 			    return 0;			   
             }           	 
 				 
@@ -259,8 +261,8 @@
         {
         	if(GeneralBoard[h] & Black_Move_From_Stack[q])
         	{
-        	cout << "MY MOVE IS " << PlayerMoves[h]; 
-        	Dave << PlayerMoves[h];
+        	cout << "bestmove " << PlayerMoves[h]; 
+        	Dave << "bestmove " << PlayerMoves[h];
         }
 		}
 		for( int h = 0; h < 64; h++)
@@ -467,6 +469,7 @@
 			    Black_Bishop_Spacer = 0;
 			    Black_Queen_Spacer = 0;
 			    Black_Move_Spacer = 0;
+			    Current_Turn = true;
 			    return 0;
               }              
 #endif
