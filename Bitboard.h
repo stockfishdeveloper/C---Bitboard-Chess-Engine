@@ -15,20 +15,20 @@ Bitboard GeneralBoard[64] = {
     };
 Bitboard Eigth_Rank_White = 18374686479671623680ULL;//For masking out pawn pushes to the eagth rank for each side--white and black
 Bitboard Eigth_Rank_Black = 255;//See last comment
-Bitboard White_Pieces = 65535;
-Bitboard Black_Pieces = 18446462598732840960ULL;
-Bitboard White_King = 16;
-Bitboard Black_King = 1152921504606846976;
-Bitboard White_Queens = 8;
-Bitboard White_Rooks = 129;
-Bitboard White_Bishops = 36;
-Bitboard White_Knights = 66;
-Bitboard White_Pawns = 65280;
-Bitboard Black_Queens = 576460752303423488;
-Bitboard Black_Rooks = 9295429630892703744ULL;
-Bitboard Black_Bishops = 2594073385365405696;
-Bitboard Black_Knights = 4755801206503243776;
-Bitboard Black_Pawns = 71776119061217280;
+Bitboard White_Pieces;
+Bitboard Black_Pieces;
+Bitboard White_King;
+Bitboard Black_King;
+Bitboard White_Queens;
+Bitboard White_Rooks;
+Bitboard White_Bishops;
+Bitboard White_Knights;
+Bitboard White_Pawns;
+Bitboard Black_Queens;
+Bitboard Black_Rooks;
+Bitboard Black_Bishops;
+Bitboard Black_Knights;
+Bitboard Black_Pawns;
 
 //Contains the squares that a knight on a given index can move to. For example, the 0th element has the bits of b3 and c2 set
 Bitboard Knight_Lookup_Table[64] = {
@@ -81,5 +81,4 @@ string PlayerMoves[64] =
 };
 
 #endif//Bitboard.h
-
 

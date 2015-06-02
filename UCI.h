@@ -3,7 +3,8 @@ int MakeMove();
 
 inline int CheckUci()
 {
-	
+	bool Is_Fen = false;
+	int Parse_Fen(string Fen);
 	string UciCommand;
 	
 while (cin >> UciCommand)
@@ -42,27 +43,160 @@ Black_Pawns = 71776119061217280;
 Current_Turn = true;
 }
 
+else if (Is_Fen)
+{
+Parse_Fen(UciCommand); 
+Is_Fen = false;
+}
+
+else if (UciCommand == "fen")
+Is_Fen = true; 
+ 
+
 else if(UciCommand == "go") 
 MakeMove();
 
-
-else
-Dave << UciCommand << endl;
+Log << UciCommand << endl;
 }
 
 return 0;
 }
 
+
+int Parse_Fen(string Fen)
+{
+Bitboard Current_Rank = 72057594037927936;
+char Current_Square;
+for(int h = 0; h < (Fen.length()); h++)
+{
+	Current_Square = Fen[h];
+	
+
+cout << Fen << endl;
+switch(Current_Square)
+{
+	case '1':
+		Current_Rank *= 2;
+		break;
+	case '2':
+		Current_Rank *= 4;
+		break;
+	case '3':
+	    Current_Rank *= 8;
+	    break;
+	case '4':
+		Current_Rank *= 16;
+		break;
+	case '5':
+		Current_Rank *= 32;
+		break;
+	case '6':
+		Current_Rank *= 64;
+		break;
+	case '7':
+		Current_Rank *= 128;
+		break;
+	case '8':
+		Current_Rank *= 256;
+		break;
+    case 'K':
+    	White_King = Current_Rank;
+    	White_Pieces |= Current_Rank;
+    	break;
+    case 'k':
+    	Black_King = Current_Rank;
+    	Black_Pieces |= Current_Rank;
+    	break;
+    case 'Q':
+    	White_Queens |= Current_Rank;
+    	White_Pieces |= Current_Rank;
+    	break;
+    case 'q':
+    	Black_Queens |= Current_Rank;
+    	Black_Pieces |= Current_Rank;
+    	break;
+    case 'R':
+    	White_Rooks |= Current_Rank;
+    	White_Pieces |= Current_Rank;
+    	break;
+    case 'r':
+    	Black_Rooks |= Current_Rank;
+    	Black_Pieces |= Current_Rank;
+    	break;
+    case 'B':
+    	White_Bishops |= Current_Rank;
+    	White_Pieces |= Current_Rank;
+    	break;
+    case 'b':
+    	Black_Bishops |= Current_Rank;
+    	Black_Pieces |= Current_Rank;
+    	break;
+    case 'N':
+    	White_Knights |= Current_Rank;
+    	White_Pieces |= Current_Rank;
+    	break;
+    case 'n':
+    	Black_Knights |= Current_Rank;
+    	Black_Pieces |= Current_Rank;
+    	break;
+    case 'P':
+    	White_Pawns |= Current_Rank;
+    	White_Pieces |= Current_Rank;
+    	break;
+    case 'p':
+    	Black_Pawns |= Current_Rank;
+    	Black_Pieces |= Current_Rank;
+    	break;
+    case '/':
+    	Current_Rank /= 32768;
+		break;
+}
+
+char Curr_Turn;
+cin >> Curr_Turn;
+if(Curr_Turn == 'w')
+Current_Turn = true;
+else
+Current_Turn = false;
+cout << White_Pieces;	
+}
+	
+	return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 int MakeMove()
 {
 	
-//CheckUci();
-
-
-
-//Keep making moves until one side loses or the game is a draw
-
-	if(Current_Turn == true)
+if(Current_Turn)
 	{
 Generate_White_Knight_Moves();//Generates White Knight moves
 Generate_White_King_Moves();//Generates White King moves
@@ -72,7 +206,7 @@ Generate_White_Bishop_Moves();//Generates White Bishop moves
 Generate_White_Queen_Moves();//Generates White Queen moves
 MakeWhiteMove();//Plays White's moves out on the internal bitboards
 }
-else if(Current_Turn == false)
+else 
 {
 Generate_Black_Knight_Moves();//Generates Black Knight moves
 Generate_Black_King_Moves();//Generates Black King moves
@@ -82,11 +216,7 @@ Generate_Black_Bishop_Moves();//Generates Black Bishop moves
 Generate_Black_Queen_Moves();//Generates Black Queen moves
 MakeBlackMove();//Plays Black's moves out on the internal bitboards
 }
-
-
-//So that we can see the reult
-   // char f;
-    //cin >> f;
-    
+   
     return 0;
 }
+

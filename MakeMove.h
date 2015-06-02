@@ -1,4 +1,3 @@
-
 #ifndef The_Three_Stooges 
 #define The_Three_Stooges 
 
@@ -22,8 +21,8 @@
         {
         	if(GeneralBoard[h] & White_Move_From_Stack[q])//Get the index in GeneralBoard[] of the square the current pieces is moving from
         	{
-        	cout << "bestmove " << PlayerMoves[h];//Cout it to the GUI, but don't endl because we have to display the whole move squashed togather, e.g. d2d4
-        	Dave << "bestmove " << PlayerMoves[h];//Put it out to the text file
+        	cout << "bestmove " << PlayerMoves[h];//Cout it to the user, but don't endl because we have to display the whole move squashed togather, e.g. d2d4
+        	Log << "bestmove " << PlayerMoves[h];//Put it out to the text file
         }
 		}
 		for( int h = 0; h < 64; h++)
@@ -31,7 +30,7 @@
         	if(GeneralBoard[h] & White_Move_To_Stack[q])//For each to square found
         	{
         	cout << PlayerMoves[h] << endl;//cout it and
-        	Dave << PlayerMoves[h] << endl;//Put it into the text file; now we can do a new line because we are done with the current move
+        	Log << PlayerMoves[h] << endl;//Put it into the text file; now we can do a new line because we are done with the current move
         }
 		}		
                // Update Bitboards
@@ -262,7 +261,7 @@
         	if(GeneralBoard[h] & Black_Move_From_Stack[q])
         	{
         	cout << "bestmove " << PlayerMoves[h]; 
-        	Dave << "bestmove " << PlayerMoves[h];
+        	Log << "bestmove " << PlayerMoves[h];
         }
 		}
 		for( int h = 0; h < 64; h++)
@@ -270,7 +269,7 @@
         	if(GeneralBoard[h] & Black_Move_To_Stack[q])
         	{
         	cout << PlayerMoves[h] << endl; 
-        	Dave << PlayerMoves[h] << endl;
+        	Log << PlayerMoves[h] << endl;
         }
 		}	           
 			       // Update Bitboards               
