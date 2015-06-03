@@ -82,8 +82,8 @@ switch(Current_Square)
 		Current_Rank *= 4;
 		break;
 	case '3':
-	    Current_Rank *= 8;
-	    break;
+	    	Current_Rank *= 8;
+	    	break;
 	case '4':
 		Current_Rank *= 16;
 		break;
@@ -149,7 +149,7 @@ switch(Current_Square)
     	break;
     case '/':
     	Current_Rank /= 32768;
-		break;
+	break;
 }
 
 char Curr_Turn;
