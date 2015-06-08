@@ -1,6 +1,7 @@
 int CheckUci();
 int MakeMove();
-
+int Read_Fen(char Current_Square);
+Bitboard Current_Rank = 72057594037927936;
 inline int CheckUci()
 {
 	bool Is_Fen = false;
@@ -65,101 +66,24 @@ return 0;
 
 int Parse_Fen(string Fen)
 {
-Bitboard Current_Rank = 72057594037927936;
+
 char Current_Square;
 for(int h = 0; h < (Fen.length()); h++)
 {
 	Current_Square = Fen[h];
 	
 
-cout << Fen << endl;
-switch(Current_Square)
-{
-	case '1':
-		Current_Rank *= 2;
-		break;
-	case '2':
-		Current_Rank *= 4;
-		break;
-	case '3':
-	    	Current_Rank *= 8;
-	    	break;
-	case '4':
-		Current_Rank *= 16;
-		break;
-	case '5':
-		Current_Rank *= 32;
-		break;
-	case '6':
-		Current_Rank *= 64;
-		break;
-	case '7':
-		Current_Rank *= 128;
-		break;
-	case '8':
-		Current_Rank *= 256;
-		break;
-    case 'K':
-    	White_King = Current_Rank;
-    	White_Pieces |= Current_Rank;
-    	break;
-    case 'k':
-    	Black_King = Current_Rank;
-    	Black_Pieces |= Current_Rank;
-    	break;
-    case 'Q':
-    	White_Queens |= Current_Rank;
-    	White_Pieces |= Current_Rank;
-    	break;
-    case 'q':
-    	Black_Queens |= Current_Rank;
-    	Black_Pieces |= Current_Rank;
-    	break;
-    case 'R':
-    	White_Rooks |= Current_Rank;
-    	White_Pieces |= Current_Rank;
-    	break;
-    case 'r':
-    	Black_Rooks |= Current_Rank;
-    	Black_Pieces |= Current_Rank;
-    	break;
-    case 'B':
-    	White_Bishops |= Current_Rank;
-    	White_Pieces |= Current_Rank;
-    	break;
-    case 'b':
-    	Black_Bishops |= Current_Rank;
-    	Black_Pieces |= Current_Rank;
-    	break;
-    case 'N':
-    	White_Knights |= Current_Rank;
-    	White_Pieces |= Current_Rank;
-    	break;
-    case 'n':
-    	Black_Knights |= Current_Rank;
-    	Black_Pieces |= Current_Rank;
-    	break;
-    case 'P':
-    	White_Pawns |= Current_Rank;
-    	White_Pieces |= Current_Rank;
-    	break;
-    case 'p':
-    	Black_Pawns |= Current_Rank;
-    	Black_Pieces |= Current_Rank;
-    	break;
-    case '/':
-    	Current_Rank /= 32768;
-	break;
+Read_Fen(Current_Square);
 }
-
+//cout << White_Pieces;
 char Curr_Turn;
 cin >> Curr_Turn;
 if(Curr_Turn == 'w')
 Current_Turn = true;
 else
 Current_Turn = false;
-cout << White_Pieces;	
-}
+	
+
 	
 	return 0;
 }
@@ -218,5 +142,133 @@ MakeBlackMove();//Plays Black's moves out on the internal bitboards
 }
    
     return 0;
+}
+
+int Read_Fen(char Current_Square)
+{
+	switch(Current_Square)
+{
+	case '1':
+		if(!((Current_Rank * 2) & (A_Pawn_Mask)))
+		Current_Rank *= 2;
+		else
+		Current_Rank *= 1;
+		break;
+	case '2':
+		if(!((Current_Rank * 4) & (A_Pawn_Mask)))
+		Current_Rank *= 4;
+		else
+		Current_Rank *= 2;
+		break;
+	case '3':
+	    if(!((Current_Rank * 8) & (A_Pawn_Mask)))
+		Current_Rank *= 8;
+		else
+		Current_Rank *= 4;
+	    break;
+	case '4':
+		if(!((Current_Rank * 16) & (A_Pawn_Mask)))
+		Current_Rank *= 16;
+		else
+		Current_Rank *= 8;
+		break;
+	case '5':
+		if(!((Current_Rank * 32) & (A_Pawn_Mask)))
+		Current_Rank *= 32;
+		else
+		Current_Rank *= 16;
+		break;
+	case '6':
+		if(!((Current_Rank * 64) & (A_Pawn_Mask)))
+		Current_Rank *= 64;
+		else
+		Current_Rank *= 32;
+		break;
+	case '7':
+		if(!((Current_Rank * 128) & (A_Pawn_Mask)))
+		Current_Rank *= 128;
+		else
+		Current_Rank *= 64;
+		break;
+	case '8':
+		Current_Rank *= 128;
+		break;
+    case 'K':
+    	White_King = Current_Rank;
+    	White_Pieces |= Current_Rank;
+    	if(!(Current_Rank & H_Pawn_Mask))
+    	Current_Rank *= 2;
+    	break;
+    case 'k':
+    	Black_King = Current_Rank;
+    	Black_Pieces |= Current_Rank;
+    	if(!(Current_Rank & H_Pawn_Mask))
+    	Current_Rank *= 2;
+    	break;
+    case 'Q':
+    	White_Queens |= Current_Rank;
+    	White_Pieces |= Current_Rank;
+    	if(!(Current_Rank & H_Pawn_Mask))
+    	Current_Rank *= 2;
+    	break;
+    case 'q':
+    	Black_Queens |= Current_Rank;
+    	Black_Pieces |= Current_Rank;
+    	if(!(Current_Rank & H_Pawn_Mask))
+    	Current_Rank *= 2;
+    	break;
+    case 'R':
+    	White_Rooks |= Current_Rank;
+    	White_Pieces |= Current_Rank;
+    	if(!(Current_Rank & H_Pawn_Mask))
+    	Current_Rank *= 2;
+    	break;
+    case 'r':
+    	Black_Rooks |= Current_Rank;
+    	Black_Pieces |= Current_Rank;
+    	if(!(Current_Rank & H_Pawn_Mask))
+    	Current_Rank *= 2;
+    	break;
+    case 'B':
+    	White_Bishops |= Current_Rank;
+    	White_Pieces |= Current_Rank;
+    	if(!(Current_Rank & H_Pawn_Mask))
+    	Current_Rank *= 2;
+    	break;
+    case 'b':
+    	Black_Bishops |= Current_Rank;
+    	Black_Pieces |= Current_Rank;
+    	if(!(Current_Rank & H_Pawn_Mask))
+    	Current_Rank *= 2;
+    	break;
+    case 'N':
+    	White_Knights |= Current_Rank;
+    	White_Pieces |= Current_Rank;
+    	if(!(Current_Rank & H_Pawn_Mask))
+    	Current_Rank *= 2;
+    	break;
+    case 'n':
+    	Black_Knights |= Current_Rank;
+    	Black_Pieces |= Current_Rank;
+    	if(!(Current_Rank & H_Pawn_Mask))
+    	Current_Rank *= 2;
+    	break;
+    case 'P':
+    	White_Pawns |= Current_Rank;
+    	White_Pieces |= Current_Rank;
+    	if(!(Current_Rank & H_Pawn_Mask))
+    	Current_Rank *= 2;
+    	break;
+    case 'p':
+    	Black_Pawns |= Current_Rank;
+    	Black_Pieces |= Current_Rank;
+    	if(!(Current_Rank & H_Pawn_Mask))
+    	Current_Rank *= 2;
+    	break;
+    case '/':
+    	Current_Rank /= 32768;
+		break;
+}
+return 0;
 }
 
