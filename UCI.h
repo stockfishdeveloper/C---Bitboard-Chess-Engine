@@ -1,13 +1,17 @@
 int CheckUci();
 int MakeMove();
+int Moves_Command();
+int Parse_Moves(string First_Part, string Second_Part, char Promotion_Type);
+int Parse_Moves(string First_Part, string Second_Part);
 int Read_Fen(char Current_Square);
 Bitboard Current_Rank = 72057594037927936;
+bool White_Turn = false;
+string UciCommand;
 inline int CheckUci()
 {
 	bool Is_Fen = false;
 	int Parse_Fen(string Fen);
-	string UciCommand;
-	
+		
 while (cin >> UciCommand)
 {
 	if(UciCommand == "uci")
@@ -46,6 +50,7 @@ Current_Turn = true;
 
 else if (Is_Fen)
 {
+Log << UciCommand << endl;
 Parse_Fen(UciCommand); 
 Is_Fen = false;
 }
@@ -56,6 +61,9 @@ Is_Fen = true;
 
 else if(UciCommand == "go") 
 MakeMove();
+
+else if (UciCommand == "moves")
+Moves_Command();
 
 Log << UciCommand << endl;
 }
@@ -78,10 +86,23 @@ Read_Fen(Current_Square);
 //cout << White_Pieces;
 char Curr_Turn;
 cin >> Curr_Turn;
+Log << Curr_Turn << endl;
 if(Curr_Turn == 'w')
 Current_Turn = true;
 else
 Current_Turn = false;
+string Legal_Castling;
+cin >> Legal_Castling;
+Log << Legal_Castling << endl;
+string En_Passant;
+cin >> En_Passant;
+Log << En_Passant << endl;
+string Pawn_Moves;
+cin >> Pawn_Moves;
+Log << Pawn_Moves << endl;
+string Move_Count;
+cin >> Move_Count;
+Log << Move_Count << endl;
 	
 
 	
@@ -272,3 +293,122 @@ int Read_Fen(char Current_Square)
 return 0;
 }
 
+int Moves_Command()
+{
+	char First_Part[5];
+	char Second_Part[5];
+	char Promotion_Type;
+	while(First_Part != "go")
+	{
+		cin.get(First_Part, 3);
+		cin.get(Second_Part, 3);
+		cout << "Here!" << endl;
+		if(Second_Part == "a8" || "b8" || "c8" || "d8" || "e8" || "f8" || "g8" || "h8")
+		{
+			cin >> Promotion_Type;
+			Parse_Moves(First_Part, Second_Part, Promotion_Type);
+		}
+		else
+		{
+			Parse_Moves(First_Part, Second_Part);
+		}
+	}
+	UciCommand = "go";
+	White_Turn ^= 1;
+	return 0;		
+}
+
+int Parse_Moves(string First, string Second)
+{
+	Bitboard From;
+	Bitboard To;
+	for(int i = 0; i < 64; i++)
+	{
+		if(PlayerMoves[i] == First)
+		From = GeneralBoard[i];
+	}
+	for(int i = 0; i < 64; i++)
+	{
+		if(PlayerMoves[i] == Second)
+		To = GeneralBoard[i];
+	}
+	if(White_Turn)
+	{
+		White_Pieces ^= From;
+		White_Pieces |= To;
+		if(White_Rooks & From)
+		{
+		White_Rooks ^= From;
+		White_Rooks |= To;
+	    }
+	    if(White_Knights & From)
+		{
+		White_Knights ^= From;
+		White_Knights |= To;
+	    }
+	    if(White_Bishops & From)
+		{
+		White_Bishops ^= From;
+		White_Bishops |= To;
+	    }
+	    if(White_Pawns & From)
+		{
+		White_Pawns ^= From;
+		White_Pawns |= To;
+	    }
+	    if(White_King & From)
+		{
+		White_King ^= From;
+		White_King |= To;
+	    }
+	    if(White_Queens & From)
+		{
+		White_Queens ^= From;
+		White_Queens |= To;
+	    }
+	}
+	else
+	{
+		Black_Pieces ^= From;
+		Black_Pieces |= To;
+		if(Black_Rooks & From)
+		{
+		Black_Rooks ^= From;
+		Black_Rooks |= To;
+	    }
+	    if(Black_Knights & From)
+		{
+		Black_Knights ^= From;
+		Black_Knights |= To;
+	    }
+	    if(Black_Bishops & From)
+		{
+		Black_Bishops ^= From;
+		Black_Bishops |= To;
+	    }
+	    if(Black_Pawns & From)
+		{
+		Black_Pawns ^= From;
+		Black_Pawns |= To;
+	    }
+	    if(Black_King & From)
+		{
+		Black_King ^= From;
+		Black_King |= To;
+	    }
+	    if(Black_Queens & From)
+		{
+		Black_Queens ^= From;
+		Black_Queens |= To;
+	    }
+		
+	}
+return 0;	
+}
+
+
+
+
+int Parse_Moves(string First_Part, string Second_Part, char Promotion_Type)
+{
+}
