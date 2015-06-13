@@ -294,25 +294,38 @@ return 0;
 }
 
 int Moves_Command()
-{
+{ 
 	char First_Part[5];
 	char Second_Part[5];
 	char Promotion_Type;
 	while(First_Part != "go")
 	{
+		cin.get();
 		cin.get(First_Part, 3);
+		cout << First_Part << endl;
+		//cin.get(); 
+		if(First_Part == "go")
+		{
+			cout << "Dave!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+		break;
+		}
 		cin.get(Second_Part, 3);
+		cout << Second_Part << endl;
 		cout << "Here!" << endl;
-		if(Second_Part == "a8" || "b8" || "c8" || "d8" || "e8" || "f8" || "g8" || "h8")
+		if(Second_Part == "a8" || Second_Part == "b8" || Second_Part == "c8" || Second_Part == "d8" || Second_Part == "e8" || Second_Part == "f8" || Second_Part == "g8" || Second_Part == "h8")
 		{
 			cin >> Promotion_Type;
 			Parse_Moves(First_Part, Second_Part, Promotion_Type);
 		}
+		
 		else
 		{
 			Parse_Moves(First_Part, Second_Part);
+			
 		}
+		
 	}
+	cout << White_Pieces << endl;
 	UciCommand = "go";
 	White_Turn ^= 1;
 	return 0;		
@@ -409,6 +422,90 @@ return 0;
 
 
 
-int Parse_Moves(string First_Part, string Second_Part, char Promotion_Type)
+int Parse_Moves(string First, string Second, char Promotion_Type)
 {
+	Bitboard From;
+	Bitboard To;
+	for(int i = 0; i < 64; i++)
+	{
+		if(PlayerMoves[i] == First)
+		From = GeneralBoard[i];
+	}
+	for(int i = 0; i < 64; i++)
+	{
+		if(PlayerMoves[i] == Second)
+		To = GeneralBoard[i];
+	}
+	if(White_Turn)
+	{
+		White_Pieces ^= From;
+		White_Pieces |= To;
+		if(White_Rooks & From)
+		{
+		White_Rooks ^= From;
+		White_Rooks |= To;
+	    }
+	    if(White_Knights & From)
+		{
+		White_Knights ^= From;
+		White_Knights |= To;
+	    }
+	    if(White_Bishops & From)
+		{
+		White_Bishops ^= From;
+		White_Bishops |= To;
+	    }
+	    if(White_Pawns & From)
+		{
+		White_Pawns ^= From;
+		White_Pawns |= To;
+	    }
+	    if(White_King & From)
+		{
+		White_King ^= From;
+		White_King |= To;
+	    }
+	    if(White_Queens & From)
+		{
+		White_Queens ^= From;
+		White_Queens |= To;
+	    }
+	}
+	else
+	{
+		Black_Pieces ^= From;
+		Black_Pieces |= To;
+		if(Black_Rooks & From)
+		{
+		Black_Rooks ^= From;
+		Black_Rooks |= To;
+	    }
+	    if(Black_Knights & From)
+		{
+		Black_Knights ^= From;
+		Black_Knights |= To;
+	    }
+	    if(Black_Bishops & From)
+		{
+		Black_Bishops ^= From;
+		Black_Bishops |= To;
+	    }
+	    if(Black_Pawns & From)
+		{
+		Black_Pawns ^= From;
+		Black_Pawns |= To;
+	    }
+	    if(Black_King & From)
+		{
+		Black_King ^= From;
+		Black_King |= To;
+	    }
+	    if(Black_Queens & From)
+		{
+		Black_Queens ^= From;
+		Black_Queens |= To;
+	    }
+		
+	}
+return 0;	
 }
