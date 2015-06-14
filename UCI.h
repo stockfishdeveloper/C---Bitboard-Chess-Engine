@@ -5,7 +5,7 @@ int Parse_Moves(string First_Part, string Second_Part, char Promotion_Type);
 int Parse_Moves(string First_Part, string Second_Part);
 int Read_Fen(char Current_Square);
 Bitboard Current_Rank = 72057594037927936;
-bool White_Turn = false;
+bool White_Turn = true;
 string UciCommand;
 inline int CheckUci()
 {
@@ -303,15 +303,15 @@ int Moves_Command()
 		cin.get();
 		cin.get(First_Part, 3);
 		cout << First_Part << endl;
+		string F = "go";
 		//cin.get(); 
-		if(First_Part == "go")
+		if(First_Part == F)
 		{
-			cout << "Dave!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+		cout << "Dave!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
 		break;
 		}
 		cin.get(Second_Part, 3);
 		cout << Second_Part << endl;
-		cout << "Here!" << endl;
 		if(Second_Part == "a8" || Second_Part == "b8" || Second_Part == "c8" || Second_Part == "d8" || Second_Part == "e8" || Second_Part == "f8" || Second_Part == "g8" || Second_Part == "h8")
 		{
 			cin >> Promotion_Type;
@@ -320,14 +320,20 @@ int Moves_Command()
 		
 		else
 		{
+			cout << "Doing Pieces...." << endl;
 			Parse_Moves(First_Part, Second_Part);
+			cout << "Done with pieces...." << endl;
 			
 		}
+		White_Turn ^= 1;
+		cout << "Whose turn:" << White_Turn << endl;
 		
 	}
-	cout << White_Pieces << endl;
+	cout << "White Pieces:" << White_Pieces << endl;
+	cout << "Black Pieces:" << Black_Pieces << endl;
 	UciCommand = "go";
-	White_Turn ^= 1;
+	
+	
 	return 0;		
 }
 
@@ -347,6 +353,7 @@ int Parse_Moves(string First, string Second)
 	}
 	if(White_Turn)
 	{
+		cout << "It's White's turn..." << endl;
 		White_Pieces ^= From;
 		White_Pieces |= To;
 		if(White_Rooks & From)
