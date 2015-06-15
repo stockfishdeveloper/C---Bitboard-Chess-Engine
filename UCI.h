@@ -1,11 +1,10 @@
 int CheckUci();
 int MakeMove();
 int Moves_Command();
-int Parse_Moves(string First_Part, string Second_Part, char Promotion_Type);
+int Parse_Moves(string First_Part, string Second_Part, string Promotion_Type);
 int Parse_Moves(string First_Part, string Second_Part);
 int Read_Fen(char Current_Square);
 Bitboard Current_Rank = 72057594037927936;
-bool White_Turn = true;
 string UciCommand;
 inline int CheckUci()
 {
@@ -46,6 +45,7 @@ Black_Bishops = 2594073385365405696;
 Black_Knights = 4755801206503243776;
 Black_Pawns = 71776119061217280;
 Current_Turn = true;
+White_Turn = true;
 }
 
 else if (Is_Fen)
@@ -63,7 +63,10 @@ else if(UciCommand == "go")
 MakeMove();
 
 else if (UciCommand == "moves")
+{
+Log << UciCommand << endl;
 Moves_Command();
+}
 
 Log << UciCommand << endl;
 }
@@ -88,9 +91,15 @@ char Curr_Turn;
 cin >> Curr_Turn;
 Log << Curr_Turn << endl;
 if(Curr_Turn == 'w')
+{
 Current_Turn = true;
+White_Turn = true;
+}
 else
+{
 Current_Turn = false;
+White_Turn = false;
+}
 string Legal_Castling;
 cin >> Legal_Castling;
 Log << Legal_Castling << endl;
@@ -160,6 +169,10 @@ Generate_Black_Rook_Moves();//Generates Black Rook moves
 Generate_Black_Bishop_Moves();//Generates Black Bishop moves
 Generate_Black_Queen_Moves();//Generates Black Queen moves
 MakeBlackMove();//Plays Black's moves out on the internal bitboards
+cin >> UciCommand;
+cin >> UciCommand;
+cin >> UciCommand;
+cin >> UciCommand;
 }
    
     return 0;
@@ -297,22 +310,57 @@ int Moves_Command()
 { 
 	char First_Part[5];
 	char Second_Part[5];
-	char Promotion_Type;
+	string Promotion_Type;
 	while(First_Part != "go")
 	{
 		cin.get();
 		cin.get(First_Part, 3);
-		cout << First_Part << endl;
+		Log << First_Part;
+		//cout << First_Part << endl;
 		string F = "go";
 		//cin.get(); 
 		if(First_Part == F)
 		{
-		cout << "Dave!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+		//cout << "Dave!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
 		break;
 		}
 		cin.get(Second_Part, 3);
-		cout << Second_Part << endl;
-		if(Second_Part == "a8" || Second_Part == "b8" || Second_Part == "c8" || Second_Part == "d8" || Second_Part == "e8" || Second_Part == "f8" || Second_Part == "g8" || Second_Part == "h8")
+		Log << Second_Part << endl;
+		//cout << Second_Part << endl;
+		string a8 = "a8";
+		string b8 = "b8";
+		string c8 = "c8";
+		string d8 = "d8";
+		string e8 = "e8";
+		string f8 = "f8";
+		string g8 = "g8";
+		string h8 = "h8";
+		string a1 = "a1";
+		string b1 = "b1";
+		string c1 = "c1";
+		string d1 = "d1";
+		string e1 = "e1";
+		string f1 = "f1";
+		string g1 = "g1";
+		string h1 = "h1";
+		string a7 = "a7";
+		string b7 = "b7";
+		string c7 = "c7";
+		string d7 = "d7";
+		string e7 = "e7";
+		string f7 = "f7";
+		string g7 = "g7";
+		string h7 = "h7";
+		string a2 = "a2";
+		string b2 = "b2";
+		string c2 = "c2";
+		string d2 = "d2";
+		string e2 = "e2";
+		string f2 = "f2";
+		string g2 = "g2";
+		string h2 = "h2";
+		
+		if((Second_Part == a8 && First_Part == a7 && (White_Pawns &  Seventh_Rank_White)) || (Second_Part == b8 && First_Part == b7 && (White_Pawns & Seventh_Rank_White)) || (Second_Part == c8 && First_Part == c7 && (White_Pawns & Seventh_Rank_White)) || (Second_Part == d8 && First_Part == d7 && (White_Pawns & Seventh_Rank_White)) || (Second_Part == e8 && First_Part == e7 && (White_Pawns & Seventh_Rank_White)) || (Second_Part == f8 && First_Part == f7 && (White_Pawns & Seventh_Rank_White)) || (Second_Part == g8 && First_Part == g7 && (White_Pawns & Seventh_Rank_White)) || (Second_Part == h8 && First_Part == h7 && (White_Pawns & Seventh_Rank_White)) || (Second_Part == a1 && First_Part == a2 && (Black_Pawns & Seventh_Rank_Black)) || (Second_Part == b1 && First_Part == b2 && (Black_Pawns & Seventh_Rank_Black)) || (Second_Part == c1 && First_Part == c2 && (Black_Pawns & Seventh_Rank_Black)) || (Second_Part == d1 && First_Part == d2 && (Black_Pawns & Seventh_Rank_Black)) || (Second_Part == e1 && First_Part == e2 && (Black_Pawns & Seventh_Rank_Black)) || (Second_Part == f1 && First_Part == f2 && (Black_Pawns & Seventh_Rank_Black)) || (Second_Part == g1 && First_Part == g2 && (Black_Pawns & Seventh_Rank_Black)) || (Second_Part == h1 && First_Part == h2 && (Black_Pawns & Seventh_Rank_Black)))
 		{
 			cin >> Promotion_Type;
 			Parse_Moves(First_Part, Second_Part, Promotion_Type);
@@ -320,19 +368,31 @@ int Moves_Command()
 		
 		else
 		{
-			cout << "Doing Pieces...." << endl;
+			//cout << "Doing Pieces...." << endl;
 			Parse_Moves(First_Part, Second_Part);
-			cout << "Done with pieces...." << endl;
+			//cout << "Done with pieces...." << endl;
 			
 		}
 		White_Turn ^= 1;
-		cout << "Whose turn:" << White_Turn << endl;
+		Current_Turn ^= 1;
+		//cout << "Whose turn: " << White_Turn << endl;
 		
 	}
-	cout << "White Pieces:" << White_Pieces << endl;
-	cout << "Black Pieces:" << Black_Pieces << endl;
-	UciCommand = "go";
-	
+	//cout << "White Pieces:" << White_Pieces << endl;
+	//cout << "Black Pieces:" << Black_Pieces << endl;
+	//cout << "White Queens:" << White_Queens << endl;
+	//cout << "Black Queens:" << Black_Queens << endl;
+	//cout << "White Rooks:" << White_Rooks << endl;
+	//cout << "Black Rooks:" << Black_Rooks << endl;
+	//cout << "White Bishops:" << White_Bishops << endl;
+	//cout << "Black Bishops:" << Black_Bishops << endl;
+	//cout << "White Knights:" << White_Knights << endl;
+	//cout << "Black Knights:" << Black_Knights << endl;
+	//cout << "White Pawns:" << White_Pawns << endl;
+	//cout << "Black Pawns:" << Black_Pawns << endl;
+		cin.putback('o');
+		cin.putback('g');
+		
 	
 	return 0;		
 }
@@ -353,38 +413,121 @@ int Parse_Moves(string First, string Second)
 	}
 	if(White_Turn)
 	{
-		cout << "It's White's turn..." << endl;
 		White_Pieces ^= From;
 		White_Pieces |= To;
 		if(White_Rooks & From)
 		{
 		White_Rooks ^= From;
 		White_Rooks |= To;
+		if(Black_Pieces & To)
+		{
+			Black_Pieces ^= To;
+			Black_Queens |= To;
+			Black_Queens ^= To;
+			Black_Rooks |= To;
+			Black_Rooks ^= To;
+			Black_Bishops |= To;
+			Black_Bishops ^= To;
+			Black_Knights |= To;
+			Black_Knights ^= To;
+			Black_Pawns |= To;
+			Black_Pawns ^= To;			
+		}
 	    }
 	    if(White_Knights & From)
 		{
 		White_Knights ^= From;
 		White_Knights |= To;
+		if(Black_Pieces & To)
+		{
+			Black_Pieces ^= To;
+			Black_Queens |= To;
+			Black_Queens ^= To;
+			Black_Rooks |= To;
+			Black_Rooks ^= To;
+			Black_Bishops |= To;
+			Black_Bishops ^= To;
+			Black_Knights |= To;
+			Black_Knights ^= To;
+			Black_Pawns |= To;
+			Black_Pawns ^= To;			
+		}
 	    }
 	    if(White_Bishops & From)
 		{
 		White_Bishops ^= From;
 		White_Bishops |= To;
+		if(Black_Pieces & To)
+		{
+			Black_Pieces ^= To;
+			Black_Queens |= To;
+			Black_Queens ^= To;
+			Black_Rooks |= To;
+			Black_Rooks ^= To;
+			Black_Bishops |= To;
+			Black_Bishops ^= To;
+			Black_Knights |= To;
+			Black_Knights ^= To;
+			Black_Pawns |= To;
+			Black_Pawns ^= To;			
+		}
 	    }
 	    if(White_Pawns & From)
 		{
 		White_Pawns ^= From;
 		White_Pawns |= To;
+		if(Black_Pieces & To)
+		{
+			Black_Pieces ^= To;
+			Black_Queens |= To;
+			Black_Queens ^= To;
+			Black_Rooks |= To;
+			Black_Rooks ^= To;
+			Black_Bishops |= To;
+			Black_Bishops ^= To;
+			Black_Knights |= To;
+			Black_Knights ^= To;
+			Black_Pawns |= To;
+			Black_Pawns ^= To;			
+		}
 	    }
 	    if(White_King & From)
 		{
 		White_King ^= From;
 		White_King |= To;
+		if(Black_Pieces & To)
+		{
+			Black_Pieces ^= To;
+			Black_Queens |= To;
+			Black_Queens ^= To;
+			Black_Rooks |= To;
+			Black_Rooks ^= To;
+			Black_Bishops |= To;
+			Black_Bishops ^= To;
+			Black_Knights |= To;
+			Black_Knights ^= To;
+			Black_Pawns |= To;
+			Black_Pawns ^= To;			
+		}
 	    }
 	    if(White_Queens & From)
 		{
 		White_Queens ^= From;
 		White_Queens |= To;
+		if(Black_Pieces & To)
+		{
+			Black_Pieces ^= To;
+			Black_Queens |= To;
+			Black_Queens ^= To;
+			Black_Rooks |= To;
+			Black_Rooks ^= To;
+			Black_Bishops |= To;
+			Black_Bishops ^= To;
+			Black_Knights |= To;
+			Black_Knights ^= To;
+			Black_Pawns |= To;
+			Black_Pawns ^= To;			
+		}
 	    }
 	}
 	else
@@ -395,31 +538,115 @@ int Parse_Moves(string First, string Second)
 		{
 		Black_Rooks ^= From;
 		Black_Rooks |= To;
+		if(White_Pieces & To)
+		{
+			White_Pieces ^= To;
+			White_Queens |= To;
+			White_Queens ^= To;
+			White_Rooks |= To;
+			White_Rooks ^= To;
+			White_Bishops |= To;
+			White_Bishops ^= To;
+			White_Knights |= To;
+			White_Knights ^= To;
+			White_Pawns |= To;
+			White_Pawns ^= To;			
+		}
 	    }
 	    if(Black_Knights & From)
 		{
 		Black_Knights ^= From;
 		Black_Knights |= To;
+		if(White_Pieces & To)
+		{
+			White_Pieces ^= To;
+			White_Queens |= To;
+			White_Queens ^= To;
+			White_Rooks |= To;
+			White_Rooks ^= To;
+			White_Bishops |= To;
+			White_Bishops ^= To;
+			White_Knights |= To;
+			White_Knights ^= To;
+			White_Pawns |= To;
+			White_Pawns ^= To;			
+		}
 	    }
 	    if(Black_Bishops & From)
 		{
 		Black_Bishops ^= From;
 		Black_Bishops |= To;
+		if(White_Pieces & To)
+		{
+			White_Pieces ^= To;
+			White_Queens |= To;
+			White_Queens ^= To;
+			White_Rooks |= To;
+			White_Rooks ^= To;
+			White_Bishops |= To;
+			White_Bishops ^= To;
+			White_Knights |= To;
+			White_Knights ^= To;
+			White_Pawns |= To;
+			White_Pawns ^= To;			
+		}
 	    }
 	    if(Black_Pawns & From)
 		{
 		Black_Pawns ^= From;
 		Black_Pawns |= To;
+		if(White_Pieces & To)
+		{
+			White_Pieces ^= To;
+			White_Queens |= To;
+			White_Queens ^= To;
+			White_Rooks |= To;
+			White_Rooks ^= To;
+			White_Bishops |= To;
+			White_Bishops ^= To;
+			White_Knights |= To;
+			White_Knights ^= To;
+			White_Pawns |= To;
+			White_Pawns ^= To;			
+		}
 	    }
 	    if(Black_King & From)
 		{
 		Black_King ^= From;
 		Black_King |= To;
+		if(White_Pieces & To)
+		{
+			White_Pieces ^= To;
+			White_Queens |= To;
+			White_Queens ^= To;
+			White_Rooks |= To;
+			White_Rooks ^= To;
+			White_Bishops |= To;
+			White_Bishops ^= To;
+			White_Knights |= To;
+			White_Knights ^= To;
+			White_Pawns |= To;
+			White_Pawns ^= To;			
+		}
 	    }
 	    if(Black_Queens & From)
 		{
 		Black_Queens ^= From;
 		Black_Queens |= To;
+		if(White_Pieces & To)
+		{
+			White_Pieces ^= To;
+			White_Queens |= To;
+			White_Queens ^= To;
+			White_Rooks |= To;
+			White_Rooks ^= To;
+			White_Bishops |= To;
+			White_Bishops ^= To;
+			White_Knights |= To;
+			White_Knights ^= To;
+			White_Pawns |= To;
+			White_Pawns ^= To;			
+		}
 	    }
 		
 	}
@@ -429,8 +656,8 @@ return 0;
 
 
 
-int Parse_Moves(string First, string Second, char Promotion_Type)
-{
+int Parse_Moves(string First, string Second, string Promotion_Type)
+{//cout <<"Promotion, but here!" << endl;
 	Bitboard From;
 	Bitboard To;
 	for(int i = 0; i < 64; i++)
@@ -451,31 +678,115 @@ int Parse_Moves(string First, string Second, char Promotion_Type)
 		{
 		White_Rooks ^= From;
 		White_Rooks |= To;
+		if(Black_Pieces & To)
+		{
+			Black_Pieces ^= To;
+			Black_Queens |= To;
+			Black_Queens ^= To;
+			Black_Rooks |= To;
+			Black_Rooks ^= To;
+			Black_Bishops |= To;
+			Black_Bishops ^= To;
+			Black_Knights |= To;
+			Black_Knights ^= To;
+			Black_Pawns |= To;
+			Black_Pawns ^= To;			
+		}
 	    }
 	    if(White_Knights & From)
 		{
 		White_Knights ^= From;
 		White_Knights |= To;
+		if(Black_Pieces & To)
+		{
+			Black_Pieces ^= To;
+			Black_Queens |= To;
+			Black_Queens ^= To;
+			Black_Rooks |= To;
+			Black_Rooks ^= To;
+			Black_Bishops |= To;
+			Black_Bishops ^= To;
+			Black_Knights |= To;
+			Black_Knights ^= To;
+			Black_Pawns |= To;
+			Black_Pawns ^= To;			
+		}
 	    }
 	    if(White_Bishops & From)
 		{
 		White_Bishops ^= From;
 		White_Bishops |= To;
+		if(Black_Pieces & To)
+		{
+			Black_Pieces ^= To;
+			Black_Queens |= To;
+			Black_Queens ^= To;
+			Black_Rooks |= To;
+			Black_Rooks ^= To;
+			Black_Bishops |= To;
+			Black_Bishops ^= To;
+			Black_Knights |= To;
+			Black_Knights ^= To;
+			Black_Pawns |= To;
+			Black_Pawns ^= To;			
+		}
 	    }
 	    if(White_Pawns & From)
 		{
 		White_Pawns ^= From;
 		White_Pawns |= To;
+		if(Black_Pieces & To)
+		{
+			Black_Pieces ^= To;
+			Black_Queens |= To;
+			Black_Queens ^= To;
+			Black_Rooks |= To;
+			Black_Rooks ^= To;
+			Black_Bishops |= To;
+			Black_Bishops ^= To;
+			Black_Knights |= To;
+			Black_Knights ^= To;
+			Black_Pawns |= To;
+			Black_Pawns ^= To;			
+		}
 	    }
 	    if(White_King & From)
 		{
 		White_King ^= From;
 		White_King |= To;
+		if(Black_Pieces & To)
+		{
+			Black_Pieces ^= To;
+			Black_Queens |= To;
+			Black_Queens ^= To;
+			Black_Rooks |= To;
+			Black_Rooks ^= To;
+			Black_Bishops |= To;
+			Black_Bishops ^= To;
+			Black_Knights |= To;
+			Black_Knights ^= To;
+			Black_Pawns |= To;
+			Black_Pawns ^= To;			
+		}
 	    }
 	    if(White_Queens & From)
 		{
 		White_Queens ^= From;
 		White_Queens |= To;
+		if(Black_Pieces & To)
+		{
+			Black_Pieces ^= To;
+			Black_Queens |= To;
+			Black_Queens ^= To;
+			Black_Rooks |= To;
+			Black_Rooks ^= To;
+			Black_Bishops |= To;
+			Black_Bishops ^= To;
+			Black_Knights |= To;
+			Black_Knights ^= To;
+			Black_Pawns |= To;
+			Black_Pawns ^= To;			
+		}
 	    }
 	}
 	else
@@ -486,33 +797,150 @@ int Parse_Moves(string First, string Second, char Promotion_Type)
 		{
 		Black_Rooks ^= From;
 		Black_Rooks |= To;
+		if(White_Pieces & To)
+		{
+			White_Pieces ^= To;
+			White_Queens |= To;
+			White_Queens ^= To;
+			White_Rooks |= To;
+			White_Rooks ^= To;
+			White_Bishops |= To;
+			White_Bishops ^= To;
+			White_Knights |= To;
+			White_Knights ^= To;
+			White_Pawns |= To;
+			White_Pawns ^= To;			
+		}
 	    }
 	    if(Black_Knights & From)
 		{
 		Black_Knights ^= From;
 		Black_Knights |= To;
+		if(White_Pieces & To)
+		{
+			White_Pieces ^= To;
+			White_Queens |= To;
+			White_Queens ^= To;
+			White_Rooks |= To;
+			White_Rooks ^= To;
+			White_Bishops |= To;
+			White_Bishops ^= To;
+			White_Knights |= To;
+			White_Knights ^= To;
+			White_Pawns |= To;
+			White_Pawns ^= To;			
+		}
 	    }
 	    if(Black_Bishops & From)
 		{
 		Black_Bishops ^= From;
 		Black_Bishops |= To;
+		if(White_Pieces & To)
+		{
+			White_Pieces ^= To;
+			White_Queens |= To;
+			White_Queens ^= To;
+			White_Rooks |= To;
+			White_Rooks ^= To;
+			White_Bishops |= To;
+			White_Bishops ^= To;
+			White_Knights |= To;
+			White_Knights ^= To;
+			White_Pawns |= To;
+			White_Pawns ^= To;			
+		}
 	    }
 	    if(Black_Pawns & From)
 		{
 		Black_Pawns ^= From;
 		Black_Pawns |= To;
+		if(White_Pieces & To)
+		{
+			White_Pieces ^= To;
+			White_Queens |= To;
+			White_Queens ^= To;
+			White_Rooks |= To;
+			White_Rooks ^= To;
+			White_Bishops |= To;
+			White_Bishops ^= To;
+			White_Knights |= To;
+			White_Knights ^= To;
+			White_Pawns |= To;
+			White_Pawns ^= To;			
+		}
 	    }
 	    if(Black_King & From)
 		{
 		Black_King ^= From;
 		Black_King |= To;
+		if(White_Pieces & To)
+		{
+			White_Pieces ^= To;
+			White_Queens |= To;
+			White_Queens ^= To;
+			White_Rooks |= To;
+			White_Rooks ^= To;
+			White_Bishops |= To;
+			White_Bishops ^= To;
+			White_Knights |= To;
+			White_Knights ^= To;
+			White_Pawns |= To;
+			White_Pawns ^= To;			
+		}
 	    }
 	    if(Black_Queens & From)
 		{
 		Black_Queens ^= From;
 		Black_Queens |= To;
+		if(White_Pieces & To)
+		{
+			White_Pieces ^= To;
+			White_Queens |= To;
+			White_Queens ^= To;
+			White_Rooks |= To;
+			White_Rooks ^= To;
+			White_Bishops |= To;
+			White_Bishops ^= To;
+			White_Knights |= To;
+			White_Knights ^= To;
+			White_Pawns |= To;
+			White_Pawns ^= To;			
+		}
 	    }
 		
 	}
+	string Queen = "q";
+	string Rook = "r";
+	string Bishop = "b";
+	string Knight = "n";
+	if(Promotion_Type == Queen)
+	{
+		if(White_Turn)
+		White_Queens |= To;
+		else
+		Black_Queens |= To;
+	}
+	if(Promotion_Type == Rook)
+	{
+		if(White_Turn)
+		White_Rooks |= To;
+		else
+		Black_Rooks |= To;
+	}
+	if(Promotion_Type == Bishop)
+	{
+		if(White_Turn)
+		White_Bishops |= To;
+		else
+		Black_Bishops |= To;
+	}
+	if(Promotion_Type == Knight)
+	{
+		if(White_Turn)
+		White_Knights |= To;
+		else
+		Black_Knights |= To;
+	}
+	
 return 0;	
 }
