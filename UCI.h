@@ -363,6 +363,7 @@ int Moves_Command()
 		if((Second_Part == a8 && First_Part == a7 && (White_Pawns &  Seventh_Rank_White)) || (Second_Part == b8 && First_Part == b7 && (White_Pawns & Seventh_Rank_White)) || (Second_Part == c8 && First_Part == c7 && (White_Pawns & Seventh_Rank_White)) || (Second_Part == d8 && First_Part == d7 && (White_Pawns & Seventh_Rank_White)) || (Second_Part == e8 && First_Part == e7 && (White_Pawns & Seventh_Rank_White)) || (Second_Part == f8 && First_Part == f7 && (White_Pawns & Seventh_Rank_White)) || (Second_Part == g8 && First_Part == g7 && (White_Pawns & Seventh_Rank_White)) || (Second_Part == h8 && First_Part == h7 && (White_Pawns & Seventh_Rank_White)) || (Second_Part == a1 && First_Part == a2 && (Black_Pawns & Seventh_Rank_Black)) || (Second_Part == b1 && First_Part == b2 && (Black_Pawns & Seventh_Rank_Black)) || (Second_Part == c1 && First_Part == c2 && (Black_Pawns & Seventh_Rank_Black)) || (Second_Part == d1 && First_Part == d2 && (Black_Pawns & Seventh_Rank_Black)) || (Second_Part == e1 && First_Part == e2 && (Black_Pawns & Seventh_Rank_Black)) || (Second_Part == f1 && First_Part == f2 && (Black_Pawns & Seventh_Rank_Black)) || (Second_Part == g1 && First_Part == g2 && (Black_Pawns & Seventh_Rank_Black)) || (Second_Part == h1 && First_Part == h2 && (Black_Pawns & Seventh_Rank_Black)))
 		{
 			cin >> Promotion_Type;
+			Log << Promotion_Type << endl;
 			Parse_Moves(First_Part, Second_Part, Promotion_Type);
 		}
 		
