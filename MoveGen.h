@@ -14,6 +14,9 @@ int Generate_White_Queen_Moves();
 int Generate_Black_Queen_Moves();
 bool White_Is_Legal(Bitboard From_Square, Bitboard To_Square, int Move_Type);//Tests for legality
 bool Black_Is_Legal(Bitboard From_Square, Bitboard To_Square, int Move_Type);//Tests for legality
+bool White_Is_Legal(Bitboard From_Square, Bitboard To_Square);
+bool Black_Is_Legal(Bitboard From_Square, Bitboard To_Square);
+bool Is_Legal;
 
 
 Bitboard White_Move_From_Stack[70];//Move stack is just an array of Bitboards(64-bit integers) containing only one bit set in each--the from square or the to square
@@ -127,6 +130,7 @@ int Stack_White_Knight_Moves() // Puts all the legal knight moves on move stack
 	   	White_Move_Types[White_Move_Spacer - 1] = 4;//Make it a "plain" move
 	   }
     }
+     
 }
 
     }  
@@ -1557,4 +1561,511 @@ switch(Move_Type)
 	else
 	return true;
 } 	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+bool White_Is_Legal(Bitboard From_Square, Bitboard To_Square)
+{
+Bitboard White_Pieces2 = White_Pieces; //Make a copy of all normal bitboards to use in this function
+Bitboard Black_Pieces2 = Black_Pieces; 
+Bitboard White_King2 = White_King;
+Bitboard Black_King2 = Black_King;
+Bitboard White_Queens2 = White_Queens;
+Bitboard White_Rooks2 = White_Rooks;
+Bitboard White_Bishops2 = White_Bishops;
+Bitboard White_Knights2 = White_Knights;
+Bitboard White_Pawns2 = White_Pawns;
+Bitboard Black_Queens2 = Black_Queens;
+Bitboard Black_Rooks2 = Black_Rooks;
+Bitboard Black_Bishops2 = Black_Bishops;
+Bitboard Black_Knights2 = Black_Knights;
+Bitboard Black_Pawns2 = Black_Pawns;
+
+if(White_Pawns & From_Square)
+{
+	
+               	White_Pieces2 |= To_Square;
+               	White_Pieces2 ^= From_Square;
+               	White_Pawns2 |= To_Square;
+               	White_Pawns2 ^= From_Square;
+               	Black_Pieces2 |= To_Square;
+				Black_Pieces2 ^= To_Square;
+				Black_Queens2 |= To_Square; 
+				Black_Queens2 ^= To_Square; 
+				Black_Rooks2 |= To_Square; 
+				Black_Rooks2 ^= To_Square; 
+				Black_Bishops2 |= To_Square; 
+				Black_Bishops2 ^= To_Square; 
+				Black_Knights2 |= To_Square; 
+				Black_Knights2 ^= To_Square; 
+				Black_Pawns2 |= To_Square;  
+				Black_Pawns2  ^= To_Square;
+}
+				
+				
+               	
+               	
+                White_Pieces2 |= To_Square;
+               	White_Pieces2 ^= From_Square;
+               	White_Pawns2 |= To_Square;
+               	White_Pawns2 ^= From_Square;
+               	
+               	
+             if(White_Knights & From_Square)
+			 {  	
+               	White_Pieces2 |= To_Square;
+               	White_Pieces2 ^= From_Square;
+               	White_Knights2 |= To_Square;
+               	White_Knights2 ^= From_Square;
+               	Black_Pieces2 |= To_Square;
+				Black_Pieces2 ^= To_Square;
+				Black_Queens2 |= To_Square; 
+				Black_Queens2 ^= To_Square; 
+				Black_Rooks2 |= To_Square; 
+				Black_Rooks2 ^= To_Square; 
+				Black_Bishops2 |= To_Square; 
+				Black_Bishops2 ^= To_Square; 
+				Black_Knights2 |= To_Square; 
+				Black_Knights2 ^= To_Square; 
+				Black_Pawns2 |= To_Square;  
+				Black_Pawns2  ^= To_Square;
+			}
+			
+				
+				
+				White_Pieces2 |= To_Square;
+               	White_Pieces2 ^= From_Square;
+               	White_Knights2 |= To_Square;
+               	White_Knights2 ^= From_Square;
+               
+				   
+			   if(White_Bishops & From_Square)
+			   {
+				White_Pieces2 |= To_Square;
+               	White_Pieces2 ^= From_Square;
+               	White_Bishops2 |= To_Square;
+               	White_Bishops2 ^= From_Square;
+               	Black_Pieces2 |= To_Square;
+				Black_Pieces2 ^= To_Square;
+				Black_Queens2 |= To_Square; 
+				Black_Queens2 ^= To_Square; 
+				Black_Rooks2 |= To_Square; 
+				Black_Rooks2 ^= To_Square; 
+				Black_Bishops2 |= To_Square; 
+				Black_Bishops2 ^= To_Square; 
+				Black_Knights2 |= To_Square; 
+				Black_Knights2 ^= To_Square; 
+				Black_Pawns2 |= To_Square;  
+				Black_Pawns2  ^= To_Square;
+			   }
+			
+				
+				
+				White_Pieces2 |= To_Square;
+               	White_Pieces2 ^= From_Square;
+               	White_Bishops2 |= To_Square;
+               	White_Bishops2 ^= From_Square;
+               	
+				   
+			if(White_Rooks & From_Square)
+			{
+				White_Pieces2 |= To_Square;
+               	White_Pieces2 ^= From_Square;
+               	White_Rooks2 |= To_Square;
+               	White_Rooks2 ^= From_Square;
+               	Black_Pieces2 |= To_Square;
+				Black_Pieces2 ^= To_Square;
+				Black_Queens2 |= To_Square; 
+				Black_Queens2 ^= To_Square; 
+				Black_Rooks2 |= To_Square; 
+				Black_Rooks2 ^= To_Square; 
+				Black_Bishops2 |= To_Square; 
+				Black_Bishops2 ^= To_Square; 
+				Black_Knights2 |= To_Square; 
+				Black_Knights2 ^= To_Square; 
+				Black_Pawns2 |= To_Square;  
+				Black_Pawns2  ^= To_Square;
+			}
+			
+				
+			
+				White_Pieces2 |= To_Square;
+               	White_Pieces2 ^= From_Square;
+               	White_Rooks2 |= To_Square;
+               	White_Rooks2 ^= From_Square;
+               	
+               	
+               if(White_Queens & From_Square)
+               {
+               	White_Pieces2 |= To_Square;
+               	White_Pieces2 ^= From_Square;
+               	White_Queens2 |= To_Square;
+               	White_Queens2 ^= From_Square;
+               	Black_Pieces2 |= To_Square;
+				Black_Pieces2 ^= To_Square;
+				Black_Queens2 |= To_Square; 
+				Black_Queens2 ^= To_Square; 
+				Black_Rooks2 |= To_Square; 
+				Black_Rooks2 ^= To_Square; 
+				Black_Bishops2 |= To_Square; 
+				Black_Bishops2 ^= To_Square; 
+				Black_Knights2 |= To_Square; 
+				Black_Knights2 ^= To_Square; 
+				Black_Pawns2 |= To_Square;  
+				Black_Pawns2  ^= To_Square; 
+			   }
+			
+				
+				
+				White_Pieces2 |= To_Square;
+               	White_Pieces2 ^= From_Square;
+               	White_Queens2 |= To_Square;
+               	White_Queens2 ^= From_Square;
+               
+				
+			if(White_King & From_Square)
+			{
+				White_Pieces2 |= To_Square;
+               	White_Pieces2 ^= From_Square;
+               	White_King2 |= To_Square;
+               	White_King2 ^= From_Square;
+               	Black_Pieces2 |= To_Square;
+				Black_Pieces2 ^= To_Square;
+				Black_Queens2 |= To_Square; 
+				Black_Queens2 ^= To_Square; 
+				Black_Rooks2 |= To_Square; 
+				Black_Rooks2 ^= To_Square; 
+				Black_Bishops2 |= To_Square; 
+				Black_Bishops2 ^= To_Square; 
+				Black_Knights2 |= To_Square; 
+				Black_Knights2 ^= To_Square; 
+				Black_Pawns2 |= To_Square;  
+				Black_Pawns2  ^= To_Square;
+			}
+			
+				
+			
+				White_Pieces2 |= To_Square;
+               	White_Pieces2 ^= From_Square;
+               	White_King2 |= To_Square;
+               	White_King2 ^= From_Square;
+               
+               	
+               	
+			       
+	int h; 
+	for(int j = 0; j < 64; j++)
+	{
+		if(White_King2 & GeneralBoard[j])//Get the index (0-63) of White's king
+		h = j;
+	}
+	
+	Bitboard BAttacks = Bmagic(h, (White_Pieces2 | Black_Pieces2));
+	Bitboard RAttacks = Rmagic(h, (White_Pieces2 | Black_Pieces2));
+	Bitboard QAttacks = Qmagic(h, (White_Pieces2 | Black_Pieces2));
+	if(BAttacks & (Black_Bishops2))
+	return false;
+	if(RAttacks & (Black_Rooks2))
+	return false;
+	if(QAttacks & (Black_Queens2))
+	return false;
+	if(Knight_Lookup_Table[h] & Black_Knights2)
+	return false;
+	if(King_Lookup_Table[h] & Black_King2)
+	return false;
+	
+	Bitboard Spare = Black_Pawns2;
+	Spare ^= A_Pawn_Mask;
+	Spare ^= A_Pawn_Mask;
+	if((Spare >> 7) & White_King2)
+	return false;
+	
+	Bitboard Spare2 = Black_Pawns2;
+	Spare2 ^= H_Pawn_Mask;
+	Spare2 ^= H_Pawn_Mask;
+	if((Spare2 >> 9) & White_King2)
+	return false;
+	
+	Black_Pawns2 |= A_Pawn_Mask;
+	Black_Pawns2 ^= A_Pawn_Mask; 
+	Black_Pawns2 |= H_Pawn_Mask;
+	Black_Pawns2 ^= H_Pawn_Mask;
+	if(((Black_Pawns2 >> 7) | (Black_Pawns2 >> 9)) & White_King2)
+	return false;
+	
+	else
+	return true;
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+bool Black_Is_Legal(Bitboard From_Square, Bitboard To_Square)
+{
+Bitboard White_Pieces2 = White_Pieces; //Make a copy of all normal bitboards to use in this function
+Bitboard Black_Pieces2 = Black_Pieces; 
+Bitboard White_King2 = White_King;
+Bitboard Black_King2 = Black_King;
+Bitboard White_Queens2 = White_Queens;
+Bitboard White_Rooks2 = White_Rooks;
+Bitboard White_Bishops2 = White_Bishops;
+Bitboard White_Knights2 = White_Knights;
+Bitboard White_Pawns2 = White_Pawns;
+Bitboard Black_Queens2 = Black_Queens;
+Bitboard Black_Rooks2 = Black_Rooks;
+Bitboard Black_Bishops2 = Black_Bishops;
+Bitboard Black_Knights2 = Black_Knights;
+Bitboard Black_Pawns2 = Black_Pawns;
+
+if(Black_Pawns & From_Square)
+{
+	
+               	White_Pieces2 |= To_Square;
+               	White_Pieces2 ^= From_Square;
+               	White_Pawns2 |= To_Square;
+               	White_Pawns2 ^= From_Square;
+               	Black_Pieces2 |= To_Square;
+				Black_Pieces2 ^= To_Square;
+				Black_Queens2 |= To_Square; 
+				Black_Queens2 ^= To_Square; 
+				Black_Rooks2 |= To_Square; 
+				Black_Rooks2 ^= To_Square; 
+				Black_Bishops2 |= To_Square; 
+				Black_Bishops2 ^= To_Square; 
+				Black_Knights2 |= To_Square; 
+				Black_Knights2 ^= To_Square; 
+				Black_Pawns2 |= To_Square;  
+				Black_Pawns2  ^= To_Square;
+}
+				
+				
+               	
+               	
+                White_Pieces2 |= To_Square;
+               	White_Pieces2 ^= From_Square;
+               	White_Pawns2 |= To_Square;
+               	White_Pawns2 ^= From_Square;
+               	
+               	
+             if(Black_Knights & From_Square)
+			 {  	
+               	White_Pieces2 |= To_Square;
+               	White_Pieces2 ^= From_Square;
+               	White_Knights2 |= To_Square;
+               	White_Knights2 ^= From_Square;
+               	Black_Pieces2 |= To_Square;
+				Black_Pieces2 ^= To_Square;
+				Black_Queens2 |= To_Square; 
+				Black_Queens2 ^= To_Square; 
+				Black_Rooks2 |= To_Square; 
+				Black_Rooks2 ^= To_Square; 
+				Black_Bishops2 |= To_Square; 
+				Black_Bishops2 ^= To_Square; 
+				Black_Knights2 |= To_Square; 
+				Black_Knights2 ^= To_Square; 
+				Black_Pawns2 |= To_Square;  
+				Black_Pawns2  ^= To_Square;
+			}
+			
+				
+				
+				White_Pieces2 |= To_Square;
+               	White_Pieces2 ^= From_Square;
+               	White_Knights2 |= To_Square;
+               	White_Knights2 ^= From_Square;
+               
+				   
+			   if(Black_Bishops & From_Square)
+			   {
+				White_Pieces2 |= To_Square;
+               	White_Pieces2 ^= From_Square;
+               	White_Bishops2 |= To_Square;
+               	White_Bishops2 ^= From_Square;
+               	Black_Pieces2 |= To_Square;
+				Black_Pieces2 ^= To_Square;
+				Black_Queens2 |= To_Square; 
+				Black_Queens2 ^= To_Square; 
+				Black_Rooks2 |= To_Square; 
+				Black_Rooks2 ^= To_Square; 
+				Black_Bishops2 |= To_Square; 
+				Black_Bishops2 ^= To_Square; 
+				Black_Knights2 |= To_Square; 
+				Black_Knights2 ^= To_Square; 
+				Black_Pawns2 |= To_Square;  
+				Black_Pawns2  ^= To_Square;
+			   }
+			
+				
+				
+				White_Pieces2 |= To_Square;
+               	White_Pieces2 ^= From_Square;
+               	White_Bishops2 |= To_Square;
+               	White_Bishops2 ^= From_Square;
+               	
+				   
+			if(Black_Rooks & From_Square)
+			{
+				White_Pieces2 |= To_Square;
+               	White_Pieces2 ^= From_Square;
+               	White_Rooks2 |= To_Square;
+               	White_Rooks2 ^= From_Square;
+               	Black_Pieces2 |= To_Square;
+				Black_Pieces2 ^= To_Square;
+				Black_Queens2 |= To_Square; 
+				Black_Queens2 ^= To_Square; 
+				Black_Rooks2 |= To_Square; 
+				Black_Rooks2 ^= To_Square; 
+				Black_Bishops2 |= To_Square; 
+				Black_Bishops2 ^= To_Square; 
+				Black_Knights2 |= To_Square; 
+				Black_Knights2 ^= To_Square; 
+				Black_Pawns2 |= To_Square;  
+				Black_Pawns2  ^= To_Square;
+			}
+			
+				
+			
+				White_Pieces2 |= To_Square;
+               	White_Pieces2 ^= From_Square;
+               	White_Rooks2 |= To_Square;
+               	White_Rooks2 ^= From_Square;
+               	
+               	
+               if(Black_Queens & From_Square)
+               {
+               	White_Pieces2 |= To_Square;
+               	White_Pieces2 ^= From_Square;
+               	White_Queens2 |= To_Square;
+               	White_Queens2 ^= From_Square;
+               	Black_Pieces2 |= To_Square;
+				Black_Pieces2 ^= To_Square;
+				Black_Queens2 |= To_Square; 
+				Black_Queens2 ^= To_Square; 
+				Black_Rooks2 |= To_Square; 
+				Black_Rooks2 ^= To_Square; 
+				Black_Bishops2 |= To_Square; 
+				Black_Bishops2 ^= To_Square; 
+				Black_Knights2 |= To_Square; 
+				Black_Knights2 ^= To_Square; 
+				Black_Pawns2 |= To_Square;  
+				Black_Pawns2  ^= To_Square; 
+			   }
+			
+				
+				
+				White_Pieces2 |= To_Square;
+               	White_Pieces2 ^= From_Square;
+               	White_Queens2 |= To_Square;
+               	White_Queens2 ^= From_Square;
+               
+				
+			if(Black_King & From_Square)
+			{
+				White_Pieces2 |= To_Square;
+               	White_Pieces2 ^= From_Square;
+               	White_King2 |= To_Square;
+               	White_King2 ^= From_Square;
+               	Black_Pieces2 |= To_Square;
+				Black_Pieces2 ^= To_Square;
+				Black_Queens2 |= To_Square; 
+				Black_Queens2 ^= To_Square; 
+				Black_Rooks2 |= To_Square; 
+				Black_Rooks2 ^= To_Square; 
+				Black_Bishops2 |= To_Square; 
+				Black_Bishops2 ^= To_Square; 
+				Black_Knights2 |= To_Square; 
+				Black_Knights2 ^= To_Square; 
+				Black_Pawns2 |= To_Square;  
+				Black_Pawns2  ^= To_Square;
+			}
+			
+				
+			
+				White_Pieces2 |= To_Square;
+               	White_Pieces2 ^= From_Square;
+               	White_King2 |= To_Square;
+               	White_King2 ^= From_Square;
+               
+               	
+               	
+			       
+	int h; 
+	for(int j = 0; j < 64; j++)
+	{
+		if(Black_King2 & GeneralBoard[j])//Get the index (0-63) of White's king
+		h = j;
+	}
+	
+	Bitboard BAttacks = Bmagic(h, (White_Pieces2 | Black_Pieces2));
+	Bitboard RAttacks = Rmagic(h, (White_Pieces2 | Black_Pieces2));
+	Bitboard QAttacks = Qmagic(h, (White_Pieces2 | Black_Pieces2));
+	if(BAttacks & (White_Bishops2))
+	return false;
+	if(RAttacks & (White_Rooks2))
+	return false;
+	if(QAttacks & (White_Queens2))
+	return false;
+	if(Knight_Lookup_Table[h] & White_Knights2)
+	return false;
+	if(King_Lookup_Table[h] & White_King2)
+	return false;
+	
+	Bitboard Spare = White_Pawns2;
+	Spare ^= A_Pawn_Mask;
+	Spare ^= A_Pawn_Mask;
+	if((Spare >> 7) & Black_King2)
+	return false;
+	
+	Bitboard Spare2 = White_Pawns2;
+	Spare2 ^= H_Pawn_Mask;
+	Spare2 ^= H_Pawn_Mask;
+	if((Spare2 >> 9) & Black_King2)
+	return false;
+	
+	White_Pawns2 |= A_Pawn_Mask;
+	White_Pawns2 ^= A_Pawn_Mask; 
+	White_Pawns2 |= H_Pawn_Mask;
+	White_Pawns2 ^= H_Pawn_Mask;
+	if(((White_Pawns2 >> 7) | (White_Pawns2 >> 9)) & Black_King2)
+	return false;
+	
+	else
+	return true;
+} 
 #endif//MoveGen.h
