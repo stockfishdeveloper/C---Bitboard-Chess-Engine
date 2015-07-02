@@ -958,3 +958,4 @@ int Parse_Moves(string First, string Second, string Promotion_Type)
 	
 return 0;	
 }
+
