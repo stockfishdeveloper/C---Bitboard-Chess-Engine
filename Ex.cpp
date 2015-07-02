@@ -5,6 +5,7 @@ using namespace std;
 #include <fstream>//For writing the game to a text file
 ofstream Log("Log.txt");
 bool Current_Turn = true;
+bool White_Turn = true;
 #include "magicmoves.c"//Pradu's Magic Bitboards
 #include "Bitboard.h"
 #include "MoveGen.h"
@@ -14,7 +15,6 @@ bool Current_Turn = true;
 int main()
 {
 initmagicmoves();//Thanks, Pradu
-
 CheckUci();
 
 
