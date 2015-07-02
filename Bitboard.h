@@ -15,6 +15,8 @@ Bitboard GeneralBoard[64] = {
     };
 Bitboard Eigth_Rank_White = 18374686479671623680ULL;//For masking out pawn pushes to the eagth rank for each side--white and black
 Bitboard Eigth_Rank_Black = 255;//See last comment
+Bitboard Seventh_Rank_White = 71776119061217280;//For masking out pawn pushes to the eagth rank for each side--white and black
+Bitboard Seventh_Rank_Black = 65280;//See last comment
 Bitboard White_Pieces;
 Bitboard Black_Pieces;
 Bitboard White_King;
@@ -59,7 +61,7 @@ Bitboard King_Lookup_Table[64] = {
  Bitboard A_Pawn_Mask = 282578800148736;//Same as last comment
 
 //Contains a string representation of the squares of the chess board; for example, the 0th element in the array is "a1"
-string PlayerMoves[64] = 
+const string PlayerMoves[64] = 
 {
 
 "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1", 
@@ -79,6 +81,9 @@ string PlayerMoves[64] =
 "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8"
 
 };
+
+bool White_Is_In_Check = false;
+bool Black_Is_In_Check = false;
 
 #endif//Bitboard.h
 
