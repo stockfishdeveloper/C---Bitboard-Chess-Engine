@@ -16,7 +16,7 @@
         if(White_Move_Spacer == 1)//If there is only one mve, then force the program to play it
         q = 0; 
         if(White_Move_Spacer == 0)//If q = 0, then white loses
-         cin >> q; //To let the user know that the game finished
+         return 0; //To let the user know that the game finished
         for( int h = 0; h < 64; h++)
         {
         	if(GeneralBoard[h] & White_Move_From_Stack[q])//Get the index in GeneralBoard[] of the square the current pieces is moving from
@@ -237,6 +237,7 @@
 			    White_Queen_Spacer = 0;
 			    White_Move_Spacer = 0;
 			    Current_Turn = false;
+			    White_Turn = false;
 			    return 0;			   
             }           	 
 				 
@@ -245,8 +246,8 @@
 		
 		//Pretty much the same as White's MakeMove()
 		int MakeBlackMove()
-		{		 
-				  srand(static_cast<unsigned int>(time(0)));
+		{	
+		  srand(static_cast<unsigned int>(time(0)));
 
         int randomNumber = rand();
 		int q;
@@ -256,15 +257,15 @@
         q = 0;
         if(Black_Move_Spacer == 0)
         cin >> q;
-        for( int h = 0; h < 64; h++)
+        for(int y = 0; y < 64; y++)
         {
-        	if(GeneralBoard[h] & Black_Move_From_Stack[q])
+        	if(GeneralBoard[y] & Black_Move_From_Stack[q])
         	{
-        	cout << "bestmove " << PlayerMoves[h]; 
-        	///Log << "bestmove " << PlayerMoves[h];
+        	cout << "bestmove " << PlayerMoves[y]; 
+        	//Log << "bestmove " << PlayerMoves[h];
         }
 		}
-		for( int h = 0; h < 64; h++)
+		for(int h = 0; h < 64; h++)
         {
         	if(GeneralBoard[h] & Black_Move_To_Stack[q])
         	{
@@ -469,6 +470,7 @@
 			    Black_Queen_Spacer = 0;
 			    Black_Move_Spacer = 0;
 			    Current_Turn = true;
+			    White_Turn = true;
 			    return 0;
               }              
 #endif
