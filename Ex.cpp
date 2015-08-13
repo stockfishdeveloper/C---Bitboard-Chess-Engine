@@ -10,6 +10,7 @@ bool White_Turn = true;
 #include "Bitboard.h"
 #include "MoveGen.h"
 #include "MakeMove.h"
+#include "Search.h"
 #include "UCI.h"
 
 int main()
