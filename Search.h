@@ -14,7 +14,6 @@ Bitboard Black_Rooks2 = Black_Rooks;
 Bitboard Black_Bishops2 = Black_Bishops;
 Bitboard Black_Knights2 = Black_Knights;
 Bitboard Black_Pawns2 = Black_Pawns;
-
 class Move
 {
 	public:
@@ -29,8 +28,8 @@ class Move
 		Bitboard Black_Temp_Move_To_Stack[70];
 		int White_Temp_Move_Types[70];
 		int Black_Temp_Move_Types[70];
-		int White_Temp_Move_Spacer; 
-		int Black_Temp_Move_Spacer;
+		int White_Temp_Move_Spacer = 0; 
+		int Black_Temp_Move_Spacer = 0;
 		
 		Bitboard White_Pieces3; 
 		Bitboard Black_Pieces3; 
@@ -90,19 +89,19 @@ int Move::Undo_Move()
 				White_Move_From_Stack[h] = White_Temp_Move_From_Stack[h];
 				White_Move_To_Stack[h] = White_Temp_Move_To_Stack[h];
 				White_Move_Types[h] = White_Temp_Move_Types[h];
-				cout << "Restoring white.... " << h << endl;
+				//cout << "Restoring white.... " << h << endl;
 			}
-			cout << "In between!" << endl;
+			
 	for(int h = 0; h < Black_Temp_Move_Spacer; h++)
 	{
 		Black_Move_From_Stack[h] = Black_Temp_Move_From_Stack[h];
 		Black_Move_To_Stack[h] = Black_Temp_Move_To_Stack[h];
 		Black_Move_Types[h] = Black_Temp_Move_Types[h];
-		cout << "Restoring black...." << endl;
+		//cout << "Restoring black...." << h << endl;
 	}
 	Current_Turn ^= 1;
 	White_Turn ^= 1;
-	cout << "Undoing move...." << endl;
+	//cout << "Undoing move...." << endl;
 	return 0;
 }
 
@@ -128,46 +127,51 @@ int Nodes;
 
 int Search(int depth)
 {
-	
+	//cout << "\b\b\b\b\b\b\b\b\b" << ++Nodes;
 	//depth--;
 	if(White_Turn)
-	{cout << "In white search!" << endl;
+	{//cout << "In white search!" << endl;
 		Generate_White_Knight_Moves();
 		Generate_White_King_Moves();
 		Generate_White_Pawn_Moves();
 		Generate_White_Rook_Moves();
 		Generate_White_Bishop_Moves();
 		Generate_White_Queen_Moves();
-		for(int i = 0; i < White_Move_Spacer; i++)
-		{//cout << ++Nodes << endl;
-			Move move;
-			move.From = White_Move_From_Stack[i];
-			move.To = White_Move_To_Stack[i];
-			move.Move_Type = White_Move_Types[i];
-			move.White_Temp_Move_Spacer = White_Move_Spacer;
-			for(int h = 0; h < White_Move_Spacer; h++)
+		Move move;
+		move.White_Temp_Move_Spacer = White_Move_Spacer;
+		//cout << move.White_Temp_Move_Spacer << endl;
+		for(int h = 0; h < White_Move_Spacer; h++)
 			{
 				move.White_Temp_Move_From_Stack[h] = White_Move_From_Stack[h];
 				move.White_Temp_Move_To_Stack[h] = White_Move_To_Stack[h];
 				move.White_Temp_Move_Types[h] = White_Move_Types[h];
 			}
+		for(int i = 0; i < White_Move_Spacer; i++)
+		{ ++Nodes;
+			Log << cout << "Making white's " << i << "th move" << endl; 
+			move.From = White_Move_From_Stack[i];
+			move.To = White_Move_To_Stack[i];
+			move.Move_Type = White_Move_Types[i];
+			
+			
 			Make_White_Search_Move(White_Move_From_Stack[i], White_Move_To_Stack[i], White_Move_Types[i]);
 			
 			if(depth == 1)
-			{cout << "Hit white bottom!" << endl;
+			{//cout << "Hit white bottom!" << endl;
 			int Temp = Evaluate_Position();
 			if(Temp > Pos_Score)
 			{
 				Best_Move = i;
+				Pos_Score = Temp;
 			}
 			move.Undo_Move();
-			cout << "Made it!" << endl;
-			return 0;
+			//cout << "Made it!" << endl;
+			continue;
 			}
 			
 			Search(depth - 1);
 			move.Undo_Move();
-			cout << "Undid white move!" << endl;	
+			//cout << "Undid white move!" << endl;	
 		
 		
 		}
@@ -176,45 +180,50 @@ int Search(int depth)
 	
 	else
 	{
-	
-	cout << "In black search!" << endl;
+	//cout << "\b\b\b\b\b\b\b\b\b" << Nodes;
+	//cout << "In black search!" << endl;
 		Generate_Black_Knight_Moves();
 		Generate_Black_King_Moves();
 		Generate_Black_Pawn_Moves();
 		Generate_Black_Rook_Moves();
 		Generate_Black_Bishop_Moves();
 		Generate_Black_Queen_Moves();
-		for(int i = 0; i < Black_Move_Spacer; i++)
-		{//cout << ++Nodes << endl;
-			Move move;
-			move.From = Black_Move_From_Stack[i];
-			move.To = Black_Move_To_Stack[i];
-			move.Move_Type = Black_Move_Types[i];
-			move.Black_Temp_Move_Spacer = Black_Move_Spacer;
-			for(int h = 0; h < Black_Move_Spacer; h++)
+		Move move;
+		move.Black_Temp_Move_Spacer = Black_Move_Spacer;
+		
+		for(int h = 0; h < Black_Move_Spacer; h++)
 			{
 				move.Black_Temp_Move_From_Stack[h] = Black_Move_From_Stack[h];
 				move.Black_Temp_Move_To_Stack[h] = Black_Move_To_Stack[h];
 				move.Black_Temp_Move_Types[h] = Black_Move_Types[h];
 			}
+		for(int i = 0; i < Black_Move_Spacer; i++)
+		{ ++Nodes;
+			Log << "Making black's " << i << "th move" << endl; 
+			move.From = Black_Move_From_Stack[i];
+			move.To = Black_Move_To_Stack[i];
+			move.Move_Type = Black_Move_Types[i];
+			
+			
 			Make_Black_Search_Move(Black_Move_From_Stack[i], Black_Move_To_Stack[i], Black_Move_Types[i]);
 			
 						
 			if(depth == 1)
 			{
-				cout << "Hit black bottom!" << endl;
+				//cout << "Hit black bottom!" << endl;
 			int Temp = Evaluate_Position();
-			if(Temp > Pos_Score)
+			if(Temp < Pos_Score)
 			{
 				Best_Move = i;
+				Pos_Score = Temp;
 			}
 			move.Undo_Move();
-			cout << "Made it!" << endl;
-			return 0;
+			//cout << "Made it!" << endl;
+			continue;
 			}
 			Search(depth - 1);
 			move.Undo_Move();	
-		cout << "Undid black move!" << endl;
+		//cout << "Undid black move!" << endl;
 			
 		
 		}
@@ -224,7 +233,8 @@ int Search(int depth)
 }
 
 int Make_White_Search_Move(Bitboard From, Bitboard To, int Move_Type)
-{cout << "Making white move..." << endl;
+{//cout << "Making white move..." << endl;
+//cout << "\b\b\b\b\b\b\b\b\b" << ++Nodes;
 	switch(Move_Type)//This switch evaluates the type of move that accompanies the index of the move stack that q refers to
                { 
                
@@ -234,18 +244,18 @@ int Make_White_Search_Move(Bitboard From, Bitboard To, int Move_Type)
                	White_Pawns2 |= To;
                	White_Pawns2 ^= From;
                	Black_Pieces2 |= To;//Do the same for the black pieces because it is a capture: we have to remove a black piece
-				Black_Pieces2 ^= To;
-				Black_Queens2 |= To; 
-				Black_Queens2 ^= To; 
-				Black_Rooks2 |= To; 
-				Black_Rooks2 ^= To; 
-				Black_Bishops2 |= To; 
-				Black_Bishops2 ^= To; 
-				Black_Knights2 |= To; 
-				Black_Knights2 ^= To; 
-				Black_Pawns2 |= To;  
-				Black_Pawns2  ^= To; 
-				break;
+		Black_Pieces2 ^= To;
+		Black_Queens2 |= To; 
+		Black_Queens2 ^= To; 
+		Black_Rooks2 |= To; 
+		Black_Rooks2 ^= To; 
+		Black_Bishops2 |= To; 
+		Black_Bishops2 ^= To; 
+		Black_Knights2 |= To; 
+		Black_Knights2 ^= To; 
+		Black_Pawns2 |= To;  
+		Black_Pawns2  ^= To; 
+		break;
 				
                	
                	case 2://"Plain" pawn push: one square
@@ -262,73 +272,73 @@ int Make_White_Search_Move(Bitboard From, Bitboard To, int Move_Type)
                	White_Knights2 |= To;
                	White_Knights2 ^= From;
                	Black_Pieces2 |= To;
-				Black_Pieces2 ^= To;
-				Black_Queens2 |= To; 
-				Black_Queens2 ^= To; 
-				Black_Rooks2 |= To; 
-				Black_Rooks2 ^= To; 
-				Black_Bishops2 |= To; 
-				Black_Bishops2 ^= To; 
-				Black_Knights2 |= To; 
-				Black_Knights2 ^= To; 
-				Black_Pawns2 |= To;  
-				Black_Pawns2  ^= To; 
-				break;
+		Black_Pieces2 ^= To;
+		Black_Queens2 |= To; 
+		Black_Queens2 ^= To; 
+		Black_Rooks2 |= To; 
+		Black_Rooks2 ^= To; 
+		Black_Bishops2 |= To; 
+		Black_Bishops2 ^= To; 
+		Black_Knights2 |= To; 
+		Black_Knights2 ^= To; 
+		Black_Pawns2 |= To;  
+		Black_Pawns2  ^= To; 
+		break;
 				
-				case 4://Plain knight move
-				White_Pieces2 |= To;
+		case 4://Plain knight move
+		White_Pieces2 |= To;
                	White_Pieces2 ^= From;
                	White_Knights2 |= To;
                	White_Knights2 ^= From;
                	break;
 				   
-			    case 5://Bishop capture
-				White_Pieces2 |= To;
+	        case 5://Bishop capture
+		White_Pieces2 |= To;
                	White_Pieces2 ^= From;
                	White_Bishops2 |= To;
                	White_Bishops2 ^= From;
                	Black_Pieces2 |= To;
-				Black_Pieces2 ^= To;
-				Black_Queens2 |= To; 
-				Black_Queens2 ^= To; 
-				Black_Rooks2 |= To; 
-				Black_Rooks2 ^= To; 
-				Black_Bishops2 |= To; 
-				Black_Bishops2 ^= To; 
-				Black_Knights2 |= To; 
-				Black_Knights2 ^= To; 
-				Black_Pawns2 |= To;  
-				Black_Pawns2  ^= To; 
-				break;	
+		Black_Pieces2 ^= To;
+		Black_Queens2 |= To; 
+		Black_Queens2 ^= To; 
+		Black_Rooks2 |= To; 
+		Black_Rooks2 ^= To; 
+		Black_Bishops2 |= To; 
+		Black_Bishops2 ^= To; 
+		Black_Knights2 |= To; 
+		Black_Knights2 ^= To; 
+		Black_Pawns2 |= To;  
+		Black_Pawns2  ^= To; 
+		break;	
 				
-				case 6://"Plain" bishop move
-				White_Pieces2 |= To;
+		case 6://"Plain" bishop move
+		White_Pieces2 |= To;
                	White_Pieces2 ^= From;
                	White_Bishops2 |= To;
                	White_Bishops2 ^= From;
                	break;
 				   
-				case 7://Rook capture
-				White_Pieces2 |= To;
+		case 7://Rook capture
+		White_Pieces2 |= To;
                	White_Pieces2 ^= From;
                	White_Rooks2 |= To;
                	White_Rooks2 ^= From;
                	Black_Pieces2 |= To;
-				Black_Pieces2 ^= To;
-				Black_Queens2 |= To; 
-				Black_Queens2 ^= To; 
-				Black_Rooks2 |= To; 
-				Black_Rooks2 ^= To; 
-				Black_Bishops2 |= To; 
-				Black_Bishops2 ^= To; 
-				Black_Knights2 |= To; 
-				Black_Knights2 ^= To; 
-				Black_Pawns2 |= To;  
-				Black_Pawns2  ^= To; 
-				break;
+		Black_Pieces2 ^= To;
+		Black_Queens2 |= To; 
+		Black_Queens2 ^= To; 
+		Black_Rooks2 |= To; 
+		Black_Rooks2 ^= To; 
+		Black_Bishops2 |= To; 
+		Black_Bishops2 ^= To; 
+		Black_Knights2 |= To; 
+		Black_Knights2 ^= To; 
+		Black_Pawns2 |= To;  
+		Black_Pawns2  ^= To; 
+		break;
 				
-				case 8://"Plain" rook move
-				White_Pieces2 |= To;
+		case 8://"Plain" rook move
+		White_Pieces2 |= To;
                	White_Pieces2 ^= From;
                	White_Rooks2 |= To;
                	White_Rooks2 ^= From;
@@ -340,72 +350,72 @@ int Make_White_Search_Move(Bitboard From, Bitboard To, int Move_Type)
                	White_Queens2 |= To;
                	White_Queens2 ^= From;
                	Black_Pieces2 |= To;
-				Black_Pieces2 ^= To;
-				Black_Queens2 |= To; 
-				Black_Queens2 ^= To; 
-				Black_Rooks2 |= To; 
-				Black_Rooks2 ^= To; 
-				Black_Bishops2 |= To; 
-				Black_Bishops2 ^= To; 
-				Black_Knights2 |= To; 
-				Black_Knights2 ^= To; 
-				Black_Pawns2 |= To;  
-				Black_Pawns2  ^= To; 
-				break;
+		Black_Pieces2 ^= To;
+		Black_Queens2 |= To; 
+		Black_Queens2 ^= To; 
+		Black_Rooks2 |= To; 
+		Black_Rooks2 ^= To; 
+		Black_Bishops2 |= To; 
+		Black_Bishops2 ^= To; 
+		Black_Knights2 |= To; 
+		Black_Knights2 ^= To; 
+		Black_Pawns2 |= To;  
+		Black_Pawns2  ^= To; 
+		break;
 				
-				case 10://"Plain" queen move
-				White_Pieces2 |= To;
+		case 10://"Plain" queen move
+		White_Pieces2 |= To;
                	White_Pieces2 ^= From;
                	White_Queens2 |= To;
                	White_Queens2 ^= From;
                	break;
 				
-				case 11://King capture
-				White_Pieces2 |= To;
+		case 11://King capture
+		White_Pieces2 |= To;
                	White_Pieces2 ^= From;
                	White_King2 |= To;
                	White_King2 ^= From;
                	Black_Pieces2 |= To;
-				Black_Pieces2 ^= To;
-				Black_Queens2 |= To; 
-				Black_Queens2 ^= To; 
-				Black_Rooks2 |= To; 
-				Black_Rooks2 ^= To; 
-				Black_Bishops2 |= To; 
-				Black_Bishops2 ^= To; 
-				Black_Knights2 |= To; 
-				Black_Knights2 ^= To; 
-				Black_Pawns2 |= To;  
-				Black_Pawns2  ^= To; 
-				break; 
+		Black_Pieces2 ^= To;
+		Black_Queens2 |= To; 
+		Black_Queens2 ^= To; 
+		Black_Rooks2 |= To; 
+		Black_Rooks2 ^= To; 
+		Black_Bishops2 |= To; 
+		Black_Bishops2 ^= To; 
+		Black_Knights2 |= To; 
+		Black_Knights2 ^= To; 
+		Black_Pawns2 |= To;  
+		Black_Pawns2  ^= To; 
+		break; 
 				
-				case 12://"Plain" king move
-				White_Pieces2 |= To;
+		case 12://"Plain" king move
+		White_Pieces2 |= To;
                	White_Pieces2 ^= From;
                	White_King2 |= To;
                	White_King2 ^= From;
                	break;
 				   
-				case 13://Pawn promotion with capture; automatically promotes to queen
-			    White_Pawns2 ^= From;
-				White_Pieces2 |= To;
+		case 13://Pawn promotion with capture; automatically promotes to queen
+	        White_Pawns2 ^= From;
+		White_Pieces2 |= To;
                	White_Pieces2 ^= From;
                	White_Queens2 |= To;
                	Black_Pieces2 |= To;
-				Black_Pieces2 ^= To;
-				Black_Queens2 |= To; 
-				Black_Queens2 ^= To; 
-				Black_Rooks2 |= To; 
-				Black_Rooks2 ^= To; 
-				Black_Bishops2 |= To; 
-				Black_Bishops2 ^= To; 
-				Black_Knights2 |= To; 
-				Black_Knights2 ^= To; 
-				break; 
+		Black_Pieces2 ^= To;
+		Black_Queens2 |= To; 
+		Black_Queens2 ^= To; 
+		Black_Rooks2 |= To; 
+		Black_Rooks2 ^= To; 
+		Black_Bishops2 |= To; 
+		Black_Bishops2 ^= To; 
+		Black_Knights2 |= To; 
+		Black_Knights2 ^= To; 
+		break; 
 				
-				case 14://"Plain" pawn promotion
-			    White_Pawns2 ^= From;
-				White_Pieces2 |= To;
+		case 14://"Plain" pawn promotion
+		White_Pawns2 ^= From;
+		White_Pieces2 |= To;
                	White_Pieces2 ^= From;
                	White_Queens2 |= To;
                	break;	
@@ -414,7 +424,7 @@ int Make_White_Search_Move(Bitboard From, Bitboard To, int Move_Type)
 			   }
                  
                  //Tidy up for the next call of the move generation functions
-				 for(int t = 0; t < White_Move_Spacer; t++)               
+		 for(int t = 0; t < White_Move_Spacer; t++)               
                {
                	 White_Move_From_Stack[t] = 0;//Clear the move from stack
                	 White_Move_To_Stack[t] = 0;//Clear the move to stack
@@ -436,7 +446,8 @@ int Make_White_Search_Move(Bitboard From, Bitboard To, int Move_Type)
 
 
 int Make_Black_Search_Move(Bitboard From, Bitboard To, int Move_Type)
-{cout << "Making black move..." << endl;
+{//cout << "Making black move..." << endl;
+//cout << "\b\b\b\b\b\b\b\b\b" << ++Nodes;
 	switch(Move_Type)//This switch evaluates the type of move that accompanies the index of the move stack that q refers to
                { 
                
@@ -446,18 +457,18 @@ int Make_Black_Search_Move(Bitboard From, Bitboard To, int Move_Type)
                	Black_Pawns2 |= To;
                	Black_Pawns2 ^= From;
                	White_Pieces2 |= To;//Do the same for the black pieces because it is a capture: we have to remove a black piece
-				White_Pieces2 ^= To;
-				White_Queens2 |= To; 
-				White_Queens2 ^= To; 
-				White_Rooks2 |= To; 
-				White_Rooks2 ^= To; 
-				White_Bishops2 |= To; 
-				White_Bishops2 ^= To; 
-				White_Knights2 |= To; 
-				White_Knights2 ^= To; 
-				White_Pawns2 |= To;  
-				White_Pawns2  ^= To; 
-				break;
+		White_Pieces2 ^= To;
+		White_Queens2 |= To; 
+		White_Queens2 ^= To; 
+		White_Rooks2 |= To; 
+		White_Rooks2 ^= To; 
+		White_Bishops2 |= To; 
+		White_Bishops2 ^= To; 
+		White_Knights2 |= To; 
+		White_Knights2 ^= To; 
+		White_Pawns2 |= To;  
+		White_Pawns2  ^= To; 
+		break;
 				
                	
                	case 2://"Plain" pawn push: one square
@@ -474,73 +485,73 @@ int Make_Black_Search_Move(Bitboard From, Bitboard To, int Move_Type)
                	Black_Knights2 |= To;
                	Black_Knights2 ^= From;
                	White_Pieces2 |= To;
-				White_Pieces2 ^= To;
-				White_Queens2 |= To;
-				White_Queens2 ^= To; 
-				White_Rooks2 |= To; 
-				White_Rooks2 ^= To; 
-				White_Bishops2 |= To; 
-				White_Bishops2 ^= To; 
-				White_Knights2 |= To; 
-				White_Knights2 ^= To; 
-				White_Pawns2 |= To;  
-				White_Pawns2  ^= To; 
-				break;
+		White_Pieces2 ^= To;
+		White_Queens2 |= To;
+		White_Queens2 ^= To; 
+		White_Rooks2 |= To; 
+		White_Rooks2 ^= To; 
+		White_Bishops2 |= To; 
+		White_Bishops2 ^= To; 
+		White_Knights2 |= To; 
+		White_Knights2 ^= To; 
+		White_Pawns2 |= To;  
+		White_Pawns2  ^= To; 
+		break;
 				
-				case 4://"Plain" knight move
-				Black_Pieces2 |= To;
+		case 4://"Plain" knight move
+		Black_Pieces2 |= To;
                	Black_Pieces2 ^= From;
                	Black_Knights2 |= To;
                	Black_Knights2 ^= From;
                	break;
 				   
-			    case 5://Bishop capture
-				Black_Pieces2 |= To;
+		case 5://Bishop capture
+		Black_Pieces2 |= To;
                	Black_Pieces2 ^= From;
                	Black_Bishops2 |= To;
                	Black_Bishops2 ^= From;
                	White_Pieces2 |= To;
-				White_Pieces2 ^= To;
-				White_Queens2 |= To; 
-				White_Queens2 ^= To; 
-				White_Rooks2 |= To; 
-				White_Rooks2 ^= To; 
-				White_Bishops2 |= To; 
-				White_Bishops2 ^= To; 
-				White_Knights2 |= To; 
-				White_Knights2 ^= To; 
-				White_Pawns2 |= To;  
-				White_Pawns2  ^= To; 
-				break;	
+		White_Pieces2 ^= To;
+		White_Queens2 |= To; 
+		White_Queens2 ^= To; 
+		White_Rooks2 |= To; 
+		White_Rooks2 ^= To; 
+		White_Bishops2 |= To; 
+		White_Bishops2 ^= To; 
+		White_Knights2 |= To; 
+		White_Knights2 ^= To; 
+		White_Pawns2 |= To;  
+		White_Pawns2  ^= To; 
+		break;	
 				
-				case 6://"Plain" bishop move
-				Black_Pieces2 |= To;
+		case 6://"Plain" bishop move
+		Black_Pieces2 |= To;
                	Black_Pieces2 ^= From;
                	Black_Bishops2 |= To;
                	Black_Bishops2 ^= From;
                	break;
 				   
-				case 7://Rook capture
-				Black_Pieces2 |= To;
+		case 7://Rook capture
+		Black_Pieces2 |= To;
                	Black_Pieces2 ^= From;
                	Black_Rooks2 |= To;
                	Black_Rooks2 ^= From;
                	White_Pieces2 |= To;
-				White_Pieces2 ^= To;
-				White_Queens2 |= To; 
-				White_Queens2 ^= To; 
-				White_Rooks2 |= To; 
-				White_Rooks2 ^= To; 
-				White_Bishops2 |= To; 
-				White_Bishops2 ^= To; 
-				White_Knights2 |= To; 
-				White_Knights2 ^= To; 
-				White_Pawns2 |= To;  
-				White_Pawns2  ^= To; 
-				break;
+		White_Pieces2 ^= To;
+		White_Queens2 |= To; 
+		White_Queens2 ^= To; 
+		White_Rooks2 |= To; 
+		White_Rooks2 ^= To; 
+		White_Bishops2 |= To; 
+		White_Bishops2 ^= To; 
+		White_Knights2 |= To; 
+		White_Knights2 ^= To; 
+		White_Pawns2 |= To;  
+		White_Pawns2  ^= To; 
+		break;
 				
-				case 8://"Plain" rook move
-				Black_Pieces2 |= To;
+		case 8://"Plain" rook move
+		Black_Pieces2 |= To;
                	Black_Pieces2 ^= From;
                	Black_Rooks2 |= To;
                	Black_Rooks2 ^= From;
@@ -552,72 +563,72 @@ int Make_Black_Search_Move(Bitboard From, Bitboard To, int Move_Type)
                	Black_Queens2 |= To;
                	Black_Queens2 ^= From;
                	White_Pieces2 |= To;
-				White_Pieces2 ^= To;
-				White_Queens2 |= To; 
-				White_Queens2 ^= To; 
-				White_Rooks2 |= To; 
-				White_Rooks2 ^= To; 
-				White_Bishops2 |= To; 
-				White_Bishops2 ^= To; 
-				White_Knights2 |= To; 
-				White_Knights2 ^= To; 
-				White_Pawns2 |= To;  
-				White_Pawns2  ^= To; 
-				break;
+		White_Pieces2 ^= To;
+		White_Queens2 |= To; 
+		White_Queens2 ^= To; 
+		White_Rooks2 |= To; 
+		White_Rooks2 ^= To; 
+		White_Bishops2 |= To; 
+		White_Bishops2 ^= To; 
+		White_Knights2 |= To; 
+		White_Knights2 ^= To; 
+		White_Pawns2 |= To;  
+		White_Pawns2  ^= To; 
+		break;
 				
-				case 10://"Plain" queen move
-				Black_Pieces2 |= To;
+		case 10://"Plain" queen move
+		Black_Pieces2 |= To;
                	Black_Pieces2 ^= From;
                	Black_Queens2 |= To;
                	Black_Queens2 ^= From;
                	break;
 				
-				case 11://King capture
-				Black_Pieces2 |= To;
+		case 11://King capture
+		Black_Pieces2 |= To;
                	Black_Pieces2 ^= From;
                	Black_King2 |= To;
                	Black_King2 ^= From;
                	White_Pieces2 |= To;
-				White_Pieces2 ^= To;
-				White_Queens2 |= To; 
-				White_Queens2 ^= To; 
-				White_Rooks2 |= To; 
-				White_Rooks2 ^= To; 
-				White_Bishops2 |= To; 
-				White_Bishops2 ^= To; 
-				White_Knights2 |= To; 
-				White_Knights2 ^= To; 
-				White_Pawns2 |= To;  
-				White_Pawns2  ^= To; 
-				break; 
+		White_Pieces2 ^= To;
+		White_Queens2 |= To; 
+		White_Queens2 ^= To; 
+		White_Rooks2 |= To; 
+		White_Rooks2 ^= To; 
+		White_Bishops2 |= To; 
+		White_Bishops2 ^= To; 
+		White_Knights2 |= To; 
+		White_Knights2 ^= To; 
+		White_Pawns2 |= To;  
+		White_Pawns2  ^= To; 
+		break; 
 				
-				case 12://"Plain" king move
-				Black_Pieces2 |= To;
+		case 12://"Plain" king move
+		Black_Pieces2 |=T o;
                	Black_Pieces2 ^= From;
                	Black_King2 |= To;
                	Black_King2 ^= From;
                	break;
 				   
-				case 13://Pawn promotion with capture; automatically promotes to queen
-			    Black_Pawns2 ^= From;
-				Black_Pieces2 |= To;
+		case 13://Pawn promotion with capture; automatically promotes to queen
+		Black_Pawns2 ^= From;
+		Black_Pieces2 |= To;
                	Black_Pieces2 ^= From;
                	Black_Queens2 |= To;
                	White_Pieces2 |= To;
-				White_Pieces2 ^= To;
-				White_Queens2 |= To; 
-				White_Queens2 ^= To; 
-				White_Rooks2 |= To; 
-				White_Rooks2 ^= To; 
-				White_Bishops2 |= To; 
-				White_Bishops2 ^= To; 
-				White_Knights2 |= To; 
-				White_Knights2 ^= To; 
-				break; 
+		White_Pieces2 ^= To;
+		White_Queens2 |= To; 
+		White_Queens2 ^= To; 
+		White_Rooks2 |= To; 
+		White_Rooks2 ^= To; 
+		White_Bishops2 |= To; 
+		White_Bishops2 ^= To; 
+		White_Knights2 |= To; 
+		White_Knights2 ^= To; 
+		break; 
 				
-				case 14://"Plain" pawn promotion
-			    Black_Pawns2 ^= From;
-				Black_Pieces2 |= To;
+		case 14://"Plain" pawn promotion
+		Black_Pawns2 ^= From;
+		Black_Pieces2 |= To;
                	Black_Pieces2 ^= From;
                	Black_Queens2 |= To;
                	break;	
