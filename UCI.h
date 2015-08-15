@@ -60,7 +60,11 @@ Is_Fen = true;
  
 
 else if(UciCommand == "go") 
-MakeMove();
+{
+/*MakeMove();*/Search(1);
+cout << "\n" << Pos_Score << "\nDone with search!" << endl;
+cout << Nodes << endl;
+}
 
 else if (UciCommand == "moves")
 {
@@ -86,7 +90,6 @@ for(int h = 0; h < (Fen.length()); h++)
 
 Read_Fen(Current_Square);
 }
-//cout << White_Pieces;
 char Curr_Turn;
 cin >> Curr_Turn;
 Log << Curr_Turn << endl;
@@ -117,34 +120,6 @@ Log << Move_Count << endl;
 	
 	return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 int MakeMove()
@@ -316,17 +291,14 @@ int Moves_Command()
 		cin.get();
 		cin.get(First_Part, 3);
 		Log << First_Part;
-		//cout << First_Part << endl;
 		string F = "go";
 		//cin.get(); 
 		if(First_Part == F)
 		{
-		//cout << "Dave!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-		break;
+			break;
 		}
 		cin.get(Second_Part, 3);
 		Log << Second_Part << endl;
-		//cout << Second_Part << endl;
 		string a8 = "a8";
 		string b8 = "b8";
 		string c8 = "c8";
@@ -382,28 +354,17 @@ int Moves_Command()
 		
 		else
 		{
-			//cout << "Doing Pieces...." << endl;
+			
 			Parse_Moves(First_Part, Second_Part);
-			//cout << "Done with pieces...." << endl;
+			
 			
 		}
 		White_Turn ^= 1;
 		Current_Turn ^= 1;
-		//cout << "Whose turn: " << White_Turn << endl;
+		
 		
 	}
-	//cout << "White Pieces:" << White_Pieces << endl;
-	//cout << "Black Pieces:" << Black_Pieces << endl;
-	//cout << "White Queens:" << White_Queens << endl;
-	//cout << "Black Queens:" << Black_Queens << endl;
-	//cout << "White Rooks:" << White_Rooks << endl;
-	//cout << "Black Rooks:" << Black_Rooks << endl;
-	//cout << "White Bishops:" << White_Bishops << endl;
-	//cout << "Black Bishops:" << Black_Bishops << endl;
-	//cout << "White Knights:" << White_Knights << endl;
-	//cout << "Black Knights:" << Black_Knights << endl;
-	//cout << "White Pawns:" << White_Pawns << endl;
-	//cout << "Black Pawns:" << Black_Pawns << endl;
+	
 		cin.putback('o');
 		cin.putback('g');
 		
@@ -671,7 +632,7 @@ return 0;
 
 
 int Parse_Moves(string First, string Second, string Promotion_Type)
-{//cout <<"Promotion, but here!" << endl;
+{
 	Bitboard From;
 	Bitboard To;
 	for(int i = 0; i < 64; i++)
