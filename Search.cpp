@@ -3,10 +3,8 @@ using namespace std;
 #include "Search.h"
 #include "Eval.h"
 
-bool Fake_Current_Turn = Current_Turn;
-bool Fake_Whte_Turn = White_Turn; 
 int White_Move_Score = 0;
-int White_Static_Score = 0;
+int White_Static_Score = 0; 
 int Black_Move_Score = 0;
 int Black_Static_Score = 0;
 Bitboard Move_From = 0;
@@ -14,60 +12,26 @@ Bitboard Move_To = 0;
 int Leaf_Score = 0;
 int Best_Move = 0;
 int Nodes = 0;
-extern int CheckUci();
+bool Done_Searching = true;
 
-
-int Move::Undo_Move()
-{
-	White_Pieces = White_Pieces2; 
-	Black_Pieces = Black_Pieces2; 
-	White_King = White_King2;
-	Black_King = Black_King2;
-	White_Queens = White_Queens2;
-	White_Rooks = White_Rooks2;
-	White_Bishops = White_Bishops2;
-	White_Knights = White_Knights2;
-	White_Pawns = White_Pawns2;
-	Black_Queens = Black_Queens2;
-	Black_Rooks = Black_Rooks2;
-	Black_Bishops = Black_Bishops2;
-	Black_Knights = Black_Knights2;
-	Black_Pawns = Black_Pawns2;
-	White_Move_Spacer = White_Temp_Move_Spacer;
-	Black_Move_Spacer = Black_Temp_Move_Spacer;
-	for(int h = 0; h < White_Temp_Move_Spacer; h++)
-			{
-				White_Move_From_Stack[h] = White_Temp_Move_From_Stack[h];
-				White_Move_To_Stack[h] = White_Temp_Move_To_Stack[h];
-				White_Move_Types[h] = White_Temp_Move_Types[h];
-			}
-			
-	for(int h = 0; h < Black_Temp_Move_Spacer; h++)
-	{
-		Black_Move_From_Stack[h] = Black_Temp_Move_From_Stack[h];
-		Black_Move_To_Stack[h] = Black_Temp_Move_To_Stack[h];
-		Black_Move_Types[h] = Black_Temp_Move_Types[h];
-	}
-	Current_Turn ^= 1;
-	White_Turn ^= 1;
-	return 0;
-}
-
-
-
-Move Search(int depth, Move& Best_So_Far)
+Move SearchMax(Move alpha, Move beta, int depth)
 {
 	register Move Best;
-	if(White_Turn)
-	{
-		Best.Score = -100;
+	//Best.Score = -100;
+		    if(depth == 1)
+			{ 	
+			++Nodes;
+			int Temp = Evaluate_Position();
+			Best.Score = Temp;
+			return Best;
+			}
 		Generate_White_Knight_Moves();
 		Generate_White_King_Moves();
 		Generate_White_Pawn_Moves();
 		Generate_White_Rook_Moves();
 		Generate_White_Bishop_Moves();
 		Generate_White_Queen_Moves();
-		register Move move;
+		Move move;
 		move.White_Temp_Move_Spacer = White_Move_Spacer;
 		for(int h = 0; h < White_Move_Spacer; h++)
 			{
@@ -77,58 +41,48 @@ Move Search(int depth, Move& Best_So_Far)
 			}
 		for(int i = 0; i < White_Move_Spacer; i++)
 		{ 
-			//Log << cout << "Making white's " << i << "th move" << endl; 
 			move.From = White_Move_From_Stack[i];
 			move.To = White_Move_To_Stack[i];
 			move.Move_Type = White_Move_Types[i];
-			/******************************************************************************
-			for( int h = 0; h < 64; h++)
-			{
-        	if(GeneralBoard[h] & move.From)
-        	{
-        	//Log << PlayerMoves[h];
-        	}
-		}
-		for( int h = 0; h < 64; h++)
-        {
-        	if(GeneralBoard[h] & move.To)
-        	{
-        	//Log << PlayerMoves[h] << endl;
-        	}
-		}		
-			*********************************************************************************/
 			Make_White_Search_Move(White_Move_From_Stack[i], White_Move_To_Stack[i], White_Move_Types[i]);
 			
-			if(depth == 1)
+			//int Temp = Evaluate_Position();
+			
+			Move Temp_Move = SearchMin(alpha, beta, depth - 1);
+			move.Undo_Move();
+			if(Temp_Move.Score >= beta.Score)
+			{
+				return beta;
+			}
+			
+			//if(Best.Score < Temp_Move.Score)
+			//{
+				//Best = move;
+				//Best.Score = Temp_Move.Score;
+			//}
+			if(Temp_Move.Score  > alpha.Score)
+			{
+				alpha = move;
+				alpha.Score = Temp_Move.Score;
+			}
+			
+		}
+		
+		return alpha;
+}
+	
+	
+	Move SearchMin(Move alpha, Move beta, int depth)
+	{
+		register Move Best;
+		//Best.Score = 100;
+		if(depth == 1)
 			{ 
 			++Nodes;
 			int Temp = Evaluate_Position();
-			//Log << "Leaf score: " << Temp << endl;
-			if(Temp >= Best.Score)
-			{
-				//Log << "Leaf score: " << Temp << endl;
-				Best = move;
-				Best.Score = Temp;
+			Best.Score = Temp;
+			return Best;
 			}
-			move.Undo_Move();
-			continue;
-			}
-			
-			Move Temp_Move = Search(depth - 1, Best);
-			//Log << "Branch score: " << Temp_Move.Score << endl; 
-			if(Temp_Move.Score >= Best.Score)
-			{
-			Best = move;
-			Best.Score = Temp_Move.Score;
-			}
-			move.Undo_Move();
-		}
-		
-	}
-	
-	else
-	{
-		Best.Score = 100;
 		Generate_Black_Knight_Moves();
 		Generate_Black_King_Moves();
 		Generate_Black_Pawn_Moves();
@@ -151,7 +105,7 @@ Move Search(int depth, Move& Best_So_Far)
 			move.To = Black_Move_To_Stack[i];
 			move.Move_Type = Black_Move_Types[i];
 				/******************************************************************************/
-			for( int h = 0; h < 64; h++)
+			/*for( int h = 0; h < 64; h++)
 			{
         	if(GeneralBoard[h] & move.From)
         	{
@@ -166,38 +120,34 @@ Move Search(int depth, Move& Best_So_Far)
         	//Log << PlayerMoves[h] << endl;
         	
         }
-		}		
+		}*/		
 			/*********************************************************************************/
 			
 			Make_Black_Search_Move(Black_Move_From_Stack[i], Black_Move_To_Stack[i], Black_Move_Types[i]);
 			
-						
-			if(depth == 1)
-			{ 
-			++Nodes;
-			int Temp = Evaluate_Position();
-			//Log << "Leaf score: " << Temp << endl;
-			if(Temp <= Best.Score)
-			{
-				//Log << "Leaf score: " << Temp << endl;
-				Best = move;
-				Best.Score = Temp;
-			}
+			Move Temp_Move = SearchMax(alpha, beta, depth - 1);
 			move.Undo_Move();
-			continue;
-			}
-			Move Temp_Move = Search(depth - 1, Best);
 			//Log << "Branch score: " << Temp_Move.Score << endl; 
-			if(Temp_Move.Score <= Best.Score)
+			if(Temp_Move.Score <= alpha.Score)
 			{
-			Best = move;
-			Best.Score = Temp_Move.Score;
+				return alpha;
 			}
-			move.Undo_Move();
+			
+			//if(Best.Score > Temp_Move.Score)
+			//{
+				//Best = move;
+				//Best.Score = Temp_Move.Score;
+			//}
+			if(Temp_Move.Score < beta.Score)
+			{
+				beta = move;
+				beta.Score = Temp_Move.Score;
+			}
+			
 		}
-		
-	}
-	return Best;
+		return beta;
+	
+
 }
 
 int Make_White_Search_Move(Bitboard& From, Bitboard& To, int Move_Type)
@@ -387,6 +337,17 @@ int Make_White_Search_Move(Bitboard& From, Bitboard& To, int Move_Type)
                	White_Pieces ^= From;
                	White_Queens |= To;
                	break;	
+               	
+               	case 15://White king kingside castling
+				White_Pieces |= To;
+               	White_Pieces ^= From;
+               	White_Pieces |= 32;
+               	White_Pieces ^= 128;
+               	White_Rooks |= 32;
+               	White_Rooks ^= 128;
+               	White_King |= To;
+               	White_King ^= From;
+               	break;
 				   	
                	
 			   }
@@ -598,9 +559,18 @@ int Make_Black_Search_Move(Bitboard& From, Bitboard& To, int Move_Type)
 				Black_Pieces |= To;
                	Black_Pieces ^= From;
                	Black_Queens |= To;
-               	break;	
-				   	
-               	
+               	break;
+				 
+				case 15: 			
+				Black_Pieces |= To;
+            	Black_Pieces ^= From;
+            	Black_Pieces |= 4611686018427387904;
+            	Black_Pieces ^= 1152921504606846976;
+            	Black_Rooks |= 2305843009213693952;
+            	Black_Rooks ^= 9223372036854775808ULL;
+            	Black_King |= To;
+            	Black_King ^= From;
+            	break;
 			   }
                  
                  //Tidy up for the next call of the move generation functions
