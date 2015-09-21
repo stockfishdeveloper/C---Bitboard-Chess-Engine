@@ -1,7 +1,7 @@
 all: Chess
 
 Chess: Main.o MakeMove.o Search.o UCI.o MoveLegalityTesting.o Eval.o MoveGen.o Bitboard.o
-	g++ Main.o MakeMove.o Search.o UCI.o MoveLegalityTesting.o Eval.o MoveGen.o Bitboard.o -o Chess.exe
+	g++ Main.o MakeMove.o Search.o UCI.o MoveLegalityTesting.o Eval.o MoveGen.o Bitboard.o thread.a -o Chess.exe
 
 Main.o: Main.cpp
 	g++ -c Main.cpp	
@@ -29,4 +29,3 @@ Bitboard.o: Bitboard.cpp
 	
 clean:
 	rm *o Chess
-
