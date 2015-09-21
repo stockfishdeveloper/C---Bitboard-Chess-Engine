@@ -1,22 +1,23 @@
 #ifndef SEARCH_H_INCLUDED
 #define SEARCH_H_INCLUDED
 #include "Bitboard.h"
+#include "MoveGen.h"
 
 class Move
 {
 	public:
-		Bitboard From = 0;
-		Bitboard To = 0;
-		int Move_Type = 0;
-		int Score = 0;
+		Bitboard From;
+		Bitboard To;
+		int Move_Type;
+		int Score;
 		Bitboard White_Temp_Move_From_Stack[70];
 		Bitboard White_Temp_Move_To_Stack[70];
 		Bitboard Black_Temp_Move_From_Stack[70];
 		Bitboard Black_Temp_Move_To_Stack[70];
 		int White_Temp_Move_Types[70];
 		int Black_Temp_Move_Types[70];
-		int White_Temp_Move_Spacer = 0; 
-		int Black_Temp_Move_Spacer = 0;
+		int White_Temp_Move_Spacer; 
+		int Black_Temp_Move_Spacer;
 		
 		Bitboard White_Pieces2; 
 		Bitboard Black_Pieces2; 
@@ -32,7 +33,41 @@ class Move
 		Bitboard Black_Bishops2;
 		Bitboard Black_Knights2;
 		Bitboard Black_Pawns2;
-		int Undo_Move();
+		
+		void Undo_Move()
+		{
+		White_Pieces = White_Pieces2; 
+		Black_Pieces = Black_Pieces2; 
+		White_King = White_King2;
+		Black_King = Black_King2;
+		White_Queens = White_Queens2;
+		White_Rooks = White_Rooks2;
+		White_Bishops = White_Bishops2;
+		White_Knights = White_Knights2;
+		White_Pawns = White_Pawns2;
+		Black_Queens = Black_Queens2;
+		Black_Rooks = Black_Rooks2;
+		Black_Bishops = Black_Bishops2;
+		Black_Knights = Black_Knights2;
+		Black_Pawns = Black_Pawns2;
+		White_Move_Spacer = White_Temp_Move_Spacer;
+		Black_Move_Spacer = Black_Temp_Move_Spacer;
+		for(int h = 0; h < White_Temp_Move_Spacer; h++)
+			{
+				White_Move_From_Stack[h] = White_Temp_Move_From_Stack[h];
+				White_Move_To_Stack[h] = White_Temp_Move_To_Stack[h];
+				White_Move_Types[h] = White_Temp_Move_Types[h];
+			}
+			
+		for(int h = 0; h < Black_Temp_Move_Spacer; h++)
+		{
+		Black_Move_From_Stack[h] = Black_Temp_Move_From_Stack[h];
+		Black_Move_To_Stack[h] = Black_Temp_Move_To_Stack[h];
+		Black_Move_Types[h] = Black_Temp_Move_Types[h];
+		}
+		Current_Turn ^= 1;
+		White_Turn ^= 1;
+}
 		Move()
 		{
 		White_Pieces2 = White_Pieces; 
@@ -49,11 +84,18 @@ class Move
 		Black_Bishops2 = Black_Bishops;
 		Black_Knights2 = Black_Knights;
 		Black_Pawns2 = Black_Pawns;
+		From = 0;
+		To = 0;
+		Move_Type = 0;
+		Score = 0;
+		White_Temp_Move_Spacer = 0; 
+		Black_Temp_Move_Spacer = 0;
 		}		
 };
 
 #include "Movegen.h"
-Move Search(int depth, Move& Best_So_Far);
+Move SearchMax(Move alpha, Move beta, int depth);
+Move SearchMin(Move alpha, Move beta, int depth);
 int Make_White_Search_Move(Bitboard& From, Bitboard& To, int Move_Type);
 int Make_Black_Search_Move(Bitboard& From, Bitboard& To, int Move_Type);
 extern bool Fake_Current_Turn;
@@ -67,5 +109,6 @@ extern Bitboard Move_To;
 extern int Leaf_Score;
 extern int Best_Move;
 extern int Nodes;
+extern bool Done_Searching;
 
 #endif
