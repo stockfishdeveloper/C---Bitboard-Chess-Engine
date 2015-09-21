@@ -8,7 +8,7 @@
 #include "windows.h"
 #include <chrono> 
 #include "Thread.h"
-#include "C:\TinyThread++-1.1-src\TinyThread++-1.1\source\tinythread.h"
+#include "tinythread.h"
 
 using namespace std;
 int CheckUci();
