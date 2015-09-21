@@ -6,12 +6,14 @@
 #include <iostream>
 #include <ctime>
 #include "windows.h"
-#include <chrono>
+#include <chrono> 
+#include "Thread.h"
+#include "C:\TinyThread++-1.1-src\TinyThread++-1.1\source\tinythread.h"
 
 using namespace std;
 int CheckUci();
 string UciCommand;
-Bitboard Current_Rank = 72057594037927936;
+Bitboard Current_Rank = 72057594037927936; 
 ofstream Log("Log.txt");
 int CheckUci()
 {
@@ -69,32 +71,62 @@ Is_Fen = true;
 
 else if(UciCommand == "go") 
 {
+ string wtime = "";
+ string btime = "";
+ int time_left_white = 0;
+ int time_left_black = 0;
+ cin >> wtime >> time_left_white >> btime >> time_left_black;
  string first;
  string second;
+ Move Spar;
+ Spar.Score = -100;
+ Move Spar2;
+ Spar2.Score = 100;
  Move blank;
+ int Depth = 2;
+ Done_Searching = false;
+ //int RunThread();
+ using namespace tthread;
+ thread t(Runthread, 0);
  
-/* run this program using the console pauser or add your own getch, system("pause") or input loop */
+ using namespace std;
+ /* run this program using the console pauser or add your own getch, system("pause") or input loop */
 typedef std::chrono::high_resolution_clock Time;
     typedef std::chrono::milliseconds ms;
     typedef std::chrono::duration<float> fsec;
     auto t0 = Time::now();
-    blank = Search(4, blank);
+    if(White_Turn == true)
+    blank = SearchMax(Spar, Spar2, Depth);
+    else
+    blank = SearchMin(Spar, Spar2, Depth);
+    Done_Searching = true;
+    cout << "bestmove e7e5" << endl;
+    t.join();
+    /*if(White_Turn)
+	{
+		blank = SearchMax(Spar, Spar2, 5);
+	}
+	else 
+	{
+		blank = SearchMax(Spar, Spar2, 5);
+	}*/
     auto t1 = Time::now();
     fsec fs = t1 - t0;
     ms d = std::chrono::duration_cast<ms>(fs);
     //std::cout << d.count() << "ms\n";
  float temporary = (Nodes / d.count());
  //float temp_and_one = temporary * 1000.0;
- cout << "Number of nodes searched: " << Nodes << endl;
+ /*cout << "Number of nodes searched: " << Nodes << endl;
  cout << "Time in milliseconds: " << d.count() << endl;
  cout << "KNps: " << temporary << endl;
+ cout << "Best move score: " << blank.Score << endl;*/
 //cout << before << " " << after << endl;
 MakeMove(blank);
 		for( int h = 0; h < 64; h++)
 			{
         	if(GeneralBoard[h] & blank.From)
         	{
-        	//cout << "bestmove " << PlayerMoves[h];
+        	cout << "bestmove " << PlayerMoves[h];
         	first = PlayerMoves[h];
         	}
 		}
@@ -102,7 +134,7 @@ MakeMove(blank);
         {
         	if(GeneralBoard[h] & blank.To)
         	{
-        	//cout  << PlayerMoves[h] << endl;
+        	cout  << PlayerMoves[h] << endl;
         	second = PlayerMoves[h];
         	}
 		}
@@ -170,31 +202,31 @@ int MakeMove(Move& Best_Move)
 
 if(Current_Turn)
 	{
-Generate_White_Knight_Moves();//Generates White Knight moves
+/*Generate_White_Knight_Moves();//Generates White Knight moves
 Generate_White_King_Moves();//Generates White King moves
 Generate_White_Pawn_Moves();//Generates White Pawn moves
 Generate_White_Rook_Moves();//Generates White Rook moves
 Generate_White_Bishop_Moves();//Generates White Bishop moves
-Generate_White_Queen_Moves();//Generates White Queen moves
+Generate_White_Queen_Moves();//Generates White Queen moves*/
 MakeWhiteMove(Best_Move);//Plays White's moves out on the internal bitboards
+/*cin >> UciCommand;
 cin >> UciCommand;
 cin >> UciCommand;
-cin >> UciCommand;
-cin >> UciCommand;
+cin >> UciCommand;*/
 }
 else 
 {
-Generate_Black_Knight_Moves();//Generates Black Knight moves
+/*Generate_Black_Knight_Moves();//Generates Black Knight moves
 Generate_Black_King_Moves();//Generates Black King moves
 Generate_Black_Pawn_Moves();//Generates Black Pawn moves
 Generate_Black_Rook_Moves();//Generates Black Rook moves
 Generate_Black_Bishop_Moves();//Generates Black Bishop moves
-Generate_Black_Queen_Moves();//Generates Black Queen moves
+Generate_Black_Queen_Moves();//Generates Black Queen moves*/
 MakeBlackMove(Best_Move);//Plays Black's moves out on the internal bitboards
+/*cin >> UciCommand;
 cin >> UciCommand;
 cin >> UciCommand;
-cin >> UciCommand;
-cin >> UciCommand;
+cin >> UciCommand;*/
 }
    
     return 0;
@@ -550,6 +582,17 @@ int Parse_Moves(string First, string Second)
 			Black_Pawns |= To;
 			Black_Pawns ^= To;			
 		}
+		if((To == 64) && (From == 16) && (White_King & From) && (White_King & To))
+		{
+			White_Pieces |= To;
+            White_Pieces ^= From;
+            White_Pieces |= 32;
+            White_Pieces ^= 128;
+            White_Rooks |= 32;
+            White_Rooks ^= 128;
+            White_King |= To;
+            White_King ^= From;
+		}
 	    }
 	}
 	else
@@ -669,7 +712,18 @@ int Parse_Moves(string First, string Second)
 			White_Pawns |= To;
 			White_Pawns ^= To;			
 		}
-	    }
+		if((To == 4611686018427387904) && (From == 1152921504606846976) && (Black_King & From) && (Black_King & To))
+		{
+			Black_Pieces |= To;
+            Black_Pieces ^= From;
+            Black_Pieces |= 4611686018427387904;
+            Black_Pieces ^= 1152921504606846976;
+            Black_Rooks |= 2305843009213693952;
+            Black_Rooks ^= 9223372036854775808ULL;
+            Black_King |= To;
+            Black_King ^= From;
+		}
+		}
 		
 	}
 return 0;	
