@@ -6,15 +6,15 @@
 #include <iostream>
 #include <ctime>
 #include "windows.h"
-#include <chrono> 
-#include "Thread.h"
-#include "tinythread.h"
+#include <chrono> //For multithreading--must be using C++11 compiler
+#include "Thread.h"//Threading header file
+#include "C:\TinyThread++-1.1-src\TinyThread++-1.1\source\tinythread.h"//Thread library
 
 using namespace std;
 int CheckUci();
 string UciCommand;
 Bitboard Current_Rank = 72057594037927936; 
-ofstream Log("Log.txt");
+ofstream Log("Log.txt");//For writing to a text file
 int CheckUci()
 {
 	bool Is_Fen = false;
@@ -32,13 +32,13 @@ else if(UciCommand == "isready")
 cout << "readyok\n";
 
 else if(UciCommand == "quit")
-exit(0);
+exit(0);//Exit the program if called to quit
 
 else if (UciCommand == "ucinewgame") 
 ; 
 
 else if(UciCommand == "startpos")
-{
+{//Set up the board internally
 White_Pieces = 65535;
 Black_Pieces = 18446462598732840960ULL;
 White_King = 16;
@@ -83,11 +83,11 @@ else if(UciCommand == "go")
  Move Spar2;
  Spar2.Score = 100;
  Move blank;
- int Depth = 2;
+ int Depth = 5;
  Done_Searching = false;
  //int RunThread();
  using namespace tthread;
- thread t(Runthread, 0);
+ thread t(Runthread, 0);//Spawn new thread to constantly output infos the the GUI while the search function is running
  
  using namespace std;
  /* run this program using the console pauser or add your own getch, system("pause") or input loop */
@@ -100,7 +100,7 @@ typedef std::chrono::high_resolution_clock Time;
     else
     blank = SearchMin(Spar, Spar2, Depth);
     Done_Searching = true;
-    cout << "bestmove e7e5" << endl;
+    //cout << "bestmove e7e5\n" << endl;
     t.join();
     /*if(White_Turn)
 	{
@@ -113,14 +113,14 @@ typedef std::chrono::high_resolution_clock Time;
     auto t1 = Time::now();
     fsec fs = t1 - t0;
     ms d = std::chrono::duration_cast<ms>(fs);
-    //std::cout << d.count() << "ms\n";
+    
  float temporary = (Nodes / d.count());
  //float temp_and_one = temporary * 1000.0;
- /*cout << "Number of nodes searched: " << Nodes << endl;
+ cout << "Number of nodes searched: " << Nodes << endl;
  cout << "Time in milliseconds: " << d.count() << endl;
  cout << "KNps: " << temporary << endl;
- cout << "Best move score: " << blank.Score << endl;*/
-//cout << before << " " << after << endl;
+ cout << "Best move score: " << blank.Score << endl;
+
 MakeMove(blank);
 		for( int h = 0; h < 64; h++)
 			{
