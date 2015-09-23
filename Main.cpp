@@ -5,9 +5,8 @@ using namespace std;
 
 int main()
 {
-initmagicmoves();//Thanks, Pradu
+initmagicmoves();//Thanks, Pradu 
 CheckUci();
-
 
     return 0;
 
