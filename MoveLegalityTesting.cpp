@@ -1,13 +1,13 @@
-#include "MoveLegalityTesting.h"
+#include "MoveLegalityTesting.h" 
 #include "magicmoves.h"
 /* This function takes a bitboard called To_Square that has only the bit set that the move moves to; it takes a From_Square that is the same, 
 and it has the bit set that the piece in the move moves to. It also takes a Move_Type, which tells it which way to update its bitboards
 */
 
-bool White_Is_Legal(Bitboard& From_Square, Bitboard& To_Square, int Move_Type)
+bool White_Is_Legal(Bitboard& From_Square, Bitboard& To_Square, int Move_Type) 
 {
         int h; 
-        for(int j = 0; j < 64; j++)
+        for(int j = 0; j < 64; j++) 
         {
                 if(White_King & GeneralBoard[j])//Get the index (0-63) of White's king
                 h = j;
@@ -39,18 +39,18 @@ case 1://Pawn capture
                 White_Pawns2 |= To_Square;
                 White_Pawns2 ^= From_Square;
                 Black_Pieces2 |= To_Square;
-                                Black_Pieces2 ^= To_Square;
-                                Black_Queens2 |= To_Square; 
-                                Black_Queens2 ^= To_Square; 
-                                Black_Rooks2 |= To_Square; 
-                                Black_Rooks2 ^= To_Square; 
-                                Black_Bishops2 |= To_Square; 
-                                Black_Bishops2 ^= To_Square; 
-                                Black_Knights2 |= To_Square; 
-                                Black_Knights2 ^= To_Square; 
-                                Black_Pawns2 |= To_Square;  
-                                Black_Pawns2  ^= To_Square; 
-                                break;
+                Black_Pieces2 ^= To_Square;
+                Black_Queens2 |= To_Square; 
+                Black_Queens2 ^= To_Square; 
+                Black_Rooks2 |= To_Square; 
+                Black_Rooks2 ^= To_Square; 
+                Black_Bishops2 |= To_Square; 
+                Black_Bishops2 ^= To_Square; 
+                Black_Knights2 |= To_Square; 
+                Black_Knights2 ^= To_Square; 
+                Black_Pawns2 |= To_Square;  
+                Black_Pawns2  ^= To_Square; 
+                break;
                                 
                 
                 case 2://Pawn single push
