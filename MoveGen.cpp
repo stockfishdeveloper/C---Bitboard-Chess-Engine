@@ -3,7 +3,7 @@ using namespace std;
 #include "MoveGen.h"
 #include "magicmoves.h"
 
-int White_Knight_Spacer = 0;
+int White_Knight_Spacer = 0; 
 int Black_Knight_Spacer = 0;
 int White_King_Spacer = 0;
 int Black_King_Spacer = 0;
@@ -38,6 +38,8 @@ int Black_Move_Types[70];
 int White_Move_Spacer = 0; // Keeps a "record" of the last move put on the stack so that it knows which index of the array to put the next move in
 int Black_Move_Spacer = 0;
 bool Is_Legal;
+bool WhiteHasCastled = false;
+bool BlackHasCastled = false;
 // White Knight Move generation
 
 // *****************************************************************************************************************************************
@@ -218,7 +220,7 @@ int Stack_White_King_Moves() // Puts all the legal king moves on move stack
 { 
     int j = 0;//Used in a for loop to index the current king
     int w = 0; // Use it in a for loop to keep track of the number of iterations
-    for(int w = 0; w <= White_King_Spacer; w++)// For each knight found on KnightCount[]
+    for(int w = 0; w <= White_King_Spacer; w++)// For each king found on KnightCount[]
     {    
     for( int i = 0; i < 64; i++)
     {
@@ -227,7 +229,20 @@ int Stack_White_King_Moves() // Puts all the legal king moves on move stack
             j = i;
         }
     }        
-     
+    
+	Bitboard first = (WhiteKingCount[w] & 16);
+	Bitboard second = ((White_Pieces | Black_Pieces) & 96);
+	Bitboard e1 = 16, f1 = 32, g1 = 64, a0 = 0;
+	bool canmovetof1 = White_Is_Legal(e1, f1, 15);
+	bool canmovetog1 = White_Is_Legal(f1, g1, 15);
+	bool canmovetoe1 = White_Is_Legal(a0, e1, 15); 
+    if(first && (!second) && canmovetof1 && canmovetog1 && canmovetoe1 && (!WhiteHasCastled))
+    {
+		White_Move_From_Stack[White_Move_Spacer] = WhiteKingCount[w];
+		Bitboard too = 64;	
+		White_Move_To_Stack[White_Move_Spacer++] = too;
+		White_Move_Types[White_Move_Spacer - 1] = 15;
+	}
     Bitboard Spare = (King_Lookup_Table[j] | WhiteKingCount[w]);// Spare is a bitboard with all legal squares the king can move to and the original square of the knight
     Bitboard Spare2 = White_Pieces & King_Lookup_Table[j]; // Spare2 has all moves that do not capture one of white's own pieces    
     Bitboard Spare3 = ((Spare ^ Spare2) ^ GeneralBoard[j]); // Spare3 is the final result
@@ -300,7 +315,21 @@ int Stack_Black_King_Moves() // Puts all the legal king moves on move stack
         {
             j = i;
         }
-    }        
+    } 
+	
+	Bitboard first = (BlackKingCount[w] & 16);
+	Bitboard second = ((White_Pieces | Black_Pieces) & 6917529027641081856);
+	Bitboard e8 = 1152921504606846976, f8 = 2305843009213693952, g8 = 4611686018427387904, a0 = 0;
+	bool canmovetof8 = Black_Is_Legal(e8, f8, 15);
+	bool canmovetog8 = Black_Is_Legal(f8, g8, 15);
+	bool canmovetoe8 = Black_Is_Legal(a0, e8, 15); 
+    if(first && (!second) && canmovetof8 && canmovetog8 && canmovetoe8 && (!BlackHasCastled))
+    {
+		Black_Move_From_Stack[Black_Move_Spacer] = BlackKingCount[w];
+		Bitboard too = 4611686018427387904;	
+		Black_Move_To_Stack[Black_Move_Spacer++] = too;
+		Black_Move_Types[Black_Move_Spacer - 1] = 15;
+	}       
      
     Bitboard Spare = (King_Lookup_Table[j] | BlackKingCount[w]);// Spare is a bitboard with all legal squares the king can move to and the original square of the king
     Bitboard Spare2 = Black_Pieces & King_Lookup_Table[j]; // Spare2 has all moves that do not capture one of white's own pieces    
@@ -973,7 +1002,7 @@ int Generate_Black_Queen_Moves()
     }
 }        
          Black_Queen_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
-         Stack_Black_Queen_Moves(); // Puts all legal queen moves on stack
+         Stack_Black_Queen_Moves(); // Puts all legal queen moves on stack 
     }
         
         return 0;
@@ -987,7 +1016,7 @@ int Stack_Black_Queen_Moves() // Puts all the legal queen moves on move stack
     int j = 0;
     int w = 0; // Use it in a for loop to keep track of the number of iterations
     for(int w = 0; w <= Black_Queen_Spacer; w++)// For each queen found on QueenCount[]
-    {    
+    	{    
     for( int i = 0; i < 64; i++)
     {
         if(BlackQueenCount[w] & (GeneralBoard[i])) // Find the index of the current queen(1-63) and assign this value to j
@@ -1003,12 +1032,12 @@ int Stack_Black_Queen_Moves() // Puts all the legal queen moves on move stack
     Spare2 |= Black_Pieces;
     Spare2 ^= Black_Pieces;
     Bitboard Spare3 = (Spare1 | Spare2);
-         
-            for(int r = 0; r < 64; r++) // For each legal square found in Spare1 for the current queen
+                                                                
+        for(int r = 0; r < 64; r++) // For each legal square found in Spare1 for the current queen
     {
         if(GeneralBoard[r] & Spare3)
         { 
-        int y = 10;
+        int y = 10;                                                                                                                                                                                                        
         if(GeneralBoard[r] & White_Pieces)
         y--;
                 if(Black_Is_Legal(BlackQueenCount[w], GeneralBoard[r], y))
