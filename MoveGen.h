@@ -66,5 +66,7 @@ int Stack_Black_Queen_Moves();
 
 extern int White_Move_Spacer; // Keeps a "record" of the last move put on the stack so that it knows which index of the array to put the next move in
 extern int Black_Move_Spacer;
+extern bool WhiteHasCastled;
+extern bool BlackHasCastled;
 
 #endif
