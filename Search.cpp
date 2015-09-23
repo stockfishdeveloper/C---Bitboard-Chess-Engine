@@ -1,7 +1,9 @@
 using namespace std;
+#include <iostream>
 #include "Bitboard.h"
 #include "Search.h"
 #include "Eval.h"
+#include "UCI.h"
 
 int White_Move_Score = 0;
 int White_Static_Score = 0; 
@@ -13,9 +15,15 @@ int Leaf_Score = 0;
 int Best_Move = 0;
 int Nodes = 0;
 bool Done_Searching = true;
+int Depthy = 1000;
 
 Move SearchMax(Move alpha, Move beta, int depth)
 {
+/*if(depth < Depthy)
+{
+cout << "info depth " << depth << endl;
+Depthy = depth;
+}*/
 	register Move Best;
 	//Best.Score = -100;
 		    if(depth == 1)
@@ -23,6 +31,7 @@ Move SearchMax(Move alpha, Move beta, int depth)
 			++Nodes;
 			int Temp = Evaluate_Position();
 			Best.Score = Temp;
+			Log << "Depth is 1, score is " << Temp << endl;
 			return Best;
 			}
 		Generate_White_Knight_Moves();
@@ -74,6 +83,11 @@ Move SearchMax(Move alpha, Move beta, int depth)
 	
 	Move SearchMin(Move alpha, Move beta, int depth)
 	{
+		/*if(depth < Depthy)
+		{
+		cout << "info depth " << depth << endl;
+		Depthy = depth;
+		}*/
 		register Move Best;
 		//Best.Score = 100;
 		if(depth == 1)
@@ -81,6 +95,7 @@ Move SearchMax(Move alpha, Move beta, int depth)
 			++Nodes;
 			int Temp = Evaluate_Position();
 			Best.Score = Temp;
+			Log << "Depth is 1, score is " << Temp << endl;
 			return Best;
 			}
 		Generate_Black_Knight_Moves();
