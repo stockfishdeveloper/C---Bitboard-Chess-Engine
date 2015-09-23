@@ -35,7 +35,7 @@
 		}	
 		*/	
                // Update Bitboards
-  Bitboard From = Best_Move.From;            
+  Bitboard From = Best_Move.From;             
   Bitboard To = Best_Move.To;
   int Move_Type = Best_Move.Move_Type;
 
@@ -222,7 +222,19 @@
 				White_Pieces |= To;
                	White_Pieces ^= From;
                	White_Queens |= To;
-               	break;	
+               	break;
+				   
+				case 15://White king kingside castling
+				White_Pieces |= To;
+               	White_Pieces ^= From;
+               	White_Pieces |= 32;
+               	White_Pieces ^= 128;
+               	White_Rooks |= 32;
+               	White_Rooks ^= 128;
+               	White_King |= To;
+               	White_King ^= From;
+               	WhiteHasCastled = true;
+               	break;
 				   	
                	
 			   }
@@ -468,7 +480,18 @@
 				Black_Pieces |= To;
                	Black_Pieces ^= From;
                	Black_Queens |= To;
-               	break;	
+               	break;
+				   
+				case 15: 			
+				Black_Pieces |= To;
+            	Black_Pieces ^= From;
+            	Black_Pieces |= 4611686018427387904;
+            	Black_Pieces ^= 1152921504606846976;
+            	Black_Rooks |= 2305843009213693952;
+            	Black_Rooks ^= 9223372036854775808ULL;
+            	Black_King |= To;
+            	Black_King ^= From;	
+            	break;
 				   	
                	
 			   }
