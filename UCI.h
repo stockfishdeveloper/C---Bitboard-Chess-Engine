@@ -3,6 +3,7 @@
 using namespace std;
 #include <fstream>
 #include "Search.h"
+extern LINE line;
 extern ofstream Log;
 extern int CheckUci();
 int MakeMove(Move&);
@@ -12,5 +13,4 @@ int Parse_Moves(string First_Part, string Second_Part);
 int Read_Fen(char Current_Square);
 extern Bitboard Current_Rank;
 extern string UciCommand;
-
 #endif
