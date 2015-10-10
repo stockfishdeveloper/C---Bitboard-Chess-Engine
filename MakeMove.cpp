@@ -13,7 +13,7 @@
 		if(White_Move_Spacer > 1)//We must choose a number smaller than the number of legal moves found
         q = (randomNumber % (White_Move_Spacer - 1));
         
-        if(White_Move_Spacer == 1)//If there is only one mve, then force the program to play it
+        if(White_Move_Spacer == 1)//If there is only one move, then force the program to play it
         q = 0; 
         if(White_Move_Spacer == 0)//If q = 0, then white loses
          return 0; //To let the user know that the game finished
@@ -224,7 +224,7 @@
                	White_Queens |= To;
                	break;
 				   
-				case 15://White king kingside castling
+				/*case 15://White king kingside castling
 				White_Pieces |= To;
                	White_Pieces ^= From;
                	White_Pieces |= 32;
@@ -234,7 +234,7 @@
                	White_King |= To;
                	White_King ^= From;
                	WhiteHasCastled = true;
-               	break;
+               	break;*/
 				   	
                	
 			   }
@@ -482,7 +482,7 @@
                	Black_Queens |= To;
                	break;
 				   
-				case 15: 			
+				/*case 15: 			
 				Black_Pieces |= To;
             	Black_Pieces ^= From;
             	Black_Pieces |= 4611686018427387904;
@@ -491,7 +491,7 @@
             	Black_Rooks ^= 9223372036854775808ULL;
             	Black_King |= To;
             	Black_King ^= From;	
-            	break;
+            	break;*/
 				   	
                	
 			   }
@@ -516,4 +516,3 @@
 			    return 0;
 
 }
-
