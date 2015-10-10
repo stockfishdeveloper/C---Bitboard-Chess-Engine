@@ -1,5 +1,6 @@
 using namespace std;
 #include <iostream>
+#include <cstring>
 #include "Bitboard.h"
 #include "Search.h"
 #include "Eval.h"
@@ -17,21 +18,29 @@ int Nodes = 0;
 bool Done_Searching = true;
 int Depthy = 1000;
 
-Move SearchMax(Move alpha, Move beta, int depth)
+Move SearchMax(Move alpha, Move beta, int depth, LINE * pline)
 {
 /*if(depth < Depthy)
 {
-cout << "info depth " << depth << endl;
+cout << "info seldepth " << depth << endl;
 Depthy = depth;
-}*/
-	register Move Best;
+}
+else
+		{
+			cout << "info depth " << depth << endl;
+		}*/
+	
 	//Best.Score = -100;
+	LINE line;
+	
 		    if(depth == 1)
 			{ 	
+			Move Best;
 			++Nodes;
-			int Temp = Evaluate_Position();
-			Best.Score = Temp;
-			Log << "Depth is 1, score is " << Temp << endl;
+			Best.Score = Evaluate_Position();
+			pline->cmove = 0;
+			pline->score = Best.Score;
+			//Log << "Depth is 1, score is " << Temp << endl;
 			return Best;
 			}
 		Generate_White_Knight_Moves();
@@ -40,7 +49,7 @@ Depthy = depth;
 		Generate_White_Rook_Moves();
 		Generate_White_Bishop_Moves();
 		Generate_White_Queen_Moves();
-		Move move;
+		register Move move;
 		move.White_Temp_Move_Spacer = White_Move_Spacer;
 		for(int h = 0; h < White_Move_Spacer; h++)
 			{
@@ -57,7 +66,8 @@ Depthy = depth;
 			
 			//int Temp = Evaluate_Position();
 			
-			Move Temp_Move = SearchMin(alpha, beta, depth - 1);
+			Move Temp_Move = SearchMin(alpha, beta, depth - 1, &line);
+			int Curr_Move_Score = Evaluate_Position();
 			move.Undo_Move();
 			if(Temp_Move.Score >= beta.Score)
 			{
@@ -71,6 +81,15 @@ Depthy = depth;
 			//}
 			if(Temp_Move.Score  > alpha.Score)
 			{
+				pline->argmove[0] = move;
+				::line.score = Curr_Move_Score;
+            memcpy(pline->argmove + 1, line.argmove,
+
+                line.cmove * sizeof(Move));
+
+            pline->cmove = line.cmove + 1;
+
+
 				alpha = move;
 				alpha.Score = Temp_Move.Score;
 			}
@@ -81,21 +100,29 @@ Depthy = depth;
 }
 	
 	
-	Move SearchMin(Move alpha, Move beta, int depth)
+	Move SearchMin(Move alpha, Move beta, int depth, LINE * pline)
 	{
 		/*if(depth < Depthy)
 		{
 		cout << "info depth " << depth << endl;
 		Depthy = depth;
+		}
+		else
+		{
+			cout << "seldepth " << depth << endl;
 		}*/
-		register Move Best;
+		
 		//Best.Score = 100;
+		LINE line;
+		
 		if(depth == 1)
 			{ 
+			Move Best;
 			++Nodes;
-			int Temp = Evaluate_Position();
-			Best.Score = Temp;
-			Log << "Depth is 1, score is " << Temp << endl;
+			Best.Score = Evaluate_Position();
+			pline->cmove = 0;
+			pline->score = Best.Score;
+			//Log << "Depth is 1, score is " << Temp << endl;
 			return Best;
 			}
 		Generate_Black_Knight_Moves();
@@ -104,7 +131,7 @@ Depthy = depth;
 		Generate_Black_Rook_Moves();
 		Generate_Black_Bishop_Moves();
 		Generate_Black_Queen_Moves();
-		Move move;
+		register Move move;
 		move.Black_Temp_Move_Spacer = Black_Move_Spacer;
 		
 		for(int h = 0; h < Black_Move_Spacer; h++)
@@ -140,7 +167,8 @@ Depthy = depth;
 			
 			Make_Black_Search_Move(Black_Move_From_Stack[i], Black_Move_To_Stack[i], Black_Move_Types[i]);
 			
-			Move Temp_Move = SearchMax(alpha, beta, depth - 1);
+			Move Temp_Move = SearchMax(alpha, beta, depth - 1, &line);
+			int Curr_Move_Score = Evaluate_Position();
 			move.Undo_Move();
 			//Log << "Branch score: " << Temp_Move.Score << endl; 
 			if(Temp_Move.Score <= alpha.Score)
@@ -155,6 +183,13 @@ Depthy = depth;
 			//}
 			if(Temp_Move.Score < beta.Score)
 			{
+				pline->argmove[0] = move;
+				::line.score = Curr_Move_Score;
+            memcpy(pline->argmove + 1, line.argmove,
+
+                line.cmove * sizeof(Move));
+
+            pline->cmove = line.cmove + 1;
 				beta = move;
 				beta.Score = Temp_Move.Score;
 			}
@@ -353,7 +388,7 @@ int Make_White_Search_Move(Bitboard& From, Bitboard& To, int Move_Type)
                	White_Queens |= To;
                	break;	
                	
-               	case 15://White king kingside castling
+               	/*case 15://White king kingside castling
 				White_Pieces |= To;
                	White_Pieces ^= From;
                	White_Pieces |= 32;
@@ -362,7 +397,7 @@ int Make_White_Search_Move(Bitboard& From, Bitboard& To, int Move_Type)
                	White_Rooks ^= 128;
                	White_King |= To;
                	White_King ^= From;
-               	break;
+               	break;*/
 				   	
                	
 			   }
@@ -576,7 +611,7 @@ int Make_Black_Search_Move(Bitboard& From, Bitboard& To, int Move_Type)
                	Black_Queens |= To;
                	break;
 				 
-				case 15: 			
+				/*case 15: 			
 				Black_Pieces |= To;
             	Black_Pieces ^= From;
             	Black_Pieces |= 4611686018427387904;
@@ -585,7 +620,7 @@ int Make_Black_Search_Move(Bitboard& From, Bitboard& To, int Move_Type)
             	Black_Rooks ^= 9223372036854775808ULL;
             	Black_King |= To;
             	Black_King ^= From;
-            	break;
+            	break;*/
 			   }
                  
                  //Tidy up for the next call of the move generation functions
@@ -608,4 +643,3 @@ int Make_Black_Search_Move(Bitboard& From, Bitboard& To, int Move_Type)
 			    return 0;
 
 }
-
