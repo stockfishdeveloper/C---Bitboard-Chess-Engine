@@ -52,7 +52,7 @@ int Generate_White_Knight_Moves()
 {
     if(White_Knights & (GeneralBoard[i])) // If a knight is found
     {
-           WhiteKnightCount[White_Knight_Spacer] = GeneralBoard[i]; // Put the Knight on the Knight Stack; Call the knight a "number of knights" e.g. the "first" knight
+           WhiteKnightCount[White_Knight_Spacer] = GeneralBoard[i]; // Put the Knight on the Knight Stack; Call the knight a "number" of knights e.g. the "first" knight
            White_Knight_Spacer++;//Increment the knight move spacer 
     }
 }        
@@ -229,8 +229,8 @@ int Stack_White_King_Moves() // Puts all the legal king moves on move stack
             j = i;
         }
     }        
-    
-	Bitboard first = (WhiteKingCount[w] & 16);
+    //Kingside castling functionality
+	/*Bitboard first = (WhiteKingCount[w] & 16);
 	Bitboard second = ((White_Pieces | Black_Pieces) & 96);
 	Bitboard e1 = 16, f1 = 32, g1 = 64, a0 = 0;
 	bool canmovetof1 = White_Is_Legal(e1, f1, 15);
@@ -242,7 +242,7 @@ int Stack_White_King_Moves() // Puts all the legal king moves on move stack
 		Bitboard too = 64;	
 		White_Move_To_Stack[White_Move_Spacer++] = too;
 		White_Move_Types[White_Move_Spacer - 1] = 15;
-	}
+	}*/
     Bitboard Spare = (King_Lookup_Table[j] | WhiteKingCount[w]);// Spare is a bitboard with all legal squares the king can move to and the original square of the knight
     Bitboard Spare2 = White_Pieces & King_Lookup_Table[j]; // Spare2 has all moves that do not capture one of white's own pieces    
     Bitboard Spare3 = ((Spare ^ Spare2) ^ GeneralBoard[j]); // Spare3 is the final result
@@ -316,8 +316,8 @@ int Stack_Black_King_Moves() // Puts all the legal king moves on move stack
             j = i;
         }
     } 
-	
-	Bitboard first = (BlackKingCount[w] & 16);
+	//Kingside castling functionality
+	/*Bitboard first = (BlackKingCount[w] & 16);
 	Bitboard second = ((White_Pieces | Black_Pieces) & 6917529027641081856);
 	Bitboard e8 = 1152921504606846976, f8 = 2305843009213693952, g8 = 4611686018427387904, a0 = 0;
 	bool canmovetof8 = Black_Is_Legal(e8, f8, 15);
@@ -329,7 +329,7 @@ int Stack_Black_King_Moves() // Puts all the legal king moves on move stack
 		Bitboard too = 4611686018427387904;	
 		Black_Move_To_Stack[Black_Move_Spacer++] = too;
 		Black_Move_Types[Black_Move_Spacer - 1] = 15;
-	}       
+	}*/   
      
     Bitboard Spare = (King_Lookup_Table[j] | BlackKingCount[w]);// Spare is a bitboard with all legal squares the king can move to and the original square of the king
     Bitboard Spare2 = Black_Pieces & King_Lookup_Table[j]; // Spare2 has all moves that do not capture one of white's own pieces    
@@ -1071,5 +1071,4 @@ int Stack_Black_Queen_Moves() // Puts all the legal queen moves on move stack
 Black_Queen_Spacer = 0; // Reset the queen count of the current position so that if called again, the function can start from scratch
     return 0;
 }
-
 
