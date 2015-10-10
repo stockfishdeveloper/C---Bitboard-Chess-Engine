@@ -93,9 +93,17 @@ class Move
 		}		
 };
 
+typedef struct tagLINE
+{
+	int cmove;// Number of moves in the line.
+    Move argmove[15];  // The line.
+    int score = 0;
+	
+} LINE;
+
 #include "Movegen.h"
-Move SearchMax(Move alpha, Move beta, int depth);
-Move SearchMin(Move alpha, Move beta, int depth);
+Move SearchMax(Move alpha, Move beta, int depth, LINE * pline);
+Move SearchMin(Move alpha, Move beta, int depth, LINE * pline);
 int Make_White_Search_Move(Bitboard& From, Bitboard& To, int Move_Type);
 int Make_Black_Search_Move(Bitboard& From, Bitboard& To, int Move_Type);
 extern bool Fake_Current_Turn;
