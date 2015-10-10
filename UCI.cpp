@@ -15,6 +15,9 @@ int CheckUci();
 string UciCommand;
 Bitboard Current_Rank = 72057594037927936; 
 ofstream Log("Log.txt");//For writing to a text file
+
+LINE line;
+
 int CheckUci()
 {
 	bool Is_Fen = false;
@@ -83,7 +86,8 @@ else if(UciCommand == "go")
  Move Spar2;
  Spar2.Score = 100;
  Move blank;
- int Depth = 5;
+ 
+ int Depth = 7;
  Done_Searching = false;
  //int RunThread();
  using namespace tthread;
@@ -96,32 +100,24 @@ typedef std::chrono::high_resolution_clock Time;
     typedef std::chrono::duration<float> fsec;
     auto t0 = Time::now();
     if(White_Turn == true)
-    blank = SearchMax(Spar, Spar2, Depth);
+    blank = SearchMax(Spar, Spar2, Depth, &line);
     else
-    blank = SearchMin(Spar, Spar2, Depth);
+    blank = SearchMin(Spar, Spar2, Depth, &line);
     Done_Searching = true;
-    //cout << "bestmove e7e5\n" << endl;
     t.join();
-    /*if(White_Turn)
-	{
-		blank = SearchMax(Spar, Spar2, 5);
-	}
-	else 
-	{
-		blank = SearchMax(Spar, Spar2, 5);
-	}*/
+    
     auto t1 = Time::now();
     fsec fs = t1 - t0;
     ms d = std::chrono::duration_cast<ms>(fs);
     
  float temporary = (Nodes / d.count());
  //float temp_and_one = temporary * 1000.0;
- cout << "Number of nodes searched: " << Nodes << endl;
+ /*cout << "Number of nodes searched: " << Nodes << endl;
  cout << "Time in milliseconds: " << d.count() << endl;
  cout << "KNps: " << temporary << endl;
- cout << "Best move score: " << blank.Score << endl;
-
-MakeMove(blank);
+ cout << "Best move score: " << blank.Score << endl;*/
+ 
+ MakeMove(blank);
 		for( int h = 0; h < 64; h++)
 			{
         	if(GeneralBoard[h] & blank.From)
@@ -447,7 +443,6 @@ int Moves_Command()
 		cin.putback('o');
 		cin.putback('g');
 		
-	
 	return 0;		
 }
 
@@ -1020,4 +1015,3 @@ int Parse_Moves(string First, string Second, string Promotion_Type)
 	
 return 0;	
 }
-
