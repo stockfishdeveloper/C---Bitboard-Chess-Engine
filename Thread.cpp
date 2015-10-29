@@ -22,9 +22,9 @@ void Runthread(void * aArg)
     typedef std::chrono::duration<float> fsec;
     auto t0 = Time::now();
 
-  while(!Done_Searching)
+  while(Searching)
   {
-  	cout << "info multipv 1 depth 7 score cp " << line.score * 100 << " pv ";
+  	cout << "info multipv 1 depth " << Depth << " seldepth " << Seldepth << " score cp " << line.score * 100 << " pv ";
 	for(int i = 0; i < line.cmove; i++)
     {
     	for( int h = 0; h < 64; h++)
