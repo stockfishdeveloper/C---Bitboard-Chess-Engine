@@ -15,6 +15,8 @@ int CheckUci();
 string UciCommand;
 Bitboard Current_Rank = 72057594037927936; 
 ofstream Log("Log.txt");//For writing to a text file
+int wtime = 0;
+int btime = 0;
 
 LINE line;
 
@@ -34,11 +36,17 @@ cout << "uciok\n";
 else if(UciCommand == "isready")
 cout << "readyok\n";
 
+else if (UciCommand == "ucinewgame")
+Searching = false;
+
 else if(UciCommand == "quit")
 exit(0);//Exit the program if called to quit
 
 else if (UciCommand == "ucinewgame") 
-; 
+{
+Searching = false; 
+Nodes = 0;
+}
 
 else if(UciCommand == "startpos")
 {//Set up the board internally
@@ -74,24 +82,18 @@ Is_Fen = true;
 
 else if(UciCommand == "go") 
 {
- string wtime = "";
- string btime = "";
- int time_left_white = 0;
- int time_left_black = 0;
- cin >> wtime >> time_left_white >> btime >> time_left_black;
+ 
+ string time_left_white = "";
+ string time_left_black = "";
+ cin >> time_left_white >> wtime >> time_left_black >> btime;
  string first;
  string second;
- Move Spar;
- Spar.Score = -100;
- Move Spar2;
- Spar2.Score = 100;
- Move blank;
  
- int Depth = 7;
- Done_Searching = false;
- //int RunThread();
+ 
+ 
+ Searching = true;
  using namespace tthread;
- thread t(Runthread, 0);//Spawn new thread to constantly output infos the the GUI while the search function is running
+ thread t(Runthread, &line);//Spawn new thread to constantly output infos the the GUI while the search function is running
  
  using namespace std;
  /* run this program using the console pauser or add your own getch, system("pause") or input loop */
@@ -99,11 +101,10 @@ typedef std::chrono::high_resolution_clock Time;
     typedef std::chrono::milliseconds ms;
     typedef std::chrono::duration<float> fsec;
     auto t0 = Time::now();
-    if(White_Turn == true)
-    blank = SearchMax(Spar, Spar2, Depth, &line);
-    else
-    blank = SearchMin(Spar, Spar2, Depth, &line);
-    Done_Searching = true;
+    int f, g, h = 0, j = 0;
+    Move blank;
+	blank = Think(wtime, btime, h, j);
+    Searching = false;
     t.join();
     
     auto t1 = Time::now();
