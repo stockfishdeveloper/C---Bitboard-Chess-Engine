@@ -5,6 +5,8 @@ using namespace std;
 #include "Search.h"
 #include "Eval.h"
 #include "UCI.h"
+#include "MakeMove.h"
+#include <chrono>
 
 int White_Move_Score = 0;
 int White_Static_Score = 0; 
@@ -15,22 +17,84 @@ Bitboard Move_To = 0;
 int Leaf_Score = 0;
 int Best_Move = 0;
 int Nodes = 0;
-bool Done_Searching = true;
+bool Searching = false;
 int Depthy = 1000;
+bool Time_Out = false;
+int Depth = 0;
+int Seldepth = 0;
+
+Move Think(int wtime, int btime, int winc, int binc)
+{
+	typedef std::chrono::high_resolution_clock Time;
+    typedef std::chrono::milliseconds ms;
+    typedef std::chrono::duration<float> fsec;
+    auto t0 = Time::now();
+    
+    int Wtime = wtime;
+	int Btime = Btime;
+	int Winc = winc;
+	int Binc = binc;
+	Move blank;
+	Move Spar;
+	Spar.Score = -100.0;
+ 	Move Spar2;
+ 	Spar2.Score = 100.0;
+	const int MAXDEPTH = 50;
+	int Plies_Searched = 0;
+	
+	for(int q = 4; q < MAXDEPTH; q++)
+	{
+	if(White_Turn == true)
+	{
+    blank = SearchMax(Spar, Spar2, (q - Plies_Searched) + 1, &line);
+    //Plies_Searched = q;
+    auto t1 = Time::now();
+	fsec fs = t1 - t0;
+	ms d = std::chrono::duration_cast<ms>(fs);
+	Depth = q;
+	if((d.count() * 3) > (Wtime / 30))
+	{
+		return blank;
+	}
+	}
+    else
+    {
+    blank = SearchMin(Spar, Spar2, (q - Plies_Searched) + 1, &line);
+    //Plies_Searched = q;
+    auto t1 = Time::now();
+	fsec fs = t1 - t0;
+	ms d = std::chrono::duration_cast<ms>(fs);
+	Depth = q;
+	if((d.count() * 3) > (Btime / 30))
+	{
+		return blank;
+	}
+	}
+	
+		LINE* f = new LINE;
+		f->cmove = 0;
+		::line = *f;
+		delete f;
+	
+	}
+	return blank;
+}
 
 Move SearchMax(Move alpha, Move beta, int depth, LINE * pline)
 {
-/*if(depth < Depthy)
-{
-cout << "info seldepth " << depth << endl;
-Depthy = depth;
-}
-else
+	
+//if(depth > Depth)
+//{
+
+Seldepth = depth;
+//}
+/*else
 		{
-			cout << "info depth " << depth << endl;
+			Depth = depth;
 		}*/
 	
 	//Best.Score = -100;
+	
 	LINE line;
 	
 		    if(depth == 1)
@@ -67,7 +131,7 @@ else
 			//int Temp = Evaluate_Position();
 			
 			Move Temp_Move = SearchMin(alpha, beta, depth - 1, &line);
-			int Curr_Move_Score = Evaluate_Position();
+			float Curr_Move_Score = Evaluate_Position();
 			move.Undo_Move();
 			if(Temp_Move.Score >= beta.Score)
 			{
@@ -102,6 +166,7 @@ else
 	
 	Move SearchMin(Move alpha, Move beta, int depth, LINE * pline)
 	{
+		Seldepth = depth;
 		/*if(depth < Depthy)
 		{
 		cout << "info depth " << depth << endl;
@@ -113,6 +178,7 @@ else
 		}*/
 		
 		//Best.Score = 100;
+		
 		LINE line;
 		
 		if(depth == 1)
@@ -168,7 +234,7 @@ else
 			Make_Black_Search_Move(Black_Move_From_Stack[i], Black_Move_To_Stack[i], Black_Move_Types[i]);
 			
 			Move Temp_Move = SearchMax(alpha, beta, depth - 1, &line);
-			int Curr_Move_Score = Evaluate_Position();
+			float Curr_Move_Score = Evaluate_Position();
 			move.Undo_Move();
 			//Log << "Branch score: " << Temp_Move.Score << endl; 
 			if(Temp_Move.Score <= alpha.Score)
