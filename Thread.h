@@ -1,1 +1,1 @@
-extern void Runthread(void * aArg);
+extern void Runthread(void * PV);
