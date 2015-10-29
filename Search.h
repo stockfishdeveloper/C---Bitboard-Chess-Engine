@@ -9,7 +9,7 @@ class Move
 		Bitboard From;
 		Bitboard To;
 		int Move_Type;
-		int Score;
+		float Score;
 		Bitboard White_Temp_Move_From_Stack[70];
 		Bitboard White_Temp_Move_To_Stack[70];
 		Bitboard Black_Temp_Move_From_Stack[70];
@@ -87,21 +87,22 @@ class Move
 		From = 0;
 		To = 0;
 		Move_Type = 0;
-		Score = 0;
+		Score = 0.0;
 		White_Temp_Move_Spacer = 0; 
 		Black_Temp_Move_Spacer = 0;
 		}		
 };
 
-typedef struct tagLINE
+class LINE
 {
+public:
 	int cmove;// Number of moves in the line.
     Move argmove[15];  // The line.
-    int score = 0;
-	
-} LINE;
+    int score = 0.0;
+};
 
 #include "Movegen.h"
+Move Think(int wtime, int btime, int winc, int binc);
 Move SearchMax(Move alpha, Move beta, int depth, LINE * pline);
 Move SearchMin(Move alpha, Move beta, int depth, LINE * pline);
 int Make_White_Search_Move(Bitboard& From, Bitboard& To, int Move_Type);
@@ -117,6 +118,9 @@ extern Bitboard Move_To;
 extern int Leaf_Score;
 extern int Best_Move;
 extern int Nodes;
-extern bool Done_Searching;
+extern bool Searching;
+extern LINE line;
+extern int Depth;
+extern int Seldepth;
 
 #endif
