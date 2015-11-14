@@ -17,8 +17,9 @@ Bitboard Current_Rank = 72057594037927936;
 ofstream Log("Log.txt");//For writing to a text file
 int wtime = 0;
 int btime = 0;
+int Time_Usage = 0;
 
-LINE line;
+LINE PVline;
 
 int CheckUci()
 {
@@ -27,10 +28,12 @@ int CheckUci()
 		
 while (cin >> UciCommand)
 {
+	Log << ">> " << UciCommand << endl;
 	if(UciCommand == "uci")
 	{
 cout << "id name Chess\n";
 cout << "id author David Cimbalista\n";
+cout << "option name TimePerMove type spin default 3 min 1 max 5\n";
 cout << "uciok\n";
 }
 else if(UciCommand == "isready")
@@ -70,7 +73,6 @@ White_Turn = true;
 
 else if (Is_Fen)
 {
-Log << UciCommand << endl;
 Parse_Fen(UciCommand); 
 Is_Fen = false;
 }
@@ -78,7 +80,22 @@ Is_Fen = false;
 else if (UciCommand == "fen")
 Is_Fen = true;
  
- 
+else if (UciCommand == "setoption")
+{
+	string name = "";
+	cin >> name;
+	string optionname = "";
+	cin >> optionname;
+	if(optionname == "TimePerMove")
+	{
+		string value = "";
+		cin >> value;
+		int value2 = 0;
+		cin >> value2;
+		Time_Usage = value2;
+	}
+}
+
 
 else if(UciCommand == "go") 
 {
@@ -86,6 +103,7 @@ else if(UciCommand == "go")
  string time_left_white = "";
  string time_left_black = "";
  cin >> time_left_white >> wtime >> time_left_black >> btime;
+ Log << ">> " << time_left_white << " >> " << wtime << " >> " << time_left_black << " >> " << btime << endl;
  string first;
  string second;
  
@@ -93,7 +111,7 @@ else if(UciCommand == "go")
  
  Searching = true;
  using namespace tthread;
- thread t(Runthread, &line);//Spawn new thread to constantly output infos the the GUI while the search function is running
+ thread t(Runthread, &PVline);//Spawn new thread to constantly output infos the the GUI while the search function is running
  
  using namespace std;
  /* run this program using the console pauser or add your own getch, system("pause") or input loop */
@@ -144,7 +162,7 @@ else if (UciCommand == "moves")
 Moves_Command();
 }
 
-Log << UciCommand << endl;
+
 }
 
 return 0;
@@ -366,7 +384,7 @@ int Moves_Command()
 	{
 		cin.get();
 		cin.get(First_Part, 3);
-		Log << First_Part;
+		Log << ">> " << First_Part;
 		string F = "go";
 		//cin.get(); 
 		if(First_Part == F)
