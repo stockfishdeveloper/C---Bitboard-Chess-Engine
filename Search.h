@@ -2,6 +2,7 @@
 #define SEARCH_H_INCLUDED
 #include "Bitboard.h"
 #include "MoveGen.h"
+#include <iostream>
 
 class Move
 {
@@ -96,7 +97,7 @@ class Move
 class LINE
 {
 public:
-	int cmove;// Number of moves in the line.
+	int cmove = 0;// Number of moves in the line.
     Move argmove[15];  // The line.
     int score = 0.0;
 };
@@ -122,5 +123,7 @@ extern bool Searching;
 extern LINE line;
 extern int Depth;
 extern int Seldepth;
+extern void Order_Moves(bool White_Turn);
+extern float Is_Mate();
 
 #endif
