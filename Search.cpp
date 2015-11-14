@@ -7,7 +7,10 @@ using namespace std;
 #include "UCI.h"
 #include "MakeMove.h"
 #include <chrono>
+#include "magicmoves.h"
 
+void Order_Moves(bool White_Turn);
+float Is_Mate();
 int White_Move_Score = 0;
 int White_Static_Score = 0; 
 int Black_Move_Score = 0;
@@ -31,41 +34,43 @@ Move Think(int wtime, int btime, int winc, int binc)
     auto t0 = Time::now();
     
     int Wtime = wtime;
-	int Btime = Btime;
+	int Btime = btime;
 	int Winc = winc;
 	int Binc = binc;
 	Move blank;
 	Move Spar;
-	Spar.Score = -100.0;
+	Spar.Score = -100000.0;
  	Move Spar2;
- 	Spar2.Score = 100.0;
-	const int MAXDEPTH = 50;
+ 	Spar2.Score = 100000.0; 
+	const int MAXDEPTH = 8;
 	int Plies_Searched = 0;
 	
-	for(int q = 4; q < MAXDEPTH; q++)
+	for(int q = 0; q < MAXDEPTH; q++)
 	{
 	if(White_Turn == true)
 	{
-    blank = SearchMax(Spar, Spar2, (q - Plies_Searched) + 1, &line);
+	Depth = q;
+    blank = SearchMax(Spar, Spar2, (q - Plies_Searched) + 1, &PVline);
     //Plies_Searched = q;
     auto t1 = Time::now();
 	fsec fs = t1 - t0;
 	ms d = std::chrono::duration_cast<ms>(fs);
-	Depth = q;
-	if((d.count() * 3) > (Wtime / 30))
+	//Time_Usage is the parameter value
+	if((d.count() * 30) > Wtime)
 	{
 		return blank;
 	}
 	}
     else
     {
-    blank = SearchMin(Spar, Spar2, (q - Plies_Searched) + 1, &line);
+    blank = SearchMin(Spar, Spar2, (q - Plies_Searched) + 1, &PVline);
     //Plies_Searched = q;
     auto t1 = Time::now();
 	fsec fs = t1 - t0;
 	ms d = std::chrono::duration_cast<ms>(fs);
 	Depth = q;
-	if((d.count() * 3) > (Btime / 30))
+	//Time_Usage is the parameter value
+	if((d.count() * 30) > Btime)
 	{
 		return blank;
 	}
@@ -73,9 +78,41 @@ Move Think(int wtime, int btime, int winc, int binc)
 	
 		LINE* f = new LINE;
 		f->cmove = 0;
-		::line = *f;
+		::PVline = *f;
 		delete f;
-	
+		/*cout << "In between plies. ::PVline has " << PVline.cmove << " moves in it." << endl;
+		cout << "All the to squares in PVline: " << endl;
+		for(int i = 0; i < 10; i++)
+		{
+			cout << PVline.argmove[i].To << endl;
+		}cout << "And the score is: " << PVline.score << endl;*/
+			 for(int t = 0; t < White_Move_Spacer; t++)               
+               {
+               	 White_Move_From_Stack[t] = 0;//Clear the move from stack
+               	 White_Move_To_Stack[t] = 0;//Clear the move to stack
+               	 White_Move_Types[t] = 0;//Clear the move types associated with the moves
+			   }
+			    White_Knight_Spacer = 0;//Clear all of the piece spacers
+			    White_King_Spacer = 0;
+			    White_Pawn_Spacer = 0;
+			    White_Rook_Spacer = 0;
+			    White_Bishop_Spacer = 0;
+			    White_Queen_Spacer = 0;
+			    White_Move_Spacer = 0;
+			    
+			     for(int t = 0; t < Black_Move_Spacer; t++)               
+               {
+               	 Black_Move_From_Stack[t] = 0;//Clear the move from stack
+               	 Black_Move_To_Stack[t] = 0;//Clear the move to stack
+               	 Black_Move_Types[t] = 0;//Clear the move types associated with the moves
+			   }
+			    Black_Knight_Spacer = 0;//Clear all of the piece spacers
+			    Black_King_Spacer = 0;
+			    Black_Pawn_Spacer = 0;
+			    Black_Rook_Spacer = 0;
+			    Black_Bishop_Spacer = 0;
+			    Black_Queen_Spacer = 0;
+			    Black_Move_Spacer = 0;
 	}
 	return blank;
 }
@@ -92,8 +129,6 @@ Seldepth = depth;
 		{
 			Depth = depth;
 		}*/
-	
-	//Best.Score = -100;
 	
 	LINE line;
 	
@@ -121,14 +156,22 @@ Seldepth = depth;
 				move.White_Temp_Move_To_Stack[h] = White_Move_To_Stack[h];
 				move.White_Temp_Move_Types[h] = White_Move_Types[h];
 			}
+			
+			if(White_Move_Spacer == 0)
+		{
+			alpha.Score = Is_Mate();
+			pline->score = alpha.Score;
+			pline->cmove = depth;
+			//cout << "\nCalled Is_Mate()" << endl;
+			return alpha;			
+		}
+					
 		for(int i = 0; i < White_Move_Spacer; i++)
 		{ 
 			move.From = White_Move_From_Stack[i];
 			move.To = White_Move_To_Stack[i];
 			move.Move_Type = White_Move_Types[i];
 			Make_White_Search_Move(White_Move_From_Stack[i], White_Move_To_Stack[i], White_Move_Types[i]);
-			
-			//int Temp = Evaluate_Position();
 			
 			Move Temp_Move = SearchMin(alpha, beta, depth - 1, &line);
 			float Curr_Move_Score = Evaluate_Position();
@@ -146,7 +189,7 @@ Seldepth = depth;
 			if(Temp_Move.Score  > alpha.Score)
 			{
 				pline->argmove[0] = move;
-				::line.score = Curr_Move_Score;
+				::PVline.score = Curr_Move_Score;
             memcpy(pline->argmove + 1, line.argmove,
 
                 line.cmove * sizeof(Move));
@@ -177,8 +220,6 @@ Seldepth = depth;
 			cout << "seldepth " << depth << endl;
 		}*/
 		
-		//Best.Score = 100;
-		
 		LINE line;
 		
 		if(depth == 1)
@@ -206,6 +247,16 @@ Seldepth = depth;
 				move.Black_Temp_Move_To_Stack[h] = Black_Move_To_Stack[h];
 				move.Black_Temp_Move_Types[h] = Black_Move_Types[h];
 			}
+			
+			if(Black_Move_Spacer == 0)
+		{
+			beta.Score = Is_Mate();
+			pline->score = beta.Score;
+			pline->cmove = depth;
+			//cout << "\nCalled Is_Mate()" << endl;
+			return beta;			
+		}
+		
 		for(int i = 0; i < Black_Move_Spacer; i++)
 		{ 
 			//Log << "Making black's " << i << "th move" << endl; 
@@ -250,7 +301,7 @@ Seldepth = depth;
 			if(Temp_Move.Score < beta.Score)
 			{
 				pline->argmove[0] = move;
-				::line.score = Curr_Move_Score;
+				::PVline.score = Curr_Move_Score;
             memcpy(pline->argmove + 1, line.argmove,
 
                 line.cmove * sizeof(Move));
@@ -261,6 +312,7 @@ Seldepth = depth;
 			}
 			
 		}
+		
 		return beta;
 	
 
@@ -708,4 +760,140 @@ int Make_Black_Search_Move(Bitboard& From, Bitboard& To, int Move_Type)
 			    White_Turn = true;
 			    return 0;
 
+}
+
+/*void Order_Moves(bool Whites_Turn)
+{
+	if(Whites_Turn == true)
+	{
+		for(int i = 0; i < White_Move_Spacer; i++)
+		{
+			if(White_Move_Types[i] % 2)
+			{
+				Bitboard temp;
+				temp = White_Move_From_Stack[White_Move_Spacer - 1];
+				White_Move_From_Stack[White_Move_Spacer - 1] = White_Move_From_Stack[i];
+				White_Move_From_Stack[i] = temp;
+				
+				temp = White_Move_To_Stack[White_Move_Spacer - 1];
+				White_Move_To_Stack[White_Move_Spacer - 1] = White_Move_To_Stack[i];
+				White_Move_To_Stack[i] = temp;
+				
+				temp = White_Move_Types[White_Move_Spacer - 1];
+				White_Move_Types[White_Move_Spacer - 1] = White_Move_Types[i];
+				White_Move_Types[i] = temp;
+			}
+		}
+	}
+	
+	else
+	{
+		for(int i = 0; i < Black_Move_Spacer; i++)
+		{
+			if(Black_Move_Types[i] % 2)
+			{
+				Bitboard temp;
+				temp = Black_Move_From_Stack[Black_Move_Spacer - 1];
+				Black_Move_From_Stack[Black_Move_Spacer - 1] = Black_Move_From_Stack[i];
+				Black_Move_From_Stack[i] = temp;
+				
+				temp = Black_Move_To_Stack[Black_Move_Spacer - 1];
+				Black_Move_To_Stack[Black_Move_Spacer - 1] = Black_Move_To_Stack[i];
+				Black_Move_To_Stack[i] = temp;
+				
+				temp = Black_Move_Types[Black_Move_Spacer - 1];
+				Black_Move_Types[Black_Move_Spacer - 1] = Black_Move_Types[i];
+				Black_Move_Types[i] = temp;
+			}
+		}
+	}
+	return;
+}*/
+
+float Is_Mate()
+{
+	int h; 
+        for(int j = 0; j < 64; j++) 
+        {
+                if(White_King & GeneralBoard[j])//Get the index (0-63) of White's king
+                h = j;
+        }
+	Bitboard BAttacks = Bmagic(h, (White_Pieces | Black_Pieces));
+    Bitboard RAttacks = Rmagic(h, (White_Pieces | Black_Pieces));
+    Bitboard QAttacks = Qmagic(h, (White_Pieces | Black_Pieces));
+    if(BAttacks & (Black_Bishops))
+        return -10000.0;
+        if(RAttacks & (Black_Rooks))
+        return -10000.0;
+        if(QAttacks & (Black_Queens))
+        return -10000.0;
+        if(Knight_Lookup_Table[h] & Black_Knights)
+        return -10000.0;
+        if(King_Lookup_Table[h] & Black_King)
+        return -10000.0;
+        
+        Bitboard Spare = Black_Pawns;
+        Spare |= A_Pawn_Mask;
+        Spare ^= A_Pawn_Mask;
+        if((Spare >> 7) & White_King)
+        return -10000.0;
+        
+        Bitboard Spare2 = Black_Pawns;
+        Spare2 |= H_Pawn_Mask;
+        Spare2 ^= H_Pawn_Mask;
+        if((Spare2 >> 9) & White_King)
+        return -10000.0;
+        
+        Bitboard Black_Pawns5 = Black_Pawns;
+        Black_Pawns5 |= A_Pawn_Mask;
+        Black_Pawns5 ^= A_Pawn_Mask; 
+        Black_Pawns5 |= H_Pawn_Mask;
+        Black_Pawns5 ^= H_Pawn_Mask;
+        if(((Black_Pawns5 >> 7) | (Black_Pawns5 >> 9)) & White_King)
+        return -10000.0;
+                
+        
+        for(int j = 0; j < 64; j++)
+        {
+                if(Black_King & GeneralBoard[j])//Get the index(0-63) of the black king
+                h = j;
+        }
+        BAttacks = Bmagic(h, (White_Pieces | Black_Pieces));
+    	RAttacks = Rmagic(h, (White_Pieces | Black_Pieces));
+		QAttacks = Qmagic(h, (White_Pieces | Black_Pieces));
+        
+        if(BAttacks & (White_Bishops))
+        return 10000.0;
+        if(RAttacks & (White_Rooks))
+        return 10000.0;
+        if(QAttacks & (White_Queens))
+        return 10000.0;
+        if(Knight_Lookup_Table[h] & White_Knights)
+        return 10000.0;
+        if(King_Lookup_Table[h] & White_King)
+        return 10000.0;
+        
+    	Spare = White_Pawns;
+        Spare |= A_Pawn_Mask;
+        Spare ^= A_Pawn_Mask;
+        if((Spare << 9) & Black_King)
+        return 10000.0;
+        
+        Bitboard Spare7 = White_Pawns;
+        Spare7 |= H_Pawn_Mask;
+        Spare7 ^= H_Pawn_Mask;
+        if((Spare7 << 7) & Black_King)
+        return 10000.0;
+        
+    	Bitboard White_Pawns2 = 0;
+		White_Pawns2 |= A_Pawn_Mask;
+        White_Pawns2 ^= A_Pawn_Mask; 
+        White_Pawns2 |= H_Pawn_Mask;
+        White_Pawns2 ^= H_Pawn_Mask;
+        //cout << "At the end of Is_Mate" << endl;
+        if(((White_Pawns << 7) | (White_Pawns << 9)) & GeneralBoard[h])
+        return 10000.0;
+        
+        else
+        return 0.0;
 }
