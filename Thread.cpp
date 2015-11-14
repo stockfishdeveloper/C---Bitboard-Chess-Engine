@@ -24,21 +24,25 @@ void Runthread(void * aArg)
 
   while(Searching)
   {
-  	cout << "info multipv 1 depth " << Depth << " seldepth " << Seldepth << " score cp " << line.score * 100 << " pv ";
-	for(int i = 0; i < line.cmove; i++)
+  	LINE pvline = PVline;
+  	cout << "info multipv 1 depth " << Depth << " seldepth " << Seldepth << " score cp " << pvline.score * 100 << " pv ";
+  	Log << "<< " << "info multipv 1 depth " << Depth << " seldepth " << Seldepth << " score cp " << pvline.score * 100 << " pv ";
+  	for(int i = 0; i < pvline.cmove; i++)
     {
-    	for( int h = 0; h < 64; h++)
+    	for( int h = 0; h < 50; h++)
 			{
-        	if(GeneralBoard[h] & line.argmove[i].From)
+        	if(GeneralBoard[h] & pvline.argmove[i].From)
         	{
-        	cout <<  PlayerMoves[h];
+        	cout << PlayerMoves[h];
+        	Log << PlayerMoves[h];
         	}
         }
-        	for( int h = 0; h < 64; h++)
+        	for( int h = 0; h < 50; h++)
         {
-        	if(GeneralBoard[h] & line.argmove[i].To)
+        	if(GeneralBoard[h] & pvline.argmove[i].To)
         	{
-        	cout  << PlayerMoves[h] << " ";
+        	cout << PlayerMoves[h] << " ";
+        	Log << PlayerMoves[h] << " ";
         	}
 		}
 	}
@@ -48,6 +52,7 @@ void Runthread(void * aArg)
  	float temporary = (Nodes / d.count());
  	
     cout << "time " << d.count() << " nodes " << Nodes << " nps " << (1000 *(Nodes / (d.count() + 1))) << endl;
-    Sleep(1000);
+    Log << "time " << d.count() << " nodes " << Nodes << " nps " << (1000 *(Nodes / (d.count() + 1))) << endl;
+    Sleep(500);
   } 
 }
