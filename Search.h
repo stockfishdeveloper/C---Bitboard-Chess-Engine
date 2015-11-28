@@ -99,15 +99,15 @@ class LINE
 public:
 	int cmove = 0;// Number of moves in the line.
     Move argmove[15];  // The line.
-    int score = 0.0;
+    float score = 0.0;
 };
 
 #include "Movegen.h"
 Move Think(int wtime, int btime, int winc, int binc);
 Move SearchMax(Move alpha, Move beta, int depth, LINE * pline);
 Move SearchMin(Move alpha, Move beta, int depth, LINE * pline);
-int Make_White_Search_Move(Bitboard& From, Bitboard& To, int Move_Type);
-int Make_Black_Search_Move(Bitboard& From, Bitboard& To, int Move_Type);
+int Make_White_Search_Move(const Bitboard& From, const Bitboard& To, const int Move_Type);
+int Make_Black_Search_Move(const Bitboard& From, const Bitboard& To, const int Move_Type);
 extern bool Fake_Current_Turn;
 extern bool Fake_Whte_Turn; 
 extern int White_Move_Score;
