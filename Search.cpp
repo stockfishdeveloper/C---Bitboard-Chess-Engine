@@ -46,127 +46,112 @@ Move Think(int wtime, int btime, int winc, int binc)
 	int Plies_Searched = 0;
 	
 	for(int q = 0; q < MAXDEPTH; q++)
-	{
-	if(White_Turn == true)
-	{
-	Depth = q;
-    blank = SearchMax(Spar, Spar2, (q - Plies_Searched) + 1, &PVline);
-    //Plies_Searched = q;
-    auto t1 = Time::now();
-	fsec fs = t1 - t0;
-	ms d = std::chrono::duration_cast<ms>(fs);
-	//Time_Usage is the parameter value
-	if((d.count() * 30) > Wtime)
-	{
-		return blank;
-	}
-	}
-    else
-    {
-    blank = SearchMin(Spar, Spar2, (q - Plies_Searched) + 1, &PVline);
-    //Plies_Searched = q;
-    auto t1 = Time::now();
-	fsec fs = t1 - t0;
-	ms d = std::chrono::duration_cast<ms>(fs);
-	Depth = q;
-	//Time_Usage is the parameter value
-	if((d.count() * 30) > Btime)
-	{
-		return blank;
-	}
-	}
-	
-		LINE* f = new LINE;
-		f->cmove = 0;
-		::PVline = *f;
-		delete f;
-		/*cout << "In between plies. ::PVline has " << PVline.cmove << " moves in it." << endl;
-		cout << "All the to squares in PVline: " << endl;
-		for(int i = 0; i < 10; i++)
 		{
-			cout << PVline.argmove[i].To << endl;
-		}cout << "And the score is: " << PVline.score << endl;*/
-			 for(int t = 0; t < White_Move_Spacer; t++)               
+			if(White_Turn == true)
+				{
+					Depth = q;
+    				blank = SearchMax(Spar, Spar2, (q - Plies_Searched) + 1, &PVline);
+    				auto t1 = Time::now();
+					fsec fs = t1 - t0;
+					ms d = std::chrono::duration_cast<ms>(fs);
+					//Time_Usage is the parameter value: if((d.count() * Tine_Usage) > Wtime)
+						if((d.count() * 30) > Wtime)
+							{
+								return blank;
+							}
+				}
+				
+    		else
+    			{
+    				blank = SearchMin(Spar, Spar2, (q - Plies_Searched) + 1, &PVline);
+    				auto t1 = Time::now();
+					fsec fs = t1 - t0;
+					ms d = std::chrono::duration_cast<ms>(fs);
+					Depth = q;
+					//Time_Usage is the parameter value
+					if((d.count() * 30) > Btime)
+						{
+							return blank;
+						}
+				}
+	
+			LINE* f = new LINE;
+			f->cmove = 0;
+			::PVline = *f;
+			delete f;
+		
+			for(int t = 0; t < White_Move_Spacer; t++)               
                {
                	 White_Move_From_Stack[t] = 0;//Clear the move from stack
                	 White_Move_To_Stack[t] = 0;//Clear the move to stack
                	 White_Move_Types[t] = 0;//Clear the move types associated with the moves
 			   }
-			    White_Knight_Spacer = 0;//Clear all of the piece spacers
-			    White_King_Spacer = 0;
-			    White_Pawn_Spacer = 0;
-			    White_Rook_Spacer = 0;
-			    White_Bishop_Spacer = 0;
-			    White_Queen_Spacer = 0;
-			    White_Move_Spacer = 0;
+			   
+			White_Knight_Spacer = 0;//Clear all of the piece spacers
+			White_King_Spacer = 0;
+			White_Pawn_Spacer = 0;
+			White_Rook_Spacer = 0;
+			White_Bishop_Spacer = 0;
+			White_Queen_Spacer = 0;
+			White_Move_Spacer = 0;
 			    
-			     for(int t = 0; t < Black_Move_Spacer; t++)               
+			for(int t = 0; t < Black_Move_Spacer; t++)               
                {
                	 Black_Move_From_Stack[t] = 0;//Clear the move from stack
                	 Black_Move_To_Stack[t] = 0;//Clear the move to stack
                	 Black_Move_Types[t] = 0;//Clear the move types associated with the moves
 			   }
-			    Black_Knight_Spacer = 0;//Clear all of the piece spacers
-			    Black_King_Spacer = 0;
-			    Black_Pawn_Spacer = 0;
-			    Black_Rook_Spacer = 0;
-			    Black_Bishop_Spacer = 0;
-			    Black_Queen_Spacer = 0;
-			    Black_Move_Spacer = 0;
-	}
+			   
+			Black_Knight_Spacer = 0;//Clear all of the piece spacers
+			Black_King_Spacer = 0;
+			Black_Pawn_Spacer = 0;
+			Black_Rook_Spacer = 0;
+			Black_Bishop_Spacer = 0;
+			Black_Queen_Spacer = 0;
+			Black_Move_Spacer = 0;
+		}
+		
 	return blank;
 }
 
 Move SearchMax(Move alpha, Move beta, int depth, LINE * pline)
 {
-	
-//if(depth > Depth)
-//{
-
-Seldepth = depth;
-//}
-/*else
-		{
-			Depth = depth;
-		}*/
-	
+	Seldepth = depth;
 	LINE line;
 	
-		    if(depth == 1)
-			{ 	
+	if(depth == 1)
+		{ 	
 			Move Best;
 			++Nodes;
 			Best.Score = Evaluate_Position();
 			pline->cmove = 0;
 			pline->score = Best.Score;
-			//Log << "Depth is 1, score is " << Temp << endl;
 			return Best;
-			}
-		Generate_White_Knight_Moves();
-		Generate_White_King_Moves();
-		Generate_White_Pawn_Moves();
-		Generate_White_Rook_Moves();
-		Generate_White_Bishop_Moves();
-		Generate_White_Queen_Moves();
-		register Move move;
-		move.White_Temp_Move_Spacer = White_Move_Spacer;
-		for(int h = 0; h < White_Move_Spacer; h++)
-			{
-				move.White_Temp_Move_From_Stack[h] = White_Move_From_Stack[h];
-				move.White_Temp_Move_To_Stack[h] = White_Move_To_Stack[h];
-				move.White_Temp_Move_Types[h] = White_Move_Types[h];
-			}
+		}
+	Generate_White_Knight_Moves();
+	Generate_White_King_Moves();
+	Generate_White_Pawn_Moves();
+	Generate_White_Rook_Moves();
+	Generate_White_Bishop_Moves();
+	Generate_White_Queen_Moves();
+	register Move move;
+	move.White_Temp_Move_Spacer = White_Move_Spacer;
+	for(int h = 0; h < White_Move_Spacer; h++)
+		{
+			move.White_Temp_Move_From_Stack[h] = White_Move_From_Stack[h];
+			move.White_Temp_Move_To_Stack[h] = White_Move_To_Stack[h];
+			move.White_Temp_Move_Types[h] = White_Move_Types[h];
+		}
 			
-			if(White_Move_Spacer == 0)
+	if(White_Move_Spacer == 0)
 		{
 			alpha.Score = Is_Mate();
 			pline->score = alpha.Score;
 			pline->cmove = depth;
-			//cout << "\nCalled Is_Mate()" << endl;
 			return alpha;			
 		}
 					
-		for(int i = 0; i < White_Move_Spacer; i++)
+	for(int i = 0; i < White_Move_Spacer; i++)
 		{ 
 			move.From = White_Move_From_Stack[i];
 			move.To = White_Move_To_Stack[i];
@@ -177,24 +162,16 @@ Seldepth = depth;
 			float Curr_Move_Score = Evaluate_Position();
 			move.Undo_Move();
 			if(Temp_Move.Score >= beta.Score)
-			{
-				return beta;
-			}
+				{
+					return beta;
+				}
 			
-			//if(Best.Score < Temp_Move.Score)
-			//{
-				//Best = move;
-				//Best.Score = Temp_Move.Score;
-			//}
 			if(Temp_Move.Score  > alpha.Score)
-			{
-				pline->argmove[0] = move;
-				::PVline.score = Curr_Move_Score;
-            memcpy(pline->argmove + 1, line.argmove,
-
-                line.cmove * sizeof(Move));
-
-            pline->cmove = line.cmove + 1;
+				{
+					pline->argmove[0] = move;
+					::PVline.score = Curr_Move_Score;
+            		memcpy(pline->argmove + 1, line.argmove, line.cmove * sizeof(Move));
+					pline->cmove = line.cmove + 1;
 
 
 				alpha = move;
@@ -210,16 +187,6 @@ Seldepth = depth;
 	Move SearchMin(Move alpha, Move beta, int depth, LINE * pline)
 	{
 		Seldepth = depth;
-		/*if(depth < Depthy)
-		{
-		cout << "info depth " << depth << endl;
-		Depthy = depth;
-		}
-		else
-		{
-			cout << "seldepth " << depth << endl;
-		}*/
-		
 		LINE line;
 		
 		if(depth == 1)
@@ -229,7 +196,6 @@ Seldepth = depth;
 			Best.Score = Evaluate_Position();
 			pline->cmove = 0;
 			pline->score = Best.Score;
-			//Log << "Depth is 1, score is " << Temp << endl;
 			return Best;
 			}
 		Generate_Black_Knight_Moves();
@@ -253,51 +219,26 @@ Seldepth = depth;
 			beta.Score = Is_Mate();
 			pline->score = beta.Score;
 			pline->cmove = depth;
-			//cout << "\nCalled Is_Mate()" << endl;
 			return beta;			
 		}
 		
 		for(int i = 0; i < Black_Move_Spacer; i++)
 		{ 
-			//Log << "Making black's " << i << "th move" << endl; 
 			move.From = Black_Move_From_Stack[i];
 			move.To = Black_Move_To_Stack[i];
 			move.Move_Type = Black_Move_Types[i];
-				/******************************************************************************/
-			/*for( int h = 0; h < 64; h++)
-			{
-        	if(GeneralBoard[h] & move.From)
-        	{
-        	//Log << PlayerMoves[h];
-        	
-        }
-		}
-		for( int h = 0; h < 64; h++)
-        {
-        	if(GeneralBoard[h] & move.To)
-        	{
-        	//Log << PlayerMoves[h] << endl;
-        	
-        }
-		}*/		
-			/*********************************************************************************/
+			
 			
 			Make_Black_Search_Move(Black_Move_From_Stack[i], Black_Move_To_Stack[i], Black_Move_Types[i]);
 			
 			Move Temp_Move = SearchMax(alpha, beta, depth - 1, &line);
 			float Curr_Move_Score = Evaluate_Position();
 			move.Undo_Move();
-			//Log << "Branch score: " << Temp_Move.Score << endl; 
 			if(Temp_Move.Score <= alpha.Score)
 			{
 				return alpha;
 			}
 			
-			//if(Best.Score > Temp_Move.Score)
-			//{
-				//Best = move;
-				//Best.Score = Temp_Move.Score;
-			//}
 			if(Temp_Move.Score < beta.Score)
 			{
 				pline->argmove[0] = move;
@@ -313,12 +254,11 @@ Seldepth = depth;
 			
 		}
 		
-		return beta;
-	
+		return beta;	
 
 }
 
-int Make_White_Search_Move(Bitboard& From, Bitboard& To, int Move_Type)
+int Make_White_Search_Move(const Bitboard& From, const Bitboard& To, const int Move_Type)
 {
 
 	switch(Move_Type)//This switch evaluates the type of move that accompanies the index of the move stack that q refers to
@@ -542,7 +482,7 @@ int Make_White_Search_Move(Bitboard& From, Bitboard& To, int Move_Type)
 }
 
 
-int Make_Black_Search_Move(Bitboard& From, Bitboard& To, int Move_Type)
+int Make_Black_Search_Move(const Bitboard& From, const Bitboard& To, const int Move_Type)
 {
 	switch(Move_Type)//This switch evaluates the type of move that accompanies the index of the move stack that Move_Type refers to
                { 
@@ -816,12 +756,16 @@ float Is_Mate()
         for(int j = 0; j < 64; j++) 
         {
                 if(White_King & GeneralBoard[j])//Get the index (0-63) of White's king
-                h = j;
+                {
+                	h = j;
+                	break;
+            	}
         }
 	Bitboard BAttacks = Bmagic(h, (White_Pieces | Black_Pieces));
     Bitboard RAttacks = Rmagic(h, (White_Pieces | Black_Pieces));
     Bitboard QAttacks = Qmagic(h, (White_Pieces | Black_Pieces));
-    if(BAttacks & (Black_Bishops))
+    	
+		if(BAttacks & (Black_Bishops))
         return -10000.0;
         if(RAttacks & (Black_Rooks))
         return -10000.0;
@@ -856,7 +800,10 @@ float Is_Mate()
         for(int j = 0; j < 64; j++)
         {
                 if(Black_King & GeneralBoard[j])//Get the index(0-63) of the black king
-                h = j;
+                {
+                	h = j;
+                	break;
+            	}
         }
         BAttacks = Bmagic(h, (White_Pieces | Black_Pieces));
     	RAttacks = Rmagic(h, (White_Pieces | Black_Pieces));
@@ -890,7 +837,6 @@ float Is_Mate()
         White_Pawns2 ^= A_Pawn_Mask; 
         White_Pawns2 |= H_Pawn_Mask;
         White_Pawns2 ^= H_Pawn_Mask;
-        //cout << "At the end of Is_Mate" << endl;
         if(((White_Pawns << 7) | (White_Pawns << 9)) & GeneralBoard[h])
         return 10000.0;
         
