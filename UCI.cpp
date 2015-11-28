@@ -39,9 +39,6 @@ cout << "uciok\n";
 else if(UciCommand == "isready")
 cout << "readyok\n";
 
-else if (UciCommand == "ucinewgame")
-Searching = false;
-
 else if(UciCommand == "quit")
 exit(0);//Exit the program if called to quit
 
@@ -217,32 +214,12 @@ int MakeMove(Move& Best_Move)
 
 if(Current_Turn)
 	{
-/*Generate_White_Knight_Moves();//Generates White Knight moves
-Generate_White_King_Moves();//Generates White King moves
-Generate_White_Pawn_Moves();//Generates White Pawn moves
-Generate_White_Rook_Moves();//Generates White Rook moves
-Generate_White_Bishop_Moves();//Generates White Bishop moves
-Generate_White_Queen_Moves();//Generates White Queen moves*/
-MakeWhiteMove(Best_Move);//Plays White's moves out on the internal bitboards
-/*cin >> UciCommand;
-cin >> UciCommand;
-cin >> UciCommand;
-cin >> UciCommand;*/
-}
+		MakeWhiteMove(Best_Move);//Plays White's moves out on the internal bitboards
+	}
 else 
-{
-/*Generate_Black_Knight_Moves();//Generates Black Knight moves
-Generate_Black_King_Moves();//Generates Black King moves
-Generate_Black_Pawn_Moves();//Generates Black Pawn moves
-Generate_Black_Rook_Moves();//Generates Black Rook moves
-Generate_Black_Bishop_Moves();//Generates Black Bishop moves
-Generate_Black_Queen_Moves();//Generates Black Queen moves*/
-MakeBlackMove(Best_Move);//Plays Black's moves out on the internal bitboards
-/*cin >> UciCommand;
-cin >> UciCommand;
-cin >> UciCommand;
-cin >> UciCommand;*/
-}
+	{
+		MakeBlackMove(Best_Move);//Plays Black's moves out on the internal bitboards
+	}
    
     return 0;
 }
