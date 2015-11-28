@@ -15,8 +15,8 @@ int Generate_White_Bishop_Moves();
 int Generate_Black_Bishop_Moves();
 int Generate_White_Queen_Moves();
 int Generate_Black_Queen_Moves();
-bool White_Is_Legal(Bitboard& From_Square, Bitboard& To_Square, int Move_Type);//Tests for legality
-bool Black_Is_Legal(Bitboard& From_Square, Bitboard& To_Square, int Move_Type);//Tests for legality
+bool White_Is_Legal(const Bitboard& From_Square, const Bitboard& To_Square, const int Move_Type);//Tests for legality
+bool Black_Is_Legal(const Bitboard& From_Square, const Bitboard& To_Square, const int Move_Type);//Tests for legality
 extern bool Is_Legal;
 extern Bitboard White_Move_From_Stack[70];//Move stack is just an array of Bitboards(64-bit integers) containing only one bit set in each--the from square or the to square
 extern Bitboard White_Move_To_Stack[70];
