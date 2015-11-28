@@ -331,10 +331,10 @@ int Stack_Black_King_Moves() // Puts all the legal king moves on move stack
 		Black_Move_Types[Black_Move_Spacer - 1] = 15;
 	}*/   
      
-    Bitboard Spare = (King_Lookup_Table[j] | BlackKingCount[w]);// Spare is a bitboard with all legal squares the king can move to and the original square of the king
-    Bitboard Spare2 = Black_Pieces & King_Lookup_Table[j]; // Spare2 has all moves that do not capture one of white's own pieces    
+    Bitboard Spare = (King_Lookup_Table[j] | BlackKingCount[w]);// Spare is a bitboard with all legal empty squares the king can move to and the original square of the king
+    Bitboard Spare2 = Black_Pieces & King_Lookup_Table[j]; // Spare2 has all moves that do not capture one of black's own pieces    
     Bitboard Spare3 = ((Spare ^ Spare2) ^ GeneralBoard[j]); // Spare3 is the final result
-        for(int r = 0; r < 64; r++) // For each legal square found in Spare3 for the current king
+        for(int r = 0; r < 10; r++) // For each legal square found in Spare3 for the current king
     {
         if(GeneralBoard[r] & Spare3)//If a square is found that the king can legally move to 
         { 
@@ -362,7 +362,7 @@ int Stack_Black_King_Moves() // Puts all the legal king moves on move stack
     }
     
      // Tidy up for the next time this function is called
-     for(int u = 0; u < 8; u++) // Tidy up for the next function call
+     for(int u = 0; u < 10; u++) // Tidy up for the next function call
     {
         BlackKingCount[u] = 0;
         }
@@ -411,7 +411,7 @@ int Stack_White_Pawn_Moves() // Puts all the legal pawn moves on move stack
     }        
         
     
-        Bitboard Spare1 = (GeneralBoard[j] << 8);//Spare1 is a bitbaord containing the current pawn shifted the the left 8; this is the suqare directly "above" it
+        Bitboard Spare1 = (GeneralBoard[j] << 8);//Spare1 is a bitboard containing the current pawn shifted the the left 8; this is the suqare directly "above" it
         Bitboard Spare2 = (White_Pieces | Black_Pieces);//We have to make sure that the pawn does not move into one of white's or black's pieces when moving straight ahead
         Spare1 |= Spare2;//See above note
         Spare1 ^= Spare2; //Spare1 has one square ahead of the current pawn(if legal to move ahead)
@@ -420,7 +420,7 @@ int Stack_White_Pawn_Moves() // Puts all the legal pawn moves on move stack
         Swat <<= 8;//Various bit twiddling follows to give a bitboard containing all legal moves the current pawn can make
         Swat |= Spare2;
         Swat ^= Spare2; 
-    Swat <<= 8;
+    	Swat <<= 8;
         Swat |= Spare2;
         Swat ^= Spare2; 
         Spare1 |= Swat;
