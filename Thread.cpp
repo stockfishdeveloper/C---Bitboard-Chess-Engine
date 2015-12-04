@@ -53,6 +53,10 @@ void Runthread(void * aArg)
  	
     cout << "time " << d.count() << " nodes " << Nodes << " nps " << (1000 *(Nodes / (d.count() + 1))) << endl;
     Log << "time " << d.count() << " nodes " << Nodes << " nps " << (1000 *(Nodes / (d.count() + 1))) << endl;
+    if(d.count() >= (Time_Allocation / 20))
+    {
+    	STOP_SEARCHING_NOW = true;
+	}
     Sleep(500);
   } 
 }
