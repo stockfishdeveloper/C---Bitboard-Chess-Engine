@@ -57,13 +57,8 @@ int Generate_White_Knight_Moves()
     }
 }        
          White_Knight_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
-         Stack_White_Knight_Moves(); // Puts all legal knight moves on stack
+         
     }    
-return 0;
-}
-
-int Stack_White_Knight_Moves() // Puts all the legal knight moves on move stack 
-{ 
     int j = 0;//Holds the index of the current knight
     int w = 0; // Use it in a for loop to keep track of the number of iterations
         for(int w = 0; w <= White_Knight_Spacer; w++) // For eack knight found on KnightCount[]; at the beginning of the game it is 2
@@ -132,14 +127,9 @@ int Generate_Black_Knight_Moves()
     }
 }        
         Black_Knight_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
-         Stack_Black_Knight_Moves(); // Puts all legal knight moves on stack
+         
     }
     
-return 0;
-}
-
-int Stack_Black_Knight_Moves() // Puts all the legal knight moves on move stack 
-{ 
     int j = 0;//Used for the index of the current knight
     int w = 0; // Use it in a for loop to keep track of the number of iterations
         for(int w = 0; w <= Black_Knight_Spacer; w++) // For eack knight found on KnightCount[]; at the beginning of the game it is 2
@@ -198,8 +188,7 @@ Black_Knight_Spacer = 0; // Reset the knight count of the current position so th
 
 int Generate_White_King_Moves()
 {
-    if(White_King)//Actually this if statement is not needed; the white king can never actually be absent from the board
-    {        
+     
    for(int i = 0; i < 64; i++)
 {
     if(White_King & (GeneralBoard[i])) // If a king is found
@@ -209,15 +198,9 @@ int Generate_White_King_Moves()
     }
 }        
          White_King_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
-         Stack_White_King_Moves(); // Puts all legal king moves on stack
-    }
+         
     
-return 0;
-
-}
-
-int Stack_White_King_Moves() // Puts all the legal king moves on move stack 
-{ 
+    
     int j = 0;//Used in a for loop to index the current king
     int w = 0; // Use it in a for loop to keep track of the number of iterations
     for(int w = 0; w <= White_King_Spacer; w++)// For each king found on KnightCount[]
@@ -286,9 +269,7 @@ White_King_Spacer = 0; // Reset the king count of the current position so that i
 
 int Generate_Black_King_Moves()
 {
-    if(Black_King)//Really not needed--the king can never actually be captured
-    {        
-   for(int i = 0; i < 64; i++)
+    for(int i = 0; i < 64; i++)
 {
     if(Black_King & (GeneralBoard[i])) // If a king is found
     {
@@ -297,14 +278,9 @@ int Generate_Black_King_Moves()
     }
 }        
          Black_King_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
-         Stack_Black_King_Moves(); // Puts all legal king moves on stack
-    }
+         
     
-return 0;
-}
-
-int Stack_Black_King_Moves() // Puts all the legal king moves on move stack 
-{ 
+    
     int j = 0;//Used to help control the for loops
     int w = 0; // Use it in a for loop to keep track of the number of iterations
     for(int w = 0; w <= Black_King_Spacer; w++)// For each king found on KingCount[]
@@ -389,15 +365,9 @@ int Generate_White_Pawn_Moves()
     }
 }        
          White_Pawn_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
-         Stack_White_Pawn_Moves(); // Puts all legal pawn moves on stack
-    }
         
-        return 0;
-}
-
-
-int Stack_White_Pawn_Moves() // Puts all the legal pawn moves on move stack 
-{ 
+    }
+           
     int j = 0;//Used to keep track of iteration in a for loop
     int w = 0; // Use it in a for loop to keep track of the number of iterations
     for(int w = 0; w <= White_Pawn_Spacer; w++)// For each pawn found on PawnCount[]
@@ -503,17 +473,9 @@ int Generate_Black_Pawn_Moves()
     }
 }        
          Black_Pawn_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
-         Stack_Black_Pawn_Moves(); // Puts all legal pawn moves on stack
+         
     }
         
-        return 0;
-        
-        
-}
-
-
-int Stack_Black_Pawn_Moves() // Puts all the legal pawn moves on move stack 
-{ 
     int j = 0;//Used in a for loop
     int w = 0; // Use it in a for loop to keep track of the number of iterations
     for(int w = 0; w <= Black_Pawn_Spacer; w++)// For each pawn found on PawnCount[]
@@ -621,14 +583,8 @@ int Generate_White_Rook_Moves()
     }
 }        
          White_Rook_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
-         Stack_White_Rook_Moves(); // Puts all legal rook moves on stack
+         
     }   
-        return 0;
-}
-
-
-int Stack_White_Rook_Moves() // Puts all the legal rook moves on move stack 
-{ 
     int j = 0;//Used i a for loop
     int w = 0; // Use it in a for loop to keep track of the number of iterations
     for(int w = 0; w <= White_Rook_Spacer; w++)// For each rook found on RookCount[]
@@ -692,15 +648,9 @@ int Generate_Black_Rook_Moves()
     }
 }        
          Black_Rook_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
-         Stack_Black_Rook_Moves(); // Puts all legal rook moves on stack
+         
     }
         
-        return 0;
-}
-
-
-int Stack_Black_Rook_Moves() // Puts all the legal rook moves on move stack 
-{ 
     int j = 0;//Used in a for loop
     int w = 0; // Use it in a for loop to keep track of the number of iterations
     for(int w = 0; w <= Black_Rook_Spacer; w++)// For each rook found on RookCount[]
@@ -767,17 +717,8 @@ int Generate_White_Bishop_Moves()//Exactly the same as the Rook, Pawn, and King 
     }
 }        
          White_Bishop_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
-         Stack_White_Bishop_Moves(); // Puts all legal bishop moves on stack
+         
     }
-        
-        return 0;
-        
-        
-}
-
-
-int Stack_White_Bishop_Moves() // Puts all the legal bishop moves on move stack 
-{ 
     int j = 0;
     int w = 0; // Use it in a for loop to keep track of the number of iterations
     for(int w = 0; w <= White_Bishop_Spacer; w++)// For each rook found on BishopCount[]
@@ -846,14 +787,8 @@ int Generate_Black_Bishop_Moves()
     }
 }        
          Black_Bishop_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
-         Stack_Black_Bishop_Moves(); // Puts all legal bishop moves on stack
+         
     }   
-        return 0;
-}
-
-
-int Stack_Black_Bishop_Moves() // Puts all the legal bishop moves on move stack 
-{ 
     int j = 0;
     int w = 0; // Use it in a for loop to keep track of the number of iterations
     for(int w = 0; w <= Black_Bishop_Spacer; w++)// For each rook found on BishopCount[]
@@ -919,17 +854,9 @@ int Generate_White_Queen_Moves()
     }
 }        
          White_Queen_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
-         Stack_White_Queen_Moves(); // Puts all legal pawn moves on stack
+         
     }
-        
-        return 0;
-        
-        
-}
 
-
-int Stack_White_Queen_Moves() // Puts all the legal queen moves on move stack 
-{ 
     int j = 0;
     int w = 0; // Use it in a for loop to keep track of the number of iterations
     for(int w = 0; w <= White_Queen_Spacer; w++)// For each queen found on QueenCount[]
@@ -1002,17 +929,9 @@ int Generate_Black_Queen_Moves()
     }
 }        
          Black_Queen_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
-         Stack_Black_Queen_Moves(); // Puts all legal queen moves on stack 
+         
     }
         
-        return 0;
-        
-        
-}
-
-
-int Stack_Black_Queen_Moves() // Puts all the legal queen moves on move stack 
-{ 
     int j = 0;
     int w = 0; // Use it in a for loop to keep track of the number of iterations
     for(int w = 0; w <= Black_Queen_Spacer; w++)// For each queen found on QueenCount[]
