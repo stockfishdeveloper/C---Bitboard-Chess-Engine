@@ -65,7 +65,7 @@ Black_Bishops = 2594073385365405696;
 Black_Knights = 4755801206503243776;
 Black_Pawns = 71776119061217280;
 Current_Turn = true;
-White_Turn = true;
+White_Turn = true; 
 }
 
 else if (Is_Fen)
@@ -93,7 +93,6 @@ else if (UciCommand == "setoption")
 	}
 }
 
-
 else if(UciCommand == "go") 
 {
  
@@ -101,7 +100,14 @@ else if(UciCommand == "go")
  string time_left_black = "";
  cin >> time_left_white >> wtime >> time_left_black >> btime;
  Log << ">> " << time_left_white << " >> " << wtime << " >> " << time_left_black << " >> " << btime << endl;
- string first;
+ if((time_left_white == "btime") || (time_left_black == "wtime"))
+ {
+ int w;
+ w = wtime;
+ wtime = btime;
+ btime = w;
+}
+ string first;	
  string second;
  
  
@@ -152,6 +158,8 @@ typedef std::chrono::high_resolution_clock Time;
 		}
 		//cout << "info currmove " << first << second << "currmovenumber 1" << "depth 2" << "score cp " << (blank.Score / 100) << " nodes " << Nodes << "pv d2d4 d7d5 c2c4 " << endl;	
 		//cout << "bestmove " << first << second << endl;
+		Nodes = 0;
+		Searching = false;
 		}
 else if (UciCommand == "moves")
 {
