@@ -26,6 +26,9 @@ bool Time_Out = false;
 int Depth = 0;
 int Seldepth = 0;
 
+int Time_Allocation = 0;
+bool STOP_SEARCHING_NOW = false;
+
 Move Think(int wtime, int btime, int winc, int binc)
 {
 	typedef std::chrono::high_resolution_clock Time;
@@ -44,11 +47,12 @@ Move Think(int wtime, int btime, int winc, int binc)
  	Spar2.Score = 100000.0; 
 	const int MAXDEPTH = 8;
 	int Plies_Searched = 0;
-	
+		
 	for(int q = 0; q < MAXDEPTH; q++)
 		{
 			if(White_Turn == true)
 				{
+					Time_Allocation = wtime;
 					Depth = q;
     				blank = SearchMax(Spar, Spar2, (q - Plies_Searched) + 1, &PVline);
     				auto t1 = Time::now();
@@ -63,6 +67,7 @@ Move Think(int wtime, int btime, int winc, int binc)
 				
     		else
     			{
+    				Time_Allocation = btime;
     				blank = SearchMin(Spar, Spar2, (q - Plies_Searched) + 1, &PVline);
     				auto t1 = Time::now();
 					fsec fs = t1 - t0;
@@ -109,7 +114,13 @@ Move Think(int wtime, int btime, int winc, int binc)
 			Black_Bishop_Spacer = 0;
 			Black_Queen_Spacer = 0;
 			Black_Move_Spacer = 0;
-		}
+			if(STOP_SEARCHING_NOW)
+			{
+				STOP_SEARCHING_NOW = false;
+				return blank;
+			}
+			STOP_SEARCHING_NOW = false;
+			}
 		
 	return blank;
 }
@@ -118,6 +129,9 @@ Move SearchMax(Move alpha, Move beta, int depth, LINE * pline)
 {
 	Seldepth = depth;
 	LINE line;
+	
+	if(STOP_SEARCHING_NOW)
+	return alpha;
 	
 	if(depth == 1)
 		{ 	
@@ -153,6 +167,8 @@ Move SearchMax(Move alpha, Move beta, int depth, LINE * pline)
 					
 	for(int i = 0; i < White_Move_Spacer; i++)
 		{ 
+		if(STOP_SEARCHING_NOW)
+	return alpha;
 			move.From = White_Move_From_Stack[i];
 			move.To = White_Move_To_Stack[i];
 			move.Move_Type = White_Move_Types[i];
@@ -189,6 +205,9 @@ Move SearchMax(Move alpha, Move beta, int depth, LINE * pline)
 		Seldepth = depth;
 		LINE line;
 		
+		if(STOP_SEARCHING_NOW)
+		return beta;
+			
 		if(depth == 1)
 			{ 
 			Move Best;
@@ -223,7 +242,8 @@ Move SearchMax(Move alpha, Move beta, int depth, LINE * pline)
 		}
 		
 		for(int i = 0; i < Black_Move_Spacer; i++)
-		{ 
+		{ if(STOP_SEARCHING_NOW)
+		return beta;
 			move.From = Black_Move_From_Stack[i];
 			move.To = Black_Move_To_Stack[i];
 			move.Move_Type = Black_Move_Types[i];
