@@ -71,57 +71,64 @@ float Evaluate_Position()
 	    register int i = 0; //A little optimization
         for(i = 0; i < 64; i++)
         	{
-                if(GeneralBoard[i] & White_Pawns) //For each white pawn on the board
-                White_Score += 1.0; //Add one point to the score
-        	}
-        for(i = 0; i < 64; i++)
-        	{
-                if(GeneralBoard[i] & White_Knights)
-                White_Score += 3.0;
-        	}
-        for(i = 0; i < 64; i++)
-        	{
-                if(GeneralBoard[i] & White_Bishops)
-                White_Score += 3.0;
-        	}
-        for(i = 0; i < 64; i++)
-        	{
-                if(GeneralBoard[i] & White_Rooks)
-                White_Score += 5.0;
-        	}
-        for(i = 0; i < 64; i++)
-        	{
-                if(GeneralBoard[i] & White_Queens)
-                White_Score += 8.0;
-        	}
-        
-        for(i = 0; i < 64; i++)
-        	{
-                if(GeneralBoard[i] & Black_Pawns)
-                Black_Score += 1.0;
-        	}
-        for(i = 0; i < 64; i++)
-        	{
-                if(GeneralBoard[i] & Black_Knights)
-                Black_Score += 3.0;
-        	}
-        for(i = 0; i < 64; i++)
-        	{
-                if(GeneralBoard[i] & Black_Bishops)
-                Black_Score += 3.0;
-        	}
-        for(i = 0; i < 64; i++)
-        	{
-                if(GeneralBoard[i] & Black_Rooks)
-                Black_Score += 5.0;
-        	}
-        for(int i = 0; i < 64; i++)
-        	{
-                if(GeneralBoard[i] & Black_Queens)
-                Black_Score += 8.0;
+		bool IsWhitePawns = GeneralBoard[i] & White_Pawns;
+		bool IsWhiteKnights = GeneralBoard[i] & White_Knights;
+		bool IsWhiteBishops = GeneralBoard[i] & White_Bishops;
+		bool IsWhiteRooks = GeneralBoard[i] & White_Rooks;
+		bool IsWhiteQueens = GeneralBoard[i] & White_Queens;
+
+		if(IsWhitePawns) //For each white pawn on the board
+		{
+			White_Score += 1.0; //Add one point to the score
+		}
+		else if(IsWhiteKnights)
+		{
+			White_Score += 3.0;
+		}
+		else if(IsWhiteBishops)
+		{
+			White_Score += 3.0;
+		}
+		else if(IsWhiteRooks)
+		{
+			White_Score += 5.0;
+		}
+		else if(IsWhiteQueens)
+		{
+			White_Score += 8.0;
+		}
         	}
         
-        
+        for(i = 0; i < 64; i++)
+        	{
+		bool IsBlackPawns = GeneralBoard[i] & Black_Pawns;
+		bool IsBlackKnights = GeneralBoard[i] & Black_Knights;
+		bool IsBlackBishops = GeneralBoard[i] & Black_Bishops;
+		bool IsBlackRooks = GeneralBoard[i] & Black_Rooks;
+		bool IsBlackQueens = GeneralBoard[i] & Black_Queens;
+
+		if(IsBlackPawns) //For each black pawn on the board
+		{
+			Black_Score += 1.0; //Add one point to the score
+		}
+		else if(IsBlackKnights)
+		{
+			Black_Score += 3.0;
+		}
+		else if(IsBlackBishops)
+		{
+			Black_Score += 3.0;
+		}
+		else if(IsBlackRooks)
+		{
+			Black_Score += 5.0;
+		}
+		else if(IsBlackQueens)
+		{
+			Black_Score += 8.0;
+		}
+        	}
+
         //********************************************************************
 		//Assign scores to the pieces with the piece square tables
 	    //********************************************************************
