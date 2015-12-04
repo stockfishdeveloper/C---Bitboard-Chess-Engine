@@ -125,5 +125,7 @@ extern int Depth;
 extern int Seldepth;
 extern void Order_Moves(bool White_Turn);
 extern float Is_Mate();
+extern int Time_Allocation;
+extern bool STOP_SEARCHING_NOW;
 
 #endif
