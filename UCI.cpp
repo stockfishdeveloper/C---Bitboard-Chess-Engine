@@ -107,10 +107,6 @@ else if(UciCommand == "go")
  wtime = btime;
  btime = w;
 }
- string first;	
- string second;
- 
- 
  
  Searching = true;
  using namespace tthread;
@@ -145,7 +141,6 @@ typedef std::chrono::high_resolution_clock Time;
         	if(GeneralBoard[h] & blank.From)
         	{
         	cout << "bestmove " << PlayerMoves[h];
-        	first = PlayerMoves[h];
         	}
 		}
 		for( int h = 0; h < 64; h++)
@@ -153,11 +148,9 @@ typedef std::chrono::high_resolution_clock Time;
         	if(GeneralBoard[h] & blank.To)
         	{
         	cout  << PlayerMoves[h] << endl;
-        	second = PlayerMoves[h];
         	}
 		}
-		//cout << "info currmove " << first << second << "currmovenumber 1" << "depth 2" << "score cp " << (blank.Score / 100) << " nodes " << Nodes << "pv d2d4 d7d5 c2c4 " << endl;	
-		//cout << "bestmove " << first << second << endl;
+		
 		Nodes = 0;
 		
 		}
