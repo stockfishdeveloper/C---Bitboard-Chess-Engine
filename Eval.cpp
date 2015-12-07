@@ -81,19 +81,19 @@ float Evaluate_Position()
                 {
                         White_Score += 1.0; //Add one point to the score
                 }
-                else if(IsWhiteKnights)
+                if(IsWhiteKnights)
                 {
                         White_Score += 3.0;
                 }
-                else if(IsWhiteBishops)
+                if(IsWhiteBishops)
                 {
                         White_Score += 3.0;
                 }
-                else if(IsWhiteRooks)
+                if(IsWhiteRooks)
                 {
                         White_Score += 5.0;
                 }
-                else if(IsWhiteQueens)
+                if(IsWhiteQueens)
                 {
                         White_Score += 8.0;
                 }
@@ -111,19 +111,19 @@ float Evaluate_Position()
                 {
                         Black_Score += 1.0; //Add one point to the score
                 }
-                else if(IsBlackKnights)
+                if(IsBlackKnights)
                 {
                         Black_Score += 3.0;
                 }
-                else if(IsBlackBishops)
+                if(IsBlackBishops)
                 {
                         Black_Score += 3.0;
                 }
-                else if(IsBlackRooks)
+                if(IsBlackRooks)
                 {
                         Black_Score += 5.0;
                 }
-                else if(IsBlackQueens)
+                if(IsBlackQueens)
                 {
                         Black_Score += 8.0;
                 }
