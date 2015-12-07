@@ -122,7 +122,7 @@ typedef std::chrono::high_resolution_clock Time;
     typedef std::chrono::milliseconds ms;
     typedef std::chrono::duration<float> fsec;
     auto t0 = Time::now();
-    int f, g, h = 0, j = 0;
+    int h = 0, j = 0;
     Move blank;
 	blank = Think(wtime, btime, h, j);
     Searching = false;
@@ -159,7 +159,7 @@ typedef std::chrono::high_resolution_clock Time;
 		//cout << "info currmove " << first << second << "currmovenumber 1" << "depth 2" << "score cp " << (blank.Score / 100) << " nodes " << Nodes << "pv d2d4 d7d5 c2c4 " << endl;	
 		//cout << "bestmove " << first << second << endl;
 		Nodes = 0;
-		Searching = false;
+		
 		}
 else if (UciCommand == "moves")
 {
