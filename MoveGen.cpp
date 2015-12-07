@@ -86,15 +86,8 @@ int Generate_White_Knight_Moves()
                 {
                 White_Move_From_Stack[White_Move_Spacer] = WhiteKnightCount[w];  // Move_From_Stack gets original position of knight(s)
         White_Move_To_Stack[White_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
-       if((White_Move_To_Stack[White_Move_Spacer - 1]) & Black_Pieces)//If the move captures one of black pieces
-       { 
-           White_Move_Types[White_Move_Spacer - 1] = 3;//Make it a capture move
-           }
+        White_Move_Types[White_Move_Spacer - 1] = y;//Make it a "plain" move
            
-           else
-           {
-                White_Move_Types[White_Move_Spacer - 1] = 4;//Make it a "plain" move
-           }
     }
      
 }
@@ -156,15 +149,8 @@ int Generate_Black_Knight_Moves()
                 {
                 Black_Move_From_Stack[Black_Move_Spacer] = BlackKnightCount[w];  // Move_From_Stack gets original position of knight(s)
         Black_Move_To_Stack[Black_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to        
-       if((Black_Move_To_Stack[Black_Move_Spacer - 1]) & White_Pieces)//If the move captures a white piece
-       { 
-           Black_Move_Types[Black_Move_Spacer - 1] = 3;//It is called a capture move
-           }
+        Black_Move_Types[Black_Move_Spacer - 1] = y;//Or else is is called a "normal" kight move
            
-           else
-           {
-                Black_Move_Types[Black_Move_Spacer - 1] = 4;//Or else is is called a "normal" kight move
-           }
     }
 }
 
@@ -240,15 +226,8 @@ int Generate_White_King_Moves()
                 {
         White_Move_From_Stack[White_Move_Spacer] = WhiteKingCount[w];  // Move_From_Stack gets original position of the white king
         White_Move_To_Stack[White_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a single square it can move to
-        if((White_Move_To_Stack[White_Move_Spacer - 1]) & Black_Pieces)//If it is a capture move
-        { 
-            White_Move_Types[White_Move_Spacer - 1] = 11;//Then put this piece of information in the MoveTypes[] array
-            }
-           
-            else
-            {
-                White_Move_Types[White_Move_Spacer - 1] = 12;//Else it is just a "normal" king move
-            }
+        White_Move_Types[White_Move_Spacer - 1] = y;//Else it is just a "normal" king move
+            
     }
     }
     
@@ -321,15 +300,8 @@ int Generate_Black_King_Moves()
                 {
         Black_Move_From_Stack[Black_Move_Spacer] = BlackKingCount[w];  // Move_From_Stack gets original position of king
         Black_Move_To_Stack[Black_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
-       if((Black_Move_To_Stack[Black_Move_Spacer - 1]) & White_Pieces)//If it captures a white piece
-       { 
-           Black_Move_Types[Black_Move_Spacer - 1] = 11;//It is a capture move
-           }
+        Black_Move_Types[Black_Move_Spacer - 1] = y;//Or else it is just a "normal" move
            
-           else
-           {
-                Black_Move_Types[Black_Move_Spacer - 1] = 12;//Or else it is just a "normal" move
-           }
     }
     
         }
@@ -612,15 +584,8 @@ int Generate_White_Rook_Moves()
                 {
         White_Move_From_Stack[White_Move_Spacer] = WhiteRookCount[w];  // Move_From_Stack gets original position of rook(s)
         White_Move_To_Stack[White_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
-        if((White_Move_To_Stack[White_Move_Spacer - 1]) & Black_Pieces)//If it captures,
-        { 
-            White_Move_Types[White_Move_Spacer - 1] = 7;//Tell MakeMove()
-            }
-           
-            else
-            {
-                White_Move_Types[White_Move_Spacer - 1] = 8;//Else it is a "plain" sliding move
-            }
+        White_Move_Types[White_Move_Spacer - 1] = y;//Else it is a "plain" sliding move
+            
     }
     }
     
@@ -678,15 +643,8 @@ int Generate_Black_Rook_Moves()
                 {
         Black_Move_From_Stack[Black_Move_Spacer] = BlackRookCount[w];  // Move_From_Stack gets original position of rook(s)
         Black_Move_To_Stack[Black_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
-        if((Black_Move_To_Stack[Black_Move_Spacer - 1]) & White_Pieces)
-        { 
-            Black_Move_Types[Black_Move_Spacer - 1] = 7;
-            }
-           
-            else
-            {
-                Black_Move_Types[Black_Move_Spacer - 1] = 8;
-            }
+        Black_Move_Types[Black_Move_Spacer - 1] = y;
+            
     }
     }
     
@@ -746,15 +704,8 @@ int Generate_White_Bishop_Moves()//Exactly the same as the Rook, Pawn, and King 
                 {
         White_Move_From_Stack[White_Move_Spacer] = WhiteBishopCount[w];  // Move_From_Stack gets original position of bishop(s)
         White_Move_To_Stack[White_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
-        if((White_Move_To_Stack[White_Move_Spacer - 1]) & Black_Pieces)
-        { 
-            White_Move_Types[White_Move_Spacer - 1] = 5;
-            }
-           
-            else
-            {
-                White_Move_Types[White_Move_Spacer - 1] = 6;
-            }
+        White_Move_Types[White_Move_Spacer - 1] = y;
+            
     }
     }
     
@@ -816,15 +767,8 @@ int Generate_Black_Bishop_Moves()
                 {
         Black_Move_From_Stack[Black_Move_Spacer] = BlackBishopCount[w];  // Move_From_Stack gets original position of bishop(s)
         Black_Move_To_Stack[Black_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
-        if((Black_Move_To_Stack[Black_Move_Spacer - 1]) & White_Pieces)
-        { 
-            Black_Move_Types[Black_Move_Spacer - 1] = 5;
-            }
-           
-            else
-            {
-                Black_Move_Types[Black_Move_Spacer - 1] = 6;
-            }
+    	Black_Move_Types[Black_Move_Spacer - 1] = y;
+            
     }
     }
     
@@ -888,15 +832,8 @@ int Generate_White_Queen_Moves()
                 {
         White_Move_From_Stack[White_Move_Spacer] = WhiteQueenCount[w];  // Move_From_Stack gets original position of queen(s)
         White_Move_To_Stack[White_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
-        if((White_Move_To_Stack[White_Move_Spacer - 1]) & Black_Pieces)
-        { 
-            White_Move_Types[White_Move_Spacer - 1] = 9;
-            }
-           
-            else
-            {
-                White_Move_Types[White_Move_Spacer - 1] = 10;
-            }
+        White_Move_Types[White_Move_Spacer - 1] = y;
+            
     }
     }
     
@@ -963,15 +900,8 @@ int Generate_Black_Queen_Moves()
                 {
         Black_Move_From_Stack[Black_Move_Spacer] = BlackQueenCount[w];  // Move_From_Stack gets original position of queen(s)
         Black_Move_To_Stack[Black_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
-        if((Black_Move_To_Stack[Black_Move_Spacer - 1]) & White_Pieces)
-        { 
-           Black_Move_Types[Black_Move_Spacer - 1] = 9;
-            }
-           
-            else
-            {
-           Black_Move_Types[Black_Move_Spacer - 1] = 10;
-            }
+        Black_Move_Types[Black_Move_Spacer - 1] = y;
+            
     }
     }
     
