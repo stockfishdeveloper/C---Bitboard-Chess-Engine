@@ -37,7 +37,7 @@ cout << "option name TimePerMove type spin default 3 min 1 max 5\n";
 cout << "uciok\n";
 }
 else if(UciCommand == "isready")
-cout << "readyok\n";
+cout << "readyok" << endl;
 
 else if(UciCommand == "quit")
 exit(0);//Exit the program if called to quit
@@ -121,7 +121,7 @@ typedef std::chrono::high_resolution_clock Time;
     int h = 0, j = 0;
     Move blank;
 	blank = Think(wtime, btime, h, j);
-    Searching = false;
+	Searching = false;
     t.join();
     
     auto t1 = Time::now();
@@ -213,7 +213,7 @@ Log << Move_Count << endl;
 int MakeMove(Move& Best_Move)
 {
 
-if(Current_Turn)
+if(White_Turn)
 	{
 		MakeWhiteMove(Best_Move);//Plays White's moves out on the internal bitboards
 	}
