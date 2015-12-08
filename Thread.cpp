@@ -29,7 +29,7 @@ void Runthread(void * aArg)
   	Log << "<< " << "info multipv 1 depth " << Depth << " seldepth " << Seldepth << " score cp " << pvline.score * 100 << " pv ";
   	for(int i = 0; i < pvline.cmove; i++)
     {
-    	for( int h = 0; h < 50; h++)
+    	for( int h = 0; h < 20; h++)
 			{
         	if(GeneralBoard[h] & pvline.argmove[i].From)
         	{
@@ -37,7 +37,7 @@ void Runthread(void * aArg)
         	Log << PlayerMoves[h];
         	}
         }
-        	for( int h = 0; h < 50; h++)
+        	for( int h = 0; h < 20; h++)
         {
         	if(GeneralBoard[h] & pvline.argmove[i].To)
         	{
