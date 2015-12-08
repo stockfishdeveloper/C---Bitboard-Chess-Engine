@@ -21,7 +21,6 @@ int Leaf_Score = 0;
 int Best_Move = 0;
 int Nodes = 0;
 bool Searching = false;
-int Depthy = 1000;
 bool Time_Out = false;
 int Depth = 0;
 int Seldepth = 0;
