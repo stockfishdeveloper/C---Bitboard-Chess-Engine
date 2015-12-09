@@ -169,7 +169,20 @@ return 0;
 
 int Parse_Fen(string Fen)
 {
-
+White_Pieces = 0;
+Black_Pieces = 0;
+White_King = 0;
+Black_King = 0;
+White_Queens = 0;
+White_Rooks = 0;
+White_Bishops = 0;
+White_Knights = 0;
+White_Pawns = 0;
+Black_Queens = 0;
+Black_Rooks = 0;
+Black_Bishops = 0;
+Black_Knights = 0;
+Black_Pawns = 0;
 char Current_Square;
 for(int h = 0; h < (Fen.length()); h++)
 {
@@ -197,15 +210,18 @@ Log << Legal_Castling << endl;
 string En_Passant;
 cin >> En_Passant;
 Log << En_Passant << endl;
-string Pawn_Moves;
+int Pawn_Moves;
 cin >> Pawn_Moves;
 Log << Pawn_Moves << endl;
-string Move_Count;
+int Move_Count;
 cin >> Move_Count;
 Log << Move_Count << endl;
 	
-
-	
+Log << "White king: " << White_King << endl;
+Log << "White rooks: " << White_Rooks << endl;
+Log << "Black king: " << Black_King << endl;
+Log << "White_Turn: " << White_Turn << endl;
+Log << "Black rooks: " << Black_Rooks << endl;
 	return 0;
 }
 
