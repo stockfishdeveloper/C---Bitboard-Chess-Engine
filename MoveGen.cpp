@@ -310,7 +310,7 @@ int Generate_Black_King_Moves()
     }
     
      // Tidy up for the next time this function is called
-     for(int u = 0; u < 10; u++) // Tidy up for the next function call
+     for(int u = 0; u < 8; u++) // Tidy up for the next function call
     {
         BlackKingCount[u] = 0;
         }
@@ -843,7 +843,7 @@ int Generate_White_Queen_Moves()
     
     
      // Tidy up for the next person
-     for(int u = 0; u < 28; u++) //Clear WhiteQueenCount[]
+     for(int u = 0; u < 40; u++) //Clear WhiteQueenCount[]
     {
         WhiteQueenCount[u] = 0;
         }
@@ -911,7 +911,7 @@ int Generate_Black_Queen_Moves()
     
     
      // Tidy up for the next person
-     for(int u = 0; u < 28; u++) //Clear BlackQueenCount
+     for(int u = 0; u < 40; u++) //Clear BlackQueenCount
     {
         BlackQueenCount[u] = 0;
         }
