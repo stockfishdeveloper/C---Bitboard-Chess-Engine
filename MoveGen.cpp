@@ -40,12 +40,10 @@ int Black_Move_Spacer = 0;
 bool Is_Legal;
 bool WhiteHasCastled = false;
 bool BlackHasCastled = false;
-// White Knight Move generation
 
-// *****************************************************************************************************************************************
-int Generate_White_Knight_Moves()
+void Generate_White_Moves()
 {
-    if(White_Knights)//If there are any white knights on the board
+	if(White_Knights)//If there are any white knights on the board
     {
         
    for(int i = 0; i < 64; i++)
@@ -59,8 +57,8 @@ int Generate_White_Knight_Moves()
          White_Knight_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
          
     }    
-    int j = 0;//Holds the index of the current knight
-    int w = 0; // Use it in a for loop to keep track of the number of iterations
+    register int j = 0;//Holds the index of the current knight
+    register int w = 0; // Use it in a for loop to keep track of the number of iterations
         for(int w = 0; w <= White_Knight_Spacer; w++) // For eack knight found on KnightCount[]; at the beginning of the game it is 2
     {
         
@@ -100,82 +98,8 @@ int Generate_White_Knight_Moves()
         }
 
 White_Knight_Spacer = 0; // Reset the knight count of the current position so that if called again, the function can start from scratch
-    return 0;
-}
 
-//****************************************************************************************************************************************************
-// Black Knight Move Generation
-
-int Generate_Black_Knight_Moves()
-{
-    if(Black_Knights)//If there are any black knights
-    {
-        
-   for(int i = 0; i < 64; i++)
-{
-    if(Black_Knights & (GeneralBoard[i])) // If a knight is found
-    {
-           BlackKnightCount[Black_Knight_Spacer] = GeneralBoard[i]; // Put the Knight on the Knight Stack; Call the knight a "number of knights" e.g. the "first" knight
-           Black_Knight_Spacer++;//Increment the Knight spacer so that the program knows to put the next move into en empty array index  
-    }
-}        
-        Black_Knight_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
-         
-    }
-    
-    int j = 0;//Used for the index of the current knight
-    int w = 0; // Use it in a for loop to keep track of the number of iterations
-        for(int w = 0; w <= Black_Knight_Spacer; w++) // For eack knight found on KnightCount[]; at the beginning of the game it is 2
-    {        
-    for( int i = 0; i < 64; i++)//For each legal square for the current knight...
-    {
-    if(BlackKnightCount[w] & (GeneralBoard[i])) // Find the index of the current knight(1-63) and assign this value to j
-        {
-            j = i;
-        }
-    }        
-     
-    Bitboard Spare = (Knight_Lookup_Table[j] | BlackKnightCount[w]);// Spare is a bitboard with all legal squares the knight can move to and the original square of the knight
-    Bitboard Spare2 = Black_Pieces & Knight_Lookup_Table[j]; // Spare2 has all moves that do not capture one of white's own pieces    
-    Bitboard Spare3 = ((Spare ^ Spare2) ^ GeneralBoard[j]); // Knight_Pos is the final result
-        for(int r = 0; r < 64; r++) // For each legal square found in Spare3 for the current knight
-    {
-        if(GeneralBoard[r] & Spare3)//If the current iteration has the square value that the knight can got to 
-        { 
-        int y = 4;//The move as of right now is a "normal" knight move
-        if(GeneralBoard[r] & White_Pieces)//If it captures the opponent's piece, then we must make the move a capture knight move
-        y--;
-        if(Black_Is_Legal(BlackKnightCount[w], GeneralBoard[r], y))//If Is_Legal returns true, then the move is legal; if false, the current move is trashed
-                {
-                Black_Move_From_Stack[Black_Move_Spacer] = BlackKnightCount[w];  // Move_From_Stack gets original position of knight(s)
-        Black_Move_To_Stack[Black_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to        
-        Black_Move_Types[Black_Move_Spacer - 1] = y;//Or else is is called a "normal" kight move
-           
-    }
-}
-
-    }
-        
-  
-    }
-    for(int u = 0; u < 40; u++) // Tidy up for the next person
-    {
-        BlackKnightCount[u] = 0;
-        }
-Black_Knight_Spacer = 0; // Reset the knight count of the current position so that if called twice, the function can start from scratch
-    return 0;
-}
-//****************************************************************************************************************************************************
-
-
-//*************************************************************************************************
-//White King Move Generation
-
-
-int Generate_White_King_Moves()
-{
-     
-   for(int i = 0; i < 64; i++)
+for(int i = 0; i < 64; i++)
 {
     if(White_King & (GeneralBoard[i])) // If a king is found
     {
@@ -187,8 +111,8 @@ int Generate_White_King_Moves()
          
     
     
-    int j = 0;//Used in a for loop to index the current king
-    int w = 0; // Use it in a for loop to keep track of the number of iterations
+    j = 0;//Used in a for loop to index the current king
+    w = 0; // Use it in a for loop to keep track of the number of iterations
     for(int w = 0; w <= White_King_Spacer; w++)// For each king found on KnightCount[]
     {    
     for( int i = 0; i < 64; i++)
@@ -242,91 +166,8 @@ int Generate_White_King_Moves()
         WhiteKingCount[u] = 0;
         }
 White_King_Spacer = 0; // Reset the king count of the current position so that if called again, the function can start from scratch
-    return 0;
-}
-//****************************************************************************************************************************************************
 
-int Generate_Black_King_Moves()
-{
-    for(int i = 0; i < 64; i++)
-{
-    if(Black_King & (GeneralBoard[i])) // If a king is found
-    {
-           BlackKingCount[Black_King_Spacer] = GeneralBoard[i]; // Put the King on the King move Stack; Call the king a "number of kings" e.g. the "first" king
-           Black_King_Spacer++;   
-    }
-}        
-         Black_King_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
-         
-    
-    
-    int j = 0;//Used to help control the for loops
-    int w = 0; // Use it in a for loop to keep track of the number of iterations
-    for(int w = 0; w <= Black_King_Spacer; w++)// For each king found on KingCount[]
-    {    
-    for( int i = 0; i < 64; i++)
-    {
-        if(BlackKingCount[w] & (GeneralBoard[i])) // Find the index of the current king(1-63) and assign this value to j
-        {
-            j = i;
-        }
-    } 
-	//Kingside castling functionality
-	/*Bitboard first = (BlackKingCount[w] & 16);
-	Bitboard second = ((White_Pieces | Black_Pieces) & 6917529027641081856);
-	Bitboard e8 = 1152921504606846976, f8 = 2305843009213693952, g8 = 4611686018427387904, a0 = 0;
-	bool canmovetof8 = Black_Is_Legal(e8, f8, 15);
-	bool canmovetog8 = Black_Is_Legal(f8, g8, 15);
-	bool canmovetoe8 = Black_Is_Legal(a0, e8, 15); 
-    if(first && (!second) && canmovetof8 && canmovetog8 && canmovetoe8 && (!BlackHasCastled))
-    {
-		Black_Move_From_Stack[Black_Move_Spacer] = BlackKingCount[w];
-		Bitboard too = 4611686018427387904;	
-		Black_Move_To_Stack[Black_Move_Spacer++] = too;
-		Black_Move_Types[Black_Move_Spacer - 1] = 15;
-	}*/   
-     
-    Bitboard Spare = (King_Lookup_Table[j] | BlackKingCount[w]);// Spare is a bitboard with all legal empty squares the king can move to and the original square of the king
-    Bitboard Spare2 = Black_Pieces & King_Lookup_Table[j]; // Spare2 has all moves that do not capture one of black's own pieces    
-    Bitboard Spare3 = ((Spare ^ Spare2) ^ GeneralBoard[j]); // Spare3 is the final result
-        for(int r = 0; r < 10; r++) // For each legal square found in Spare3 for the current king
-    {
-        if(GeneralBoard[r] & Spare3)//If a square is found that the king can legally move to 
-        { 
-        int y = 12;//It is automatically called a "normal" king move 
-        if(GeneralBoard[r] & White_Pieces)//If it captures a white piece, then we have to decrement y which tells MakeMove() that the move is a king capture
-        y--;
-                if(Black_Is_Legal(BlackKingCount[w], GeneralBoard[r], y))//If the move is legal
-                {
-        Black_Move_From_Stack[Black_Move_Spacer] = BlackKingCount[w];  // Move_From_Stack gets original position of king
-        Black_Move_To_Stack[Black_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
-        Black_Move_Types[Black_Move_Spacer - 1] = y;//Or else it is just a "normal" move
-           
-    }
-    
-        }
-    }
-        
-    }
-    
-     // Tidy up for the next time this function is called
-     for(int u = 0; u < 8; u++) // Tidy up for the next function call
-    {
-        BlackKingCount[u] = 0;
-        }
-        
-
-Black_King_Spacer = 0; // Reset the king count of the current position so that if called again, the function can start from scratch
-    return 0;
-}
-
-/********************************************************************************************************************************************
-Pawn Move Generation
-*********************************************************************************************************************************************/
-
-int Generate_White_Pawn_Moves()
-{
-        if(White_Pawns)//If there are any white pawns
+if(White_Pawns)//If there are any white pawns
         {
                 for(int i = 0; i < 64; i++)
 {
@@ -340,8 +181,8 @@ int Generate_White_Pawn_Moves()
         
     }
            
-    int j = 0;//Used to keep track of iteration in a for loop
-    int w = 0; // Use it in a for loop to keep track of the number of iterations
+    j = 0;//Used to keep track of iteration in a for loop
+    w = 0; // Use it in a for loop to keep track of the number of iterations
     for(int w = 0; w <= White_Pawn_Spacer; w++)// For each pawn found on PawnCount[]
     {    
     for( int i = 0; i < 64; i++)
@@ -429,12 +270,316 @@ int Generate_White_Pawn_Moves()
         WhitePawnCount[u] = 0;
         }
 White_Pawn_Spacer = 0; // Reset the pawn count of the current position so that if called again, the function can start from scratch
-    return 0;
+
+if(White_Rooks)//If there are any white rooks
+        {
+                for(int i = 0; i < 64; i++)
+{
+    if(White_Rooks & (GeneralBoard[i])) // If a rook is found
+    {
+           WhiteRookCount[White_Rook_Spacer] = GeneralBoard[i]; // Put the rook on the rook Stack; Call the rook a "number of rooks" e.g. the "first" rook
+           White_Rook_Spacer++;   
+    }
+}        
+         White_Rook_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
+         
+    }   
+    j = 0;//Used i a for loop
+    w = 0; // Use it in a for loop to keep track of the number of iterations
+    for(int w = 0; w <= White_Rook_Spacer; w++)// For each rook found on RookCount[]
+    {    
+    for( int i = 0; i < 64; i++)
+    {
+        if(WhiteRookCount[w] & (GeneralBoard[i])) // Find the index of the current rook(1-63) and assign this value to j
+        {
+            j = i;
+        }
+    }        
+        
+    Bitboard Spare1 = Rmagic(j, (White_Pieces | Black_Pieces));//Pradu's rook movegen
+    Spare1 |= White_Pieces;//Make sure that it doesn't capture one of white's own pieces
+    Spare1 ^= White_Pieces;//See above note
+         
+            for(int r = 0; r < 64; r++) // For each legal square found in Spare1 for the current rook
+    {
+        if(GeneralBoard[r] & Spare1)
+        { 
+        int y = 8;//It is assumed to be a "normal" rook move
+        if(GeneralBoard[r] & Black_Pieces)//But if it captures a black piece,
+        y--;//Tell MakeMove()
+                if(White_Is_Legal(WhiteRookCount[w], GeneralBoard[r], y))//If the current move is legal,
+                {
+        White_Move_From_Stack[White_Move_Spacer] = WhiteRookCount[w];  // Move_From_Stack gets original position of rook(s)
+        White_Move_To_Stack[White_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
+        White_Move_Types[White_Move_Spacer - 1] = y;//Else it is a "plain" sliding move
+            
+    }
+    }
+    
+    }
+}
+     // Tidy up for the next person
+     for(int u = 0; u < 20; u++) // Clear WhiteRookCount[]
+    {
+        WhiteRookCount[u] = 0;
+        }
+White_Rook_Spacer = 0; // Reset the rook count of the current position so that if called again, the function can start from scratch
+
+ if(White_Bishops)
+        {
+                for(int i = 0; i < 64; i++)
+{
+    if(White_Bishops & (GeneralBoard[i])) // If a bishop is found
+    {
+           WhiteBishopCount[White_Bishop_Spacer] = GeneralBoard[i]; // Put the bishop on the pawn Stack; Call the bishop a "number of bishops" e.g. the "first" bishop
+           White_Bishop_Spacer++;   
+    }
+}        
+         White_Bishop_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
+         
+    }
+    j = 0;
+    w = 0; // Use it in a for loop to keep track of the number of iterations
+    for(int w = 0; w <= White_Bishop_Spacer; w++)// For each rook found on BishopCount[]
+    {    
+    for( int i = 0; i < 64; i++)
+    {
+        if(WhiteBishopCount[w] & (GeneralBoard[i])) // Find the index of the current bishop(1-63) and assign this value to j
+        {
+            j = i;
+        }
+    }        
+        
+    Bitboard Spare1 = Bmagic(j, (White_Pieces | Black_Pieces));
+    Spare1 |= White_Pieces;
+    Spare1 ^= White_Pieces;
+         
+            for(int r = 0; r < 64; r++) // For each legal square found in Spare1 for the current bishop
+    {
+        if(GeneralBoard[r] & Spare1)
+        { 
+        int y = 6;
+        if(GeneralBoard[r] & Black_Pieces)
+        y--;
+                if(White_Is_Legal(WhiteBishopCount[w], GeneralBoard[r], y))
+                {
+        White_Move_From_Stack[White_Move_Spacer] = WhiteBishopCount[w];  // Move_From_Stack gets original position of bishop(s)
+        White_Move_To_Stack[White_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
+        White_Move_Types[White_Move_Spacer - 1] = y;
+            
+    }
+    }
+    
+
+    }
+}
+    
+    
+     // Tidy up for the next person
+     for(int u = 0; u < 20; u++) //Clear WhiteBishopCount[]
+    {
+        WhiteBishopCount[u] = 0;
+        }
+        
+
+White_Bishop_Spacer = 0; // Reset the bishop count of the current position so that if called again, the function can start from scratch
+
+ if(White_Queens)
+        {
+                for(int i = 0; i < 64; i++)
+{
+    if(White_Queens & (GeneralBoard[i])) // If a queen is found
+    {
+           WhiteQueenCount[White_Queen_Spacer] = GeneralBoard[i]; // Put the queen on the queen Stack; Call the queen a "number of queens" e.g. the "first" queen
+           White_Queen_Spacer++;   
+    }
+}        
+         White_Queen_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
+         
+    }
+
+    j = 0;
+    w = 0; // Use it in a for loop to keep track of the number of iterations
+    for(int w = 0; w <= White_Queen_Spacer; w++)// For each queen found on QueenCount[]
+    {    
+    for( int i = 0; i < 64; i++)
+    {
+        if(WhiteQueenCount[w] & (GeneralBoard[i])) // Find the index of the current queen(1-63) and assign this value to j
+        {
+            j = i;
+        }
+    }        
+        
+    Bitboard Spare1 = Rmagic(j, (White_Pieces | Black_Pieces));
+    Spare1 |= White_Pieces;
+    Spare1 ^= White_Pieces;
+    Bitboard Spare2 = Bmagic(j, (White_Pieces | Black_Pieces));
+    Spare2 |= White_Pieces;
+    Spare2 ^= White_Pieces;
+    Bitboard Spare3 = (Spare1 | Spare2);
+         
+            for(int r = 0; r < 64; r++) // For each legal square found in Spare1 for the current queen
+    {
+        if(GeneralBoard[r] & Spare3)
+        { 
+        int y = 10;
+        if(GeneralBoard[r] & Black_Pieces)
+        y--;
+                if(White_Is_Legal(WhiteQueenCount[w], GeneralBoard[r], y))
+                {
+        White_Move_From_Stack[White_Move_Spacer] = WhiteQueenCount[w];  // Move_From_Stack gets original position of queen(s)
+        White_Move_To_Stack[White_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
+        White_Move_Types[White_Move_Spacer - 1] = y;
+            
+    }
+    }
+    
+
+    }
+}
+    
+    
+     // Tidy up for the next person
+     for(int u = 0; u < 40; u++) //Clear WhiteQueenCount[]
+    {
+        WhiteQueenCount[u] = 0;
+        }
+        
+
+White_Queen_Spacer = 0; // Reset the queen count of the current position so that if called again, the function can start from scratch
+
+return;
 }
 
-int Generate_Black_Pawn_Moves()
+void Generate_Black_Moves()
 {
-        if(Black_Pawns)//If there are any black pawns
+	if(Black_Knights)//If there are any black knights
+    {
+        
+   for(int i = 0; i < 64; i++)
+{
+    if(Black_Knights & (GeneralBoard[i])) // If a knight is found
+    {
+           BlackKnightCount[Black_Knight_Spacer] = GeneralBoard[i]; // Put the Knight on the Knight Stack; Call the knight a "number of knights" e.g. the "first" knight
+           Black_Knight_Spacer++;//Increment the Knight spacer so that the program knows to put the next move into en empty array index  
+    }
+}        
+        Black_Knight_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
+         
+    }
+    
+    register int j = 0;//Used for the index of the current knight
+    register int w = 0; // Use it in a for loop to keep track of the number of iterations
+        for(int w = 0; w <= Black_Knight_Spacer; w++) // For eack knight found on KnightCount[]; at the beginning of the game it is 2
+    {        
+    for( int i = 0; i < 64; i++)//For each legal square for the current knight...
+    {
+    if(BlackKnightCount[w] & (GeneralBoard[i])) // Find the index of the current knight(1-63) and assign this value to j
+        {
+            j = i;
+        }
+    }        
+     
+    Bitboard Spare = (Knight_Lookup_Table[j] | BlackKnightCount[w]);// Spare is a bitboard with all legal squares the knight can move to and the original square of the knight
+    Bitboard Spare2 = Black_Pieces & Knight_Lookup_Table[j]; // Spare2 has all moves that do not capture one of white's own pieces    
+    Bitboard Spare3 = ((Spare ^ Spare2) ^ GeneralBoard[j]); // Knight_Pos is the final result
+        for(int r = 0; r < 64; r++) // For each legal square found in Spare3 for the current knight
+    {
+        if(GeneralBoard[r] & Spare3)//If the current iteration has the square value that the knight can got to 
+        { 
+        int y = 4;//The move as of right now is a "normal" knight move
+        if(GeneralBoard[r] & White_Pieces)//If it captures the opponent's piece, then we must make the move a capture knight move
+        y--;
+        if(Black_Is_Legal(BlackKnightCount[w], GeneralBoard[r], y))//If Is_Legal returns true, then the move is legal; if false, the current move is trashed
+                {
+                Black_Move_From_Stack[Black_Move_Spacer] = BlackKnightCount[w];  // Move_From_Stack gets original position of knight(s)
+        Black_Move_To_Stack[Black_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to        
+        Black_Move_Types[Black_Move_Spacer - 1] = y;//Or else is is called a "normal" kight move
+           
+    }
+}
+
+    }
+        
+  
+    }
+    for(int u = 0; u < 40; u++) // Tidy up for the next person
+    {
+        BlackKnightCount[u] = 0;
+        }
+Black_Knight_Spacer = 0; // Reset the knight count of the current position so that if called twice, the function can start from scratch
+
+for(int i = 0; i < 64; i++)
+{
+    if(Black_King & (GeneralBoard[i])) // If a king is found
+    {
+           BlackKingCount[Black_King_Spacer] = GeneralBoard[i]; // Put the King on the King move Stack; Call the king a "number of kings" e.g. the "first" king
+           Black_King_Spacer++;   
+    }
+}        
+         Black_King_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
+         
+    
+    
+    j = 0;//Used to help control the for loops
+    w = 0; // Use it in a for loop to keep track of the number of iterations
+    for(int w = 0; w <= Black_King_Spacer; w++)// For each king found on KingCount[]
+    {    
+    for( int i = 0; i < 64; i++)
+    {
+        if(BlackKingCount[w] & (GeneralBoard[i])) // Find the index of the current king(1-63) and assign this value to j
+        {
+            j = i;
+        }
+    } 
+	//Kingside castling functionality
+	/*Bitboard first = (BlackKingCount[w] & 16);
+	Bitboard second = ((White_Pieces | Black_Pieces) & 6917529027641081856);
+	Bitboard e8 = 1152921504606846976, f8 = 2305843009213693952, g8 = 4611686018427387904, a0 = 0;
+	bool canmovetof8 = Black_Is_Legal(e8, f8, 15);
+	bool canmovetog8 = Black_Is_Legal(f8, g8, 15);
+	bool canmovetoe8 = Black_Is_Legal(a0, e8, 15); 
+    if(first && (!second) && canmovetof8 && canmovetog8 && canmovetoe8 && (!BlackHasCastled))
+    {
+		Black_Move_From_Stack[Black_Move_Spacer] = BlackKingCount[w];
+		Bitboard too = 4611686018427387904;	
+		Black_Move_To_Stack[Black_Move_Spacer++] = too;
+		Black_Move_Types[Black_Move_Spacer - 1] = 15;
+	}*/   
+     
+    Bitboard Spare = (King_Lookup_Table[j] | BlackKingCount[w]);// Spare is a bitboard with all legal empty squares the king can move to and the original square of the king
+    Bitboard Spare2 = Black_Pieces & King_Lookup_Table[j]; // Spare2 has all moves that do not capture one of black's own pieces    
+    Bitboard Spare3 = ((Spare ^ Spare2) ^ GeneralBoard[j]); // Spare3 is the final result
+        for(int r = 0; r < 10; r++) // For each legal square found in Spare3 for the current king
+    {
+        if(GeneralBoard[r] & Spare3)//If a square is found that the king can legally move to 
+        { 
+        int y = 12;//It is automatically called a "normal" king move 
+        if(GeneralBoard[r] & White_Pieces)//If it captures a white piece, then we have to decrement y which tells MakeMove() that the move is a king capture
+        y--;
+                if(Black_Is_Legal(BlackKingCount[w], GeneralBoard[r], y))//If the move is legal
+                {
+        Black_Move_From_Stack[Black_Move_Spacer] = BlackKingCount[w];  // Move_From_Stack gets original position of king
+        Black_Move_To_Stack[Black_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
+        Black_Move_Types[Black_Move_Spacer - 1] = y;//Or else it is just a "normal" move
+           
+    }
+    
+        }
+    }
+        
+    }
+    
+     // Tidy up for the next time this function is called
+     for(int u = 0; u < 8; u++) // Tidy up for the next function call
+    {
+        BlackKingCount[u] = 0;
+        }
+        
+
+Black_King_Spacer = 0; // Reset the king count of the current position so that if called again, the function can start from scratch
+
+if(Black_Pawns)//If there are any black pawns
         {
                 for(int i = 0; i < 64; i++)
 {
@@ -448,8 +593,8 @@ int Generate_Black_Pawn_Moves()
          
     }
         
-    int j = 0;//Used in a for loop
-    int w = 0; // Use it in a for loop to keep track of the number of iterations
+    j = 0;//Used in a for loop
+    w = 0; // Use it in a for loop to keep track of the number of iterations
     for(int w = 0; w <= Black_Pawn_Spacer; w++)// For each pawn found on PawnCount[]
     {    
     for( int i = 0; i < 64; i++)
@@ -539,70 +684,8 @@ int Generate_Black_Pawn_Moves()
         }
 
 Black_Pawn_Spacer = 0; // Reset the pawn count of the current position so that if called again, the function can start from scratch
-    return 0;
-}
 
-int Generate_White_Rook_Moves()
-{
-        if(White_Rooks)//If there are any white rooks
-        {
-                for(int i = 0; i < 64; i++)
-{
-    if(White_Rooks & (GeneralBoard[i])) // If a rook is found
-    {
-           WhiteRookCount[White_Rook_Spacer] = GeneralBoard[i]; // Put the rook on the rook Stack; Call the rook a "number of rooks" e.g. the "first" rook
-           White_Rook_Spacer++;   
-    }
-}        
-         White_Rook_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
-         
-    }   
-    int j = 0;//Used i a for loop
-    int w = 0; // Use it in a for loop to keep track of the number of iterations
-    for(int w = 0; w <= White_Rook_Spacer; w++)// For each rook found on RookCount[]
-    {    
-    for( int i = 0; i < 64; i++)
-    {
-        if(WhiteRookCount[w] & (GeneralBoard[i])) // Find the index of the current rook(1-63) and assign this value to j
-        {
-            j = i;
-        }
-    }        
-        
-    Bitboard Spare1 = Rmagic(j, (White_Pieces | Black_Pieces));//Pradu's rook movegen
-    Spare1 |= White_Pieces;//Make sure that it doesn't capture one of white's own pieces
-    Spare1 ^= White_Pieces;//See above note
-         
-            for(int r = 0; r < 64; r++) // For each legal square found in Spare1 for the current rook
-    {
-        if(GeneralBoard[r] & Spare1)
-        { 
-        int y = 8;//It is assumed to be a "normal" rook move
-        if(GeneralBoard[r] & Black_Pieces)//But if it captures a black piece,
-        y--;//Tell MakeMove()
-                if(White_Is_Legal(WhiteRookCount[w], GeneralBoard[r], y))//If the current move is legal,
-                {
-        White_Move_From_Stack[White_Move_Spacer] = WhiteRookCount[w];  // Move_From_Stack gets original position of rook(s)
-        White_Move_To_Stack[White_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
-        White_Move_Types[White_Move_Spacer - 1] = y;//Else it is a "plain" sliding move
-            
-    }
-    }
-    
-    }
-}
-     // Tidy up for the next person
-     for(int u = 0; u < 20; u++) // Clear WhiteRookCount[]
-    {
-        WhiteRookCount[u] = 0;
-        }
-White_Rook_Spacer = 0; // Reset the rook count of the current position so that if called again, the function can start from scratch
-    return 0;
-}
-
-int Generate_Black_Rook_Moves()
-{
-        if(Black_Rooks)//If there are any black rooks, 
+if(Black_Rooks)//If there are any black rooks, 
         {
                 for(int i = 0; i < 64; i++)
 {
@@ -616,8 +699,8 @@ int Generate_Black_Rook_Moves()
          
     }
         
-    int j = 0;//Used in a for loop
-    int w = 0; // Use it in a for loop to keep track of the number of iterations
+    j = 0;//Used in a for loop
+    w = 0; // Use it in a for loop to keep track of the number of iterations
     for(int w = 0; w <= Black_Rook_Spacer; w++)// For each rook found on RookCount[]
     {    
     for( int i = 0; i < 64; i++)
@@ -659,74 +742,7 @@ int Generate_Black_Rook_Moves()
         BlackRookCount[u] = 0;
         }
         Black_Rook_Spacer = 0; // Reset the rook count of the current position so that if called again, the function can start from scratch
-    return 0;
-}
-
-int Generate_White_Bishop_Moves()//Exactly the same as the Rook, Pawn, and King movegen. For notes on the following functions, see the previous piece movegen functions
-{
-        if(White_Bishops)
-        {
-                for(int i = 0; i < 64; i++)
-{
-    if(White_Bishops & (GeneralBoard[i])) // If a bishop is found
-    {
-           WhiteBishopCount[White_Bishop_Spacer] = GeneralBoard[i]; // Put the bishop on the pawn Stack; Call the bishop a "number of bishops" e.g. the "first" bishop
-           White_Bishop_Spacer++;   
-    }
-}        
-         White_Bishop_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
-         
-    }
-    int j = 0;
-    int w = 0; // Use it in a for loop to keep track of the number of iterations
-    for(int w = 0; w <= White_Bishop_Spacer; w++)// For each rook found on BishopCount[]
-    {    
-    for( int i = 0; i < 64; i++)
-    {
-        if(WhiteBishopCount[w] & (GeneralBoard[i])) // Find the index of the current bishop(1-63) and assign this value to j
-        {
-            j = i;
-        }
-    }        
         
-    Bitboard Spare1 = Bmagic(j, (White_Pieces | Black_Pieces));
-    Spare1 |= White_Pieces;
-    Spare1 ^= White_Pieces;
-         
-            for(int r = 0; r < 64; r++) // For each legal square found in Spare1 for the current bishop
-    {
-        if(GeneralBoard[r] & Spare1)
-        { 
-        int y = 6;
-        if(GeneralBoard[r] & Black_Pieces)
-        y--;
-                if(White_Is_Legal(WhiteBishopCount[w], GeneralBoard[r], y))
-                {
-        White_Move_From_Stack[White_Move_Spacer] = WhiteBishopCount[w];  // Move_From_Stack gets original position of bishop(s)
-        White_Move_To_Stack[White_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
-        White_Move_Types[White_Move_Spacer - 1] = y;
-            
-    }
-    }
-    
-
-    }
-}
-    
-    
-     // Tidy up for the next person
-     for(int u = 0; u < 20; u++) //Clear WhiteBishopCount[]
-    {
-        WhiteBishopCount[u] = 0;
-        }
-        
-
-White_Bishop_Spacer = 0; // Reset the bishop count of the current position so that if called again, the function can start from scratch
-    return 0;
-}
-
-int Generate_Black_Bishop_Moves()
-{
         if(Black_Bishops)
         {
                 for(int i = 0; i < 64; i++)
@@ -740,8 +756,8 @@ int Generate_Black_Bishop_Moves()
          Black_Bishop_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
          
     }   
-    int j = 0;
-    int w = 0; // Use it in a for loop to keep track of the number of iterations
+    j = 0;
+    w = 0; // Use it in a for loop to keep track of the number of iterations
     for(int w = 0; w <= Black_Bishop_Spacer; w++)// For each rook found on BishopCount[]
     {    
     for( int i = 0; i < 64; i++)
@@ -782,79 +798,7 @@ int Generate_Black_Bishop_Moves()
         BlackBishopCount[u] = 0;
         }
         Black_Bishop_Spacer = 0; // Reset the bishop count of the current position so that if called again, the function can start from scratch
-    return 0;
-}
-
-int Generate_White_Queen_Moves()
-{
-        if(White_Queens)
-        {
-                for(int i = 0; i < 64; i++)
-{
-    if(White_Queens & (GeneralBoard[i])) // If a queen is found
-    {
-           WhiteQueenCount[White_Queen_Spacer] = GeneralBoard[i]; // Put the queen on the queen Stack; Call the queen a "number of queens" e.g. the "first" queen
-           White_Queen_Spacer++;   
-    }
-}        
-         White_Queen_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
-         
-    }
-
-    int j = 0;
-    int w = 0; // Use it in a for loop to keep track of the number of iterations
-    for(int w = 0; w <= White_Queen_Spacer; w++)// For each queen found on QueenCount[]
-    {    
-    for( int i = 0; i < 64; i++)
-    {
-        if(WhiteQueenCount[w] & (GeneralBoard[i])) // Find the index of the current queen(1-63) and assign this value to j
-        {
-            j = i;
-        }
-    }        
         
-    Bitboard Spare1 = Rmagic(j, (White_Pieces | Black_Pieces));
-    Spare1 |= White_Pieces;
-    Spare1 ^= White_Pieces;
-    Bitboard Spare2 = Bmagic(j, (White_Pieces | Black_Pieces));
-    Spare2 |= White_Pieces;
-    Spare2 ^= White_Pieces;
-    Bitboard Spare3 = (Spare1 | Spare2);
-         
-            for(int r = 0; r < 64; r++) // For each legal square found in Spare1 for the current queen
-    {
-        if(GeneralBoard[r] & Spare3)
-        { 
-        int y = 10;
-        if(GeneralBoard[r] & Black_Pieces)
-        y--;
-                if(White_Is_Legal(WhiteQueenCount[w], GeneralBoard[r], y))
-                {
-        White_Move_From_Stack[White_Move_Spacer] = WhiteQueenCount[w];  // Move_From_Stack gets original position of queen(s)
-        White_Move_To_Stack[White_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
-        White_Move_Types[White_Move_Spacer - 1] = y;
-            
-    }
-    }
-    
-
-    }
-}
-    
-    
-     // Tidy up for the next person
-     for(int u = 0; u < 40; u++) //Clear WhiteQueenCount[]
-    {
-        WhiteQueenCount[u] = 0;
-        }
-        
-
-White_Queen_Spacer = 0; // Reset the queen count of the current position so that if called again, the function can start from scratch
-    return 0;
-}
-
-int Generate_Black_Queen_Moves()
-{
         if(Black_Queens)
         {
                 for(int i = 0; i < 64; i++)
@@ -869,8 +813,8 @@ int Generate_Black_Queen_Moves()
          
     }
         
-    int j = 0;
-    int w = 0; // Use it in a for loop to keep track of the number of iterations
+    j = 0;
+    w = 0; // Use it in a for loop to keep track of the number of iterations
     for(int w = 0; w <= Black_Queen_Spacer; w++)// For each queen found on QueenCount[]
     	{    
     for( int i = 0; i < 64; i++)
@@ -918,6 +862,6 @@ int Generate_Black_Queen_Moves()
         
 
 Black_Queen_Spacer = 0; // Reset the queen count of the current position so that if called again, the function can start from scratch
-    return 0;
-}
 
+return;
+}
