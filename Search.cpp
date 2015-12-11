@@ -138,12 +138,9 @@ Move SearchMax(Move alpha, Move beta, int depth, LINE * pline)
 			pline->score = Best.Score;
 			return Best;
 		}
-	Generate_White_Knight_Moves();
-	Generate_White_King_Moves();
-	Generate_White_Pawn_Moves();
-	Generate_White_Rook_Moves();
-	Generate_White_Bishop_Moves();
-	Generate_White_Queen_Moves();
+		
+	Generate_White_Moves();
+	
 	register Move move;
 	move.White_Temp_Move_Spacer = White_Move_Spacer;
 	for(int h = 0; h < White_Move_Spacer; h++)
@@ -213,12 +210,9 @@ Move SearchMax(Move alpha, Move beta, int depth, LINE * pline)
 			pline->score = Best.Score;
 			return Best;
 			}
-		Generate_Black_Knight_Moves();
-		Generate_Black_King_Moves();
-		Generate_Black_Pawn_Moves();
-		Generate_Black_Rook_Moves();
-		Generate_Black_Bishop_Moves();
-		Generate_Black_Queen_Moves();
+			
+		Generate_Black_Moves();
+		
 		register Move move;
 		move.Black_Temp_Move_Spacer = Black_Move_Spacer;
 		
