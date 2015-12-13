@@ -41,7 +41,7 @@ Move Think(int wtime, int btime, int winc, int binc)
 	Spar.Score = -100000.0;
  	Move Spar2;
  	Spar2.Score = 100000.0; 
-	const int MAXDEPTH = 8;
+	const int MAXDEPTH = 30;
 	int Plies_Searched = 0;
 		
 	for(int q = 0; q < MAXDEPTH; q++)
@@ -114,6 +114,16 @@ Move Think(int wtime, int btime, int winc, int binc)
 			{
 				STOP_SEARCHING_NOW = false;
 				return blank;
+			}
+			if ((blank.Score <= Spar.Score) || (blank.Score >= Spar2.Score))
+			{
+				Spar.Score = -100000.0;
+				Spar2.Score = 100000.0;
+			}
+			else
+			{
+			Spar.Score = blank.Score - 0.5;
+			Spar2.Score = blank.Score + 0.5;
 			}
 			STOP_SEARCHING_NOW = false;
 			}
