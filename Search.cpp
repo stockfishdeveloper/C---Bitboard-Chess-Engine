@@ -155,8 +155,8 @@ Move SearchMax(Move alpha, Move beta, int depth, LINE * pline)
 	move.White_Temp_Move_Spacer = White_Move_Spacer;
 	for(int h = 0; h < White_Move_Spacer; h++)
 		{
-			move.White_Temp_Move_From_Stack[h] = White_Move_From_Stack[h];
-			move.White_Temp_Move_To_Stack[h] = White_Move_To_Stack[h];
+			move.White_Temp_Move_From_Stack[h] = move.Convert_Bitboard(White_Move_From_Stack[h]);
+			move.White_Temp_Move_To_Stack[h] = move.Convert_Bitboard(White_Move_To_Stack[h]);
 			move.White_Temp_Move_Types[h] = White_Move_Types[h];
 		}
 			
@@ -228,8 +228,8 @@ Move SearchMax(Move alpha, Move beta, int depth, LINE * pline)
 		
 		for(int h = 0; h < Black_Move_Spacer; h++)
 			{
-				move.Black_Temp_Move_From_Stack[h] = Black_Move_From_Stack[h];
-				move.Black_Temp_Move_To_Stack[h] = Black_Move_To_Stack[h];
+				move.Black_Temp_Move_From_Stack[h] = move.Convert_Bitboard(Black_Move_From_Stack[h]);
+				move.Black_Temp_Move_To_Stack[h] = move.Convert_Bitboard(Black_Move_To_Stack[h]);
 				move.Black_Temp_Move_Types[h] = Black_Move_Types[h];
 			}
 			
