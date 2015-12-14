@@ -11,10 +11,10 @@ class Move
 		Bitboard To;
 		int Move_Type;
 		float Score;
-		Bitboard White_Temp_Move_From_Stack[70];
-		Bitboard White_Temp_Move_To_Stack[70];
-		Bitboard Black_Temp_Move_From_Stack[70];
-		Bitboard Black_Temp_Move_To_Stack[70];
+		int White_Temp_Move_From_Stack[70];
+		int White_Temp_Move_To_Stack[70];
+		int Black_Temp_Move_From_Stack[70];
+		int Black_Temp_Move_To_Stack[70];
 		int White_Temp_Move_Types[70];
 		int Black_Temp_Move_Types[70];
 		int White_Temp_Move_Spacer; 
@@ -34,6 +34,22 @@ class Move
 		Bitboard Black_Bishops2;
 		Bitboard Black_Knights2;
 		Bitboard Black_Pawns2;
+		
+		int Convert_Bitboard(Bitboard board)
+		{
+			for(int i = 0; i < 64; i++)
+			{
+				if(board & GeneralBoard[i])
+				return i;
+			}
+			if(board == 0)
+			return 0;
+		}
+		
+		Bitboard Unconvert_Int(int number)
+		{
+			return GeneralBoard[number];
+		}
 		
 		void Undo_Move()
 		{
@@ -55,15 +71,15 @@ class Move
 		Black_Move_Spacer = Black_Temp_Move_Spacer;
 		for(int h = 0; h < White_Temp_Move_Spacer; h++)
 			{
-				White_Move_From_Stack[h] = White_Temp_Move_From_Stack[h];
-				White_Move_To_Stack[h] = White_Temp_Move_To_Stack[h];
+				White_Move_From_Stack[h] = Unconvert_Int(White_Temp_Move_From_Stack[h]);
+				White_Move_To_Stack[h] = Unconvert_Int(White_Temp_Move_To_Stack[h]);
 				White_Move_Types[h] = White_Temp_Move_Types[h];
 			}
 			
 		for(int h = 0; h < Black_Temp_Move_Spacer; h++)
 		{
-		Black_Move_From_Stack[h] = Black_Temp_Move_From_Stack[h];
-		Black_Move_To_Stack[h] = Black_Temp_Move_To_Stack[h];
+		Black_Move_From_Stack[h] = Unconvert_Int(Black_Temp_Move_From_Stack[h]);
+		Black_Move_To_Stack[h] = Unconvert_Int(Black_Temp_Move_To_Stack[h]);
 		Black_Move_Types[h] = Black_Temp_Move_Types[h];
 		}
 		Current_Turn ^= 1;
@@ -102,7 +118,7 @@ public:
     float score = 0.0;
 };
 
-#include "Movegen.h"
+
 Move Think(int wtime, int btime, int winc, int binc);
 Move SearchMax(Move alpha, Move beta, int depth, LINE * pline);
 Move SearchMin(Move alpha, Move beta, int depth, LINE * pline);
