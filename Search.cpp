@@ -21,7 +21,6 @@ bool Searching = false;
 bool Time_Out = false;
 int Depth = 0;
 int Seldepth = 0;
-
 int Time_Allocation = 0;
 bool STOP_SEARCHING_NOW = false;
 
@@ -112,7 +111,7 @@ Move Think(int wtime, int btime, int winc, int binc)
 			Black_Move_Spacer = 0;
 			if(STOP_SEARCHING_NOW)
 			{
-				STOP_SEARCHING_NOW = false;
+				Time_Allocation = 0;
 				return blank;
 			}
 			if ((blank.Score <= Spar.Score) || (blank.Score >= Spar2.Score))
@@ -125,7 +124,7 @@ Move Think(int wtime, int btime, int winc, int binc)
 			Spar.Score = blank.Score - 0.5;
 			Spar2.Score = blank.Score + 0.5;
 			}
-			STOP_SEARCHING_NOW = false;
+			//STOP_SEARCHING_NOW = false;
 			}
 		
 	return blank;
@@ -170,8 +169,9 @@ Move SearchMax(Move alpha, Move beta, int depth, LINE * pline)
 					
 	for(int i = 0; i < White_Move_Spacer; i++)
 		{ 
+		Nodes++;
 		if(STOP_SEARCHING_NOW)
-	return alpha;
+		return alpha;
 			move.From = White_Move_From_Stack[i];
 			move.To = White_Move_To_Stack[i];
 			move.Move_Type = White_Move_Types[i];
@@ -195,7 +195,7 @@ Move SearchMax(Move alpha, Move beta, int depth, LINE * pline)
 
 				alpha = move;
 				alpha.Score = Temp_Move.Score;
-			}
+				}
 			
 		}
 		
@@ -225,7 +225,6 @@ Move SearchMax(Move alpha, Move beta, int depth, LINE * pline)
 		
 		register Move move;
 		move.Black_Temp_Move_Spacer = Black_Move_Spacer;
-		
 		for(int h = 0; h < Black_Move_Spacer; h++)
 			{
 				move.Black_Temp_Move_From_Stack[h] = move.Convert_Bitboard(Black_Move_From_Stack[h]);
@@ -248,7 +247,7 @@ Move SearchMax(Move alpha, Move beta, int depth, LINE * pline)
 			move.To = Black_Move_To_Stack[i];
 			move.Move_Type = Black_Move_Types[i];
 			
-			
+			Nodes++;
 			Make_Black_Search_Move(Black_Move_From_Stack[i], Black_Move_To_Stack[i], Black_Move_Types[i]);
 			
 			Move Temp_Move = SearchMax(alpha, beta, depth - 1, &line);
