@@ -56,6 +56,7 @@ void Runthread(void * aArg)
     if(d.count() >= (Time_Allocation / 20))
     {
     	STOP_SEARCHING_NOW = true;
+    	return;
 	}
     Sleep(500);
   } 
