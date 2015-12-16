@@ -42,9 +42,13 @@ cout << "readyok" << endl;
 else if(UciCommand == "quit")
 exit(0);//Exit the program if called to quit
 
+else if(UciCommand == "stop")
+STOP_SEARCHING_NOW = true;
+
 else if (UciCommand == "ucinewgame") 
 {
-Searching = false; 
+Searching = false;
+STOP_SEARCHING_NOW = false; 
 Nodes = 0;
 }
 
@@ -65,7 +69,42 @@ Black_Bishops = 2594073385365405696;
 Black_Knights = 4755801206503243776;
 Black_Pawns = 71776119061217280;
 Current_Turn = true;
-White_Turn = true; 
+White_Turn = true;
+Searching = false;
+wtime = 0;
+btime = 0;
+Searching = false;
+STOP_SEARCHING_NOW = false; 
+Nodes = 0;
+for(int t = 0; t < 70; t++)               
+               {
+               	 White_Move_From_Stack[t] = 0;//Clear the move from stack
+               	 White_Move_To_Stack[t] = 0;//Clear the move to stack
+               	 White_Move_Types[t] = 0;//Clear the move types associated with the moves
+			   }
+			   
+			White_Knight_Spacer = 0;//Clear all of the piece spacers
+			White_King_Spacer = 0;
+			White_Pawn_Spacer = 0;
+			White_Rook_Spacer = 0;
+			White_Bishop_Spacer = 0;
+			White_Queen_Spacer = 0;
+			White_Move_Spacer = 0;
+			    
+			for(int t = 0; t < 70; t++)               
+               {
+               	 Black_Move_From_Stack[t] = 0;//Clear the move from stack
+               	 Black_Move_To_Stack[t] = 0;//Clear the move to stack
+               	 Black_Move_Types[t] = 0;//Clear the move types associated with the moves
+			   }
+			   
+			Black_Knight_Spacer = 0;//Clear all of the piece spacers
+			Black_King_Spacer = 0;
+			Black_Pawn_Spacer = 0;
+			Black_Rook_Spacer = 0;
+			Black_Bishop_Spacer = 0;
+			Black_Queen_Spacer = 0;
+			Black_Move_Spacer = 0; 
 }
 
 else if (Is_Fen)
