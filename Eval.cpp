@@ -64,10 +64,10 @@ int BPpsqt[64] =
 //********************************************************************
                 
 //Evaluates the current position based on the bitboards in Bitboard.cpp         
-float Evaluate_Position() 
+int Evaluate_Position() 
         {
-                float White_Score = 0.0; //White's Score
-                float Black_Score = 0.0; //Black's Score
+                int White_Score = 0; //White's Score
+                int Black_Score = 0; //Black's Score
         
             register int i = 0; //A little optimization
         for(i = 0; i < 64; i++)
@@ -80,23 +80,23 @@ float Evaluate_Position()
 
                 if(IsWhitePawns) //For each white pawn on the board
                 {
-                        White_Score += 1.0; //Add one point to the score
+                        White_Score += 1; //Add one point to the score
                 }
                 if(IsWhiteKnights)
                 {
-                        White_Score += 3.0;
+                        White_Score += 3;
                 }
                 if(IsWhiteBishops)
                 {
-                        White_Score += 3.0;
+                        White_Score += 3;
                 }
                 if(IsWhiteRooks)
                 {
-                        White_Score += 5.0;
+                        White_Score += 5;
                 }
                 if(IsWhiteQueens)
                 {
-                        White_Score += 8.0;
+                        White_Score += 8;
                 }
                 }
         
@@ -110,23 +110,23 @@ float Evaluate_Position()
 
                 if(IsBlackPawns) //For each black pawn on the board
                 {
-                        Black_Score += 1.0; //Add one point to the score
+                        Black_Score += 1; //Add one point to the score
                 }
                 if(IsBlackKnights)
                 {
-                        Black_Score += 3.0;
+                        Black_Score += 3;
                 }
                 if(IsBlackBishops)
                 {
-                        Black_Score += 3.0;
+                        Black_Score += 3;
                 }
                 if(IsBlackRooks)
                 {
-                        Black_Score += 5.0;
+                        Black_Score += 5;
                 }
                 if(IsBlackQueens)
                 {
-                        Black_Score += 8.0;
+                        Black_Score += 8;
                 }
                 }
 
@@ -141,13 +141,13 @@ float Evaluate_Position()
                 	bool HasWhitePawn = GeneralBoard[i] & White_Pawns;
                 	bool HasBlackPawn = GeneralBoard[i] & Black_Pawns;
                 	if(HasWhiteKnight)
-                	White_Score += float(float(WNpsqt[i]) / 100);
+                	White_Score += WNpsqt[i];
                 	if(HasBlackKnight)
-                	Black_Score += float(float(BNpsqt[i]) / 100);
+                	Black_Score += BNpsqt[i];
                 	if(HasWhitePawn)
-                	White_Score += float(float(WPpsqt[i]) / 100);
+                	White_Score += WPpsqt[i];
                 	if(HasBlackPawn)
-                	Black_Score += float(float(BPpsqt[i]) / 100);
+                	Black_Score += BPpsqt[i];
                         
                 }
             
