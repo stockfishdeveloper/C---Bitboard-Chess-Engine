@@ -10,7 +10,7 @@ class Move
 		Bitboard From;
 		Bitboard To;
 		int Move_Type;
-		float Score;
+		int Score;
 		int White_Temp_Move_From_Stack[70];
 		int White_Temp_Move_To_Stack[70];
 		int Black_Temp_Move_From_Stack[70];
@@ -104,7 +104,7 @@ class Move
 		From = 0;
 		To = 0;
 		Move_Type = 0;
-		Score = 0.0;
+		Score = 0;
 		White_Temp_Move_Spacer = 0; 
 		Black_Temp_Move_Spacer = 0;
 		}		
@@ -115,7 +115,7 @@ class LINE
 public:
 	int cmove = 0;// Number of moves in the line.
     Move argmove[15];  // The line.
-    float score = 0.0;
+    int score = 0;
 };
 
 
@@ -140,7 +140,7 @@ extern LINE line;
 extern int Depth;
 extern int Seldepth;
 extern void Order_Moves(bool White_Turn);
-extern float Is_Mate();
+extern int Is_Mate();
 extern int Time_Allocation;
 extern bool STOP_SEARCHING_NOW;
 
