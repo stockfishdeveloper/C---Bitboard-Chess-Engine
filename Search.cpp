@@ -10,7 +10,7 @@ using namespace std;
 #include "magicmoves.h"
 
 void Order_Moves(bool White_Turn);
-float Is_Mate();
+int Is_Mate();
 int White_Move_Score = 0;
 int Black_Move_Score = 0;
 Bitboard Move_From = 0;
@@ -37,9 +37,9 @@ Move Think(int wtime, int btime, int winc, int binc)
 	int Binc = binc;
 	Move blank;
 	Move Spar;
-	Spar.Score = -100000.0;
+	Spar.Score = -100000;
  	Move Spar2;
- 	Spar2.Score = 100000.0; 
+ 	Spar2.Score = 100000; 
 	const int MAXDEPTH = 30;
 	int Plies_Searched = 0;
 		
@@ -116,13 +116,13 @@ Move Think(int wtime, int btime, int winc, int binc)
 			}
 			if ((blank.Score <= Spar.Score) || (blank.Score >= Spar2.Score))
 			{
-				Spar.Score = -100000.0;
-				Spar2.Score = 100000.0;
+				Spar.Score = -100000;
+				Spar2.Score = 100000;
 			}
 			else
 			{
-			Spar.Score = blank.Score - 0.5;
-			Spar2.Score = blank.Score + 0.5;
+			Spar.Score = blank.Score - 50;
+			Spar2.Score = blank.Score + 50;
 			}
 			//STOP_SEARCHING_NOW = false;
 			}
@@ -178,7 +178,7 @@ Move SearchMax(Move alpha, Move beta, int depth, LINE * pline)
 			Make_White_Search_Move(White_Move_From_Stack[i], White_Move_To_Stack[i], White_Move_Types[i]);
 			
 			Move Temp_Move = SearchMin(alpha, beta, depth - 1, &line);
-			float Curr_Move_Score = Evaluate_Position();
+			int Curr_Move_Score = Evaluate_Position();
 			move.Undo_Move();
 			if(Temp_Move.Score >= beta.Score)
 				{
@@ -251,7 +251,7 @@ Move SearchMax(Move alpha, Move beta, int depth, LINE * pline)
 			Make_Black_Search_Move(Black_Move_From_Stack[i], Black_Move_To_Stack[i], Black_Move_Types[i]);
 			
 			Move Temp_Move = SearchMax(alpha, beta, depth - 1, &line);
-			float Curr_Move_Score = Evaluate_Position();
+			int Curr_Move_Score = Evaluate_Position();
 			move.Undo_Move();
 			if(Temp_Move.Score <= alpha.Score)
 			{
@@ -769,7 +769,7 @@ int Make_Black_Search_Move(const Bitboard& From, const Bitboard& To, const int M
 	return;
 }*/
 
-float Is_Mate()
+int Is_Mate()
 {
 	int h; 
         for(int j = 0; j < 64; j++) 
@@ -785,27 +785,27 @@ float Is_Mate()
     Bitboard QAttacks = Qmagic(h, (White_Pieces | Black_Pieces));
     	
 		if(BAttacks & (Black_Bishops))
-        return -10000.0;
+        return -10000;
         if(RAttacks & (Black_Rooks))
-        return -10000.0;
+        return -10000;
         if(QAttacks & (Black_Queens))
-        return -10000.0;
+        return -10000;
         if(Knight_Lookup_Table[h] & Black_Knights)
-        return -10000.0;
+        return -10000;
         if(King_Lookup_Table[h] & Black_King)
-        return -10000.0;
+        return -10000;
         
         Bitboard Spare = Black_Pawns;
         Spare |= A_Pawn_Mask;
         Spare ^= A_Pawn_Mask;
         if((Spare >> 7) & White_King)
-        return -10000.0;
+        return -10000;
         
         Bitboard Spare2 = Black_Pawns;
         Spare2 |= H_Pawn_Mask;
         Spare2 ^= H_Pawn_Mask;
         if((Spare2 >> 9) & White_King)
-        return -10000.0;
+        return -10000;
         
         Bitboard Black_Pawns5 = Black_Pawns;
         Black_Pawns5 |= A_Pawn_Mask;
@@ -813,7 +813,7 @@ float Is_Mate()
         Black_Pawns5 |= H_Pawn_Mask;
         Black_Pawns5 ^= H_Pawn_Mask;
         if(((Black_Pawns5 >> 7) | (Black_Pawns5 >> 9)) & White_King)
-        return -10000.0;
+        return -10000;
                 
         
         for(int j = 0; j < 64; j++)
@@ -829,27 +829,27 @@ float Is_Mate()
 		QAttacks = Qmagic(h, (White_Pieces | Black_Pieces));
         
         if(BAttacks & (White_Bishops))
-        return 10000.0;
+        return 10000;
         if(RAttacks & (White_Rooks))
-        return 10000.0;
+        return 10000;
         if(QAttacks & (White_Queens))
-        return 10000.0;
+        return 10000;
         if(Knight_Lookup_Table[h] & White_Knights)
-        return 10000.0;
+        return 10000;
         if(King_Lookup_Table[h] & White_King)
-        return 10000.0;
+        return 10000;
         
     	Spare = White_Pawns;
         Spare |= A_Pawn_Mask;
         Spare ^= A_Pawn_Mask;
         if((Spare << 9) & Black_King)
-        return 10000.0;
+        return 10000;
         
         Bitboard Spare7 = White_Pawns;
         Spare7 |= H_Pawn_Mask;
         Spare7 ^= H_Pawn_Mask;
         if((Spare7 << 7) & Black_King)
-        return 10000.0;
+        return 10000;
         
     	Bitboard White_Pawns2 = 0;
 		White_Pawns2 |= A_Pawn_Mask;
@@ -857,8 +857,8 @@ float Is_Mate()
         White_Pawns2 |= H_Pawn_Mask;
         White_Pawns2 ^= H_Pawn_Mask;
         if(((White_Pawns << 7) | (White_Pawns << 9)) & GeneralBoard[h])
-        return 10000.0;
+        return 10000;
         
         else
-        return 0.0;
+        return 0;
 }
