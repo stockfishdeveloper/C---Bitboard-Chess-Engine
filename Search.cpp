@@ -5,26 +5,60 @@ using namespace std;
 #include "Search.h"
 #include "Eval.h"
 #include "UCI.h"
-#include "MakeMove.h"
 #include <chrono>
 #include "magicmoves.h"
 
-void Order_Moves(bool White_Turn);
-int Is_Mate();
-int White_Move_Score = 0;
-int Black_Move_Score = 0;
-Bitboard Move_From = 0;
-Bitboard Move_To = 0;
-int Best_Move = 0;
-int Nodes = 0;
-bool Searching = false;
-bool Time_Out = false;
-int Depth = 0;
-int Seldepth = 0;
-int Time_Allocation = 0;
-bool STOP_SEARCHING_NOW = false;
+//int Is_Mate();
+//int White_Move_Score = 0;
+//int Black_Move_Score = 0;
+//Bitboard Move_From = 0;
+//Bitboard Move_To = 0;
+//int Best_Move = 0;
+//bool Time_Out = false;
+int Search::Time_Allocation = 0;
+bool Search::Searching = false;
+int Search::Nodes = 0;
+int Search::Depth = 0;
+int Search::Seldepth = 0;
+bool Search::STOP_SEARCHING_NOW = false;
+bool Search::Current_Turn = false;
+bool Search::White_Turn = false;
+void Move::Undo_Move()
+                {
+                White_Pieces = White_Pieces2; 
+                Black_Pieces = Black_Pieces2; 
+                White_King = White_King2;
+                Black_King = Black_King2;
+                White_Queens = White_Queens2;
+                White_Rooks = White_Rooks2;
+                White_Bishops = White_Bishops2;
+                White_Knights = White_Knights2;
+                White_Pawns = White_Pawns2;
+                Black_Queens = Black_Queens2;
+                Black_Rooks = Black_Rooks2;
+                Black_Bishops = Black_Bishops2;
+                Black_Knights = Black_Knights2;
+                Black_Pawns = Black_Pawns2;
+                White_Move_Spacer = White_Temp_Move_Spacer;
+                Black_Move_Spacer = Black_Temp_Move_Spacer;
+                for(int h = 0; h < White_Temp_Move_Spacer; h++)
+                        {
+                                White_Move_From_Stack[h] = Unconvert_Int(White_Temp_Move_From_Stack[h]);
+                                White_Move_To_Stack[h] = Unconvert_Int(White_Temp_Move_To_Stack[h]);
+                                White_Move_Types[h] = White_Temp_Move_Types[h];
+                        }
+                        
+                for(int h = 0; h < Black_Temp_Move_Spacer; h++)
+                {
+                Black_Move_From_Stack[h] = Unconvert_Int(Black_Temp_Move_From_Stack[h]);
+                Black_Move_To_Stack[h] = Unconvert_Int(Black_Temp_Move_To_Stack[h]);
+                Black_Move_Types[h] = Black_Temp_Move_Types[h];
+                }
+                Search::Current_Turn ^= 1;
+                Search::White_Turn ^= 1;
+}
 
-Move Think(int wtime, int btime, int winc, int binc)
+Move Search::Think(int wtime, int btime, int winc, int binc)
 {
 	typedef std::chrono::high_resolution_clock Time;
     typedef std::chrono::milliseconds ms;
@@ -49,7 +83,7 @@ Move Think(int wtime, int btime, int winc, int binc)
 				{
 					Time_Allocation = wtime;
 					Depth = q;
-    				blank = SearchMax(Spar, Spar2, (q - Plies_Searched) + 1, &PVline);
+    				blank = Search::SearchMax(Spar, Spar2, (q - Plies_Searched) + 1, &PVline);
     				auto t1 = Time::now();
 					fsec fs = t1 - t0;
 					ms d = std::chrono::duration_cast<ms>(fs);
@@ -63,7 +97,7 @@ Move Think(int wtime, int btime, int winc, int binc)
     		else
     			{
     				Time_Allocation = btime;
-    				blank = SearchMin(Spar, Spar2, (q - Plies_Searched) + 1, &PVline);
+    				blank = Search::SearchMin(Spar, Spar2, (q - Plies_Searched) + 1, &PVline);
     				auto t1 = Time::now();
 					fsec fs = t1 - t0;
 					ms d = std::chrono::duration_cast<ms>(fs);
@@ -130,7 +164,7 @@ Move Think(int wtime, int btime, int winc, int binc)
 	return blank;
 }
 
-Move SearchMax(Move alpha, Move beta, int depth, LINE * pline)
+Move Search::SearchMax(Move alpha, Move beta, int depth, LINE * pline)
 {
 	Seldepth = depth;
 	LINE line;
@@ -178,17 +212,16 @@ Move SearchMax(Move alpha, Move beta, int depth, LINE * pline)
 			Make_White_Search_Move(White_Move_From_Stack[i], White_Move_To_Stack[i], White_Move_Types[i]);
 			
 			Move Temp_Move = SearchMin(alpha, beta, depth - 1, &line);
-			int Curr_Move_Score = Evaluate_Position();
 			move.Undo_Move();
 			if(Temp_Move.Score >= beta.Score)
 				{
 					return beta;
 				}
 			
-			if(Temp_Move.Score  > alpha.Score)
+			if(Temp_Move.Score > alpha.Score)
 				{
 					pline->argmove[0] = move;
-					::PVline.score = Curr_Move_Score;
+					::PVline.score = Temp_Move.Score;
             		memcpy(pline->argmove + 1, line.argmove, line.cmove * sizeof(Move));
 					pline->cmove = line.cmove + 1;
 
@@ -203,7 +236,7 @@ Move SearchMax(Move alpha, Move beta, int depth, LINE * pline)
 }
 	
 	
-	Move SearchMin(Move alpha, Move beta, int depth, LINE * pline)
+Move Search::SearchMin(Move alpha, Move beta, int depth, LINE * pline)
 	{
 		Seldepth = depth;
 		LINE line;
@@ -249,9 +282,7 @@ Move SearchMax(Move alpha, Move beta, int depth, LINE * pline)
 			
 			Nodes++;
 			Make_Black_Search_Move(Black_Move_From_Stack[i], Black_Move_To_Stack[i], Black_Move_Types[i]);
-			
 			Move Temp_Move = SearchMax(alpha, beta, depth - 1, &line);
-			int Curr_Move_Score = Evaluate_Position();
 			move.Undo_Move();
 			if(Temp_Move.Score <= alpha.Score)
 			{
@@ -261,7 +292,7 @@ Move SearchMax(Move alpha, Move beta, int depth, LINE * pline)
 			if(Temp_Move.Score < beta.Score)
 			{
 				pline->argmove[0] = move;
-				::PVline.score = Curr_Move_Score;
+				::PVline.score = Temp_Move.Score;
             memcpy(pline->argmove + 1, line.argmove,
 
                 line.cmove * sizeof(Move));
@@ -277,7 +308,7 @@ Move SearchMax(Move alpha, Move beta, int depth, LINE * pline)
 
 }
 
-int Make_White_Search_Move(const Bitboard& From, const Bitboard& To, const int Move_Type)
+Search::Make_White_Search_Move(const Bitboard& From, const Bitboard& To, const int Move_Type)
 {
 
 	switch(Move_Type)//This switch evaluates the type of move that accompanies the index of the move stack that q refers to
@@ -494,14 +525,14 @@ int Make_White_Search_Move(const Bitboard& From, const Bitboard& To, const int M
 			    White_Queen_Spacer = 0;
 			    White_Move_Spacer = 0;
 		
-			    Current_Turn = false;
-			    White_Turn = false;
+			    Search::Current_Turn = false;
+			    Search::White_Turn = false;
 			    return 0;
 
 }
 
 
-int Make_Black_Search_Move(const Bitboard& From, const Bitboard& To, const int Move_Type)
+Search::Make_Black_Search_Move(const Bitboard& From, const Bitboard& To, const int Move_Type)
 {
 	switch(Move_Type)//This switch evaluates the type of move that accompanies the index of the move stack that Move_Type refers to
                { 
@@ -715,8 +746,8 @@ int Make_Black_Search_Move(const Bitboard& From, const Bitboard& To, const int M
 			    Black_Queen_Spacer = 0;
 			    Black_Move_Spacer = 0;
 		
-			    Current_Turn  = true;
-			    White_Turn = true;
+			    Search::Current_Turn  = true;
+			    Search::White_Turn = true;
 			    return 0;
 
 }
@@ -769,7 +800,7 @@ int Make_Black_Search_Move(const Bitboard& From, const Bitboard& To, const int M
 	return;
 }*/
 
-int Is_Mate()
+Search::Is_Mate()
 {
 	int h; 
         for(int j = 0; j < 64; j++) 
@@ -862,3 +893,4 @@ int Is_Mate()
         else
         return 0;
 }
+
