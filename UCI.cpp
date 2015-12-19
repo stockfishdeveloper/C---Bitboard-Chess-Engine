@@ -1,6 +1,5 @@
 #include <fstream>//For writing the game to a text file
 #include "Bitboard.h"
-#include "MakeMove.h"
 #include "UCI.h"
 #include <string>
 #include <iostream>
@@ -43,13 +42,13 @@ else if(UciCommand == "quit")
 exit(0);//Exit the program if called to quit
 
 else if(UciCommand == "stop")
-STOP_SEARCHING_NOW = true;
+Search::STOP_SEARCHING_NOW = true;
 
 else if (UciCommand == "ucinewgame") 
 {
-Searching = false;
-STOP_SEARCHING_NOW = false; 
-Nodes = 0;
+Search::Searching = false;
+Search::STOP_SEARCHING_NOW = false; 
+Search::Nodes = 0;
 }
 
 else if(UciCommand == "startpos")
@@ -68,14 +67,13 @@ Black_Rooks = 9295429630892703744ULL;
 Black_Bishops = 2594073385365405696;
 Black_Knights = 4755801206503243776;
 Black_Pawns = 71776119061217280;
-Current_Turn = true;
-White_Turn = true;
-Searching = false;
+Search::Current_Turn = true;
+Search::White_Turn = true;
+Search::Searching = false;
 wtime = 0;
 btime = 0;
-Searching = false;
-STOP_SEARCHING_NOW = false; 
-Nodes = 0;
+Search::STOP_SEARCHING_NOW = false; 
+Search::Nodes = 0;
 for(int t = 0; t < 70; t++)               
                {
                	 White_Move_From_Stack[t] = 0;//Clear the move from stack
@@ -147,7 +145,7 @@ else if(UciCommand == "go")
  btime = w;
 }
  
- Searching = true;
+ Search::Searching = true;
  using namespace tthread;
  thread t(Runthread, &PVline);//Spawn new thread to constantly output infos the the GUI while the search function is running
  
@@ -159,23 +157,22 @@ typedef std::chrono::high_resolution_clock Time;
     auto t0 = Time::now();
     int h = 0, j = 0;
     Move blank;
-	blank = Think(wtime, btime, h, j);
-	Searching = false;
+	blank = Search::Think(wtime, btime, h, j);
+	Search::Searching = false;
     t.join();
     
     auto t1 = Time::now();
     fsec fs = t1 - t0;
     ms d = std::chrono::duration_cast<ms>(fs);
     
- float temporary = (Nodes / d.count());
+ float temporary = (Search::Nodes / d.count());
  //float temp_and_one = temporary * 1000.0;
  /*cout << "Number of nodes searched: " << Nodes << endl;
  cout << "Time in milliseconds: " << d.count() << endl;
  cout << "KNps: " << temporary << endl;
  cout << "Best move score: " << blank.Score << endl;*/
  
- MakeMove(blank);
-		for( int h = 0; h < 64; h++)
+ 		for( int h = 0; h < 64; h++)
 			{
         	if(GeneralBoard[h] & blank.From)
         	{
@@ -190,7 +187,7 @@ typedef std::chrono::high_resolution_clock Time;
         	}
 		}
 		
-		Nodes = 0;
+		Search::Nodes = 0;
 		
 		}
 else if (UciCommand == "moves")
@@ -235,13 +232,13 @@ cin >> Curr_Turn;
 Log << Curr_Turn << endl;
 if(Curr_Turn == 'w')
 {
-Current_Turn = true;
-White_Turn = true;
+Search::Current_Turn = true;
+Search::White_Turn = true;
 }
 else
 {
-Current_Turn = false;
-White_Turn = false;
+Search::Current_Turn = false;
+Search::White_Turn = false;
 }
 string Legal_Castling;
 cin >> Legal_Castling;
@@ -259,25 +256,9 @@ Log << Move_Count << endl;
 Log << "White king: " << White_King << endl;
 Log << "White rooks: " << White_Rooks << endl;
 Log << "Black king: " << Black_King << endl;
-Log << "White_Turn: " << White_Turn << endl;
+Log << "White_Turn: " << Search::White_Turn << endl;
 Log << "Black rooks: " << Black_Rooks << endl;
 	return 0;
-}
-
-
-int MakeMove(Move& Best_Move)
-{
-
-if(White_Turn)
-	{
-		MakeWhiteMove(Best_Move);//Plays White's moves out on the internal bitboards
-	}
-else 
-	{
-		MakeBlackMove(Best_Move);//Plays Black's moves out on the internal bitboards
-	}
-   
-    return 0;
 }
 
 int Read_Fen(char Current_Square)
@@ -486,8 +467,8 @@ int Moves_Command()
 			
 			
 		}
-		White_Turn ^= 1;
-		Current_Turn ^= 1;
+		Search::White_Turn ^= 1;
+		Search::Current_Turn ^= 1;
 		
 		
 	}
@@ -512,7 +493,7 @@ int Parse_Moves(string First, string Second)
 		if(PlayerMoves[i] == Second)
 		To = GeneralBoard[i];
 	}
-	if(White_Turn)
+	if(Search::White_Turn)
 	{
 		White_Pieces ^= From;
 		White_Pieces |= To;
@@ -793,7 +774,7 @@ int Parse_Moves(string First, string Second, string Promotion_Type)
 		if(PlayerMoves[i] == Second)
 		To = GeneralBoard[i];
 	}
-	if(White_Turn)
+	if(Search::White_Turn)
 	{
 		White_Pieces ^= From;
 		White_Pieces |= To;
@@ -1038,28 +1019,28 @@ int Parse_Moves(string First, string Second, string Promotion_Type)
 	string Knight = "n";
 	if(Promotion_Type == Queen)
 	{
-		if(White_Turn)
+		if(Search::White_Turn)
 		White_Queens |= To;
 		else
 		Black_Queens |= To;
 	}
 	if(Promotion_Type == Rook)
 	{
-		if(White_Turn)
+		if(Search::White_Turn)
 		White_Rooks |= To;
 		else
 		Black_Rooks |= To;
 	}
 	if(Promotion_Type == Bishop)
 	{
-		if(White_Turn)
+		if(Search::White_Turn)
 		White_Bishops |= To;
 		else
 		Black_Bishops |= To;
 	}
 	if(Promotion_Type == Knight)
 	{
-		if(White_Turn)
+		if(Search::White_Turn)
 		White_Knights |= To;
 		else
 		Black_Knights |= To;
