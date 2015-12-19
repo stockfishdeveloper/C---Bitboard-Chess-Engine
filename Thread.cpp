@@ -22,11 +22,11 @@ void Runthread(void * aArg)
     typedef std::chrono::duration<float> fsec;
     auto t0 = Time::now();
 
-  while(Searching)
+  while(Search::Searching)
   {
   	LINE pvline = PVline;
-  	cout << "info multipv 1 depth " << Depth << " seldepth " << Seldepth << " score cp " << pvline.score << " pv ";
-  	Log << "<< " << "info multipv 1 depth " << Depth << " seldepth " << Seldepth << " score cp " << pvline.score << " pv ";
+  	cout << "info multipv 1 depth " << Search::Depth << " seldepth " << Search::Seldepth << " score cp " << pvline.score << " pv ";
+  	Log << "<< " << "info multipv 1 depth " << Search::Depth << " seldepth " << Search::Seldepth << " score cp " << pvline.score << " pv ";
   	for(int i = 0; i < pvline.cmove; i++)
     {
     	for( int h = 0; h < 20; h++)
@@ -50,11 +50,11 @@ void Runthread(void * aArg)
   	fsec fs = t1 - t0;
   	ms d = std::chrono::duration_cast<ms>(fs);    
  	 	
-    cout << "time " << d.count() << " nodes " << Nodes << " nps " << (1000 *(Nodes / (d.count() + 1))) << endl;
-    Log << "time " << d.count() << " nodes " << Nodes << " nps " << (1000 *(Nodes / (d.count() + 1))) << endl;
-    if(d.count() >= (Time_Allocation / 20))
+    cout << "time " << d.count() << " nodes " << Search::Nodes << " nps " << (1000 *(Search::Nodes / (d.count() + 1))) << endl;
+    Log << "time " << d.count() << " nodes " << Search::Nodes << " nps " << (1000 *(Search::Nodes / (d.count() + 1))) << endl;
+    if(d.count() >= (Search::Time_Allocation / 20))
     {
-    	STOP_SEARCHING_NOW = true;
+    	Search::STOP_SEARCHING_NOW = true;
     	return;
 	}
     Sleep(500);
