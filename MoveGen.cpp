@@ -27,8 +27,6 @@ Bitboard WhiteBishopCount[20];
 Bitboard BlackBishopCount[20];
 Bitboard WhiteQueenCount[28];
 Bitboard BlackQueenCount[28];
-bool Current_Turn = true;
-bool White_Turn = true;
 Bitboard White_Move_From_Stack[70];//Move stack is just an array of Bitboards(64-bit integers) containing only one bit set in each--the from square or the to square
 Bitboard White_Move_To_Stack[70];
 Bitboard Black_Move_From_Stack[70];
