@@ -1,6 +1,7 @@
 using namespace std;
 #include <iostream>
 #include <cstring>
+#include <cassert>
 #include "Bitboard.h"
 #include "Search.h"
 #include "Eval.h"
@@ -82,6 +83,7 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
 			if(White_Turn == true)
 				{
 					Time_Allocation = wtime;
+					assert(Time_Allocation > 0);
 					Depth = q;
     				blank = Search::SearchMax(Spar, Spar2, (q - Plies_Searched) + 1, &PVline);
     				auto t1 = Time::now();
@@ -97,6 +99,7 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
     		else
     			{
     				Time_Allocation = btime;
+    				assert(Time_Allocation > 0);
     				blank = Search::SearchMin(Spar, Spar2, (q - Plies_Searched) + 1, &PVline);
     				auto t1 = Time::now();
 					fsec fs = t1 - t0;
@@ -113,7 +116,6 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
 			f->cmove = 0;
 			::PVline = *f;
 			delete f;
-		
 			for(int t = 0; t < White_Move_Spacer; t++)               
                {
                	 White_Move_From_Stack[t] = 0;//Clear the move from stack
@@ -176,7 +178,7 @@ Move Search::SearchMax(Move alpha, Move beta, int depth, LINE * pline)
 		{ 	
 			Move Best;
 			++Nodes;
-			Best.Score = Evaluate_Position();
+			Best.Score = Eval::Evaluate_Position();
 			pline->cmove = 0;
 			pline->score = Best.Score;
 			return Best;
@@ -248,7 +250,7 @@ Move Search::SearchMin(Move alpha, Move beta, int depth, LINE * pline)
 			{ 
 			Move Best;
 			++Nodes;
-			Best.Score = Evaluate_Position();
+			Best.Score = Eval::Evaluate_Position();
 			pline->cmove = 0;
 			pline->score = Best.Score;
 			return Best;
