@@ -5,9 +5,9 @@
 #include <iostream>
 #include <ctime>
 #include "windows.h"
-#include <chrono> //For multithreading--must be using C++11 compiler
+#include <chrono> 
+#include <thread> //For multithreading--must be using C++11 compiler
 #include "Thread.h"//Threading header file
-#include "C:\TinyThread++-1.1-src\TinyThread++-1.1\source\tinythread.h"//Thread library
 
 using namespace std;
 int CheckUci();
@@ -146,8 +146,7 @@ else if(UciCommand == "go")
 }
  
  Search::Searching = true;
- using namespace tthread;
- thread t(Runthread, &PVline);//Spawn new thread to constantly output infos the the GUI while the search function is running
+ std::thread t(Runthread, &PVline);//Spawn new thread to constantly output infos the the GUI while the search function is running
  
  using namespace std;
  /* run this program using the console pauser or add your own getch, system("pause") or input loop */
@@ -253,12 +252,7 @@ int Move_Count;
 cin >> Move_Count;
 Log << Move_Count << endl;
 	
-Log << "White king: " << White_King << endl;
-Log << "White rooks: " << White_Rooks << endl;
-Log << "Black king: " << Black_King << endl;
-Log << "White_Turn: " << Search::White_Turn << endl;
-Log << "Black rooks: " << Black_Rooks << endl;
-	return 0;
+return 0;
 }
 
 int Read_Fen(char Current_Square)
