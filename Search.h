@@ -11,12 +11,12 @@ class Move
                 Bitboard To;
                 int Move_Type;
                 int Score;
-                int White_Temp_Move_From_Stack[70];
-                int White_Temp_Move_To_Stack[70];
-                int Black_Temp_Move_From_Stack[70];
-                int Black_Temp_Move_To_Stack[70];
-                int White_Temp_Move_Types[70];
-                int Black_Temp_Move_Types[70];
+                int White_Temp_Move_From_Stack[60];
+                int White_Temp_Move_To_Stack[60];
+                int Black_Temp_Move_From_Stack[60];
+                int Black_Temp_Move_To_Stack[60];
+                int White_Temp_Move_Types[60];
+                int Black_Temp_Move_Types[60];
                 int White_Temp_Move_Spacer; 
                 int Black_Temp_Move_Spacer;
                 
