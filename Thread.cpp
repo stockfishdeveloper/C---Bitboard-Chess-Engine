@@ -1,4 +1,3 @@
-#include "tinythread.h"
 #include "Search.h"
 #include "Thread.h"
 #include "UCI.h"
