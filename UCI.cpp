@@ -74,35 +74,9 @@ wtime = 0;
 btime = 0;
 Search::STOP_SEARCHING_NOW = false; 
 Search::Nodes = 0;
-for(int t = 0; t < 70; t++)               
-               {
-               	 White_Move_From_Stack[t] = 0;//Clear the move from stack
-               	 White_Move_To_Stack[t] = 0;//Clear the move to stack
-               	 White_Move_Types[t] = 0;//Clear the move types associated with the moves
-			   }
-			   
-			White_Knight_Spacer = 0;//Clear all of the piece spacers
-			White_King_Spacer = 0;
-			White_Pawn_Spacer = 0;
-			White_Rook_Spacer = 0;
-			White_Bishop_Spacer = 0;
-			White_Queen_Spacer = 0;
-			White_Move_Spacer = 0;
-			    
-			for(int t = 0; t < 70; t++)               
-               {
-               	 Black_Move_From_Stack[t] = 0;//Clear the move from stack
-               	 Black_Move_To_Stack[t] = 0;//Clear the move to stack
-               	 Black_Move_Types[t] = 0;//Clear the move types associated with the moves
-			   }
-			   
-			Black_Knight_Spacer = 0;//Clear all of the piece spacers
-			Black_King_Spacer = 0;
-			Black_Pawn_Spacer = 0;
-			Black_Rook_Spacer = 0;
-			Black_Bishop_Spacer = 0;
-			Black_Queen_Spacer = 0;
-			Black_Move_Spacer = 0; 
+
+Search::Clear();
+
 }
 
 else if (Is_Fen)
