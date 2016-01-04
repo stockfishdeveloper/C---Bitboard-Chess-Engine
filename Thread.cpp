@@ -6,12 +6,12 @@
 #include <windows.h>
 
 using namespace std;
-using namespace tthread;
 
 int nodes = 0;
 int movenum = 0;
 bool turn = false;
 int f;
+mutex output;
 // This is the child thread function
 
 void Runthread(void * aArg)
@@ -23,9 +23,18 @@ void Runthread(void * aArg)
 
   while(Search::Searching)
   {
+  	//Before copying the LINE we want to make sure we do not copy the LINE with corrupted data
+  	//We must use a mutex
+  	output.lock();
+  	int depth = Search::Depth;
+  	int seldepth = Search::Seldepth;
+  	int nodes = Search::Nodes;
+  	int time_allocation = Search::Time_Allocation;
   	LINE pvline = PVline;
-  	cout << "info multipv 1 depth " << Search::Depth << " seldepth " << Search::Seldepth << " score cp " << pvline.score << " pv ";
-  	Log << "<< " << "info multipv 1 depth " << Search::Depth << " seldepth " << Search::Seldepth << " score cp " << pvline.score << " pv ";
+  	output.unlock();
+  	
+  	cout << "info multipv 1 depth " << depth << " seldepth " << seldepth << " score cp " << pvline.score << " pv ";
+  	Log << "<< " << "info multipv 1 depth " << depth << " seldepth " << seldepth << " score cp " << pvline.score << " pv ";
   	for(int i = 0; i < pvline.cmove; i++)
     {
     	for( int h = 0; h < 20; h++)
@@ -49,9 +58,9 @@ void Runthread(void * aArg)
   	fsec fs = t1 - t0;
   	ms d = std::chrono::duration_cast<ms>(fs);    
  	 	
-    cout << "time " << d.count() << " nodes " << Search::Nodes << " nps " << (1000 *(Search::Nodes / (d.count() + 1))) << endl;
-    Log << "time " << d.count() << " nodes " << Search::Nodes << " nps " << (1000 *(Search::Nodes / (d.count() + 1))) << endl;
-    if(d.count() >= (Search::Time_Allocation / 20))
+    cout << "time " << d.count() << " nodes " << nodes << " nps " << (1000 *(nodes / (d.count() + 1))) << endl;
+    Log << "time " << d.count() << " nodes " << nodes << " nps " << (1000 *(nodes / (d.count() + 1))) << endl;
+    if(d.count() >= (time_allocation / 20))
     {
     	Search::STOP_SEARCHING_NOW = true;
     	return;
