@@ -100,13 +100,14 @@ int Make_Black_Search_Move(const Bitboard& From, const Bitboard& To, const int M
 //extern Bitboard Move_From;
 //extern Bitboard Move_To;
 //extern int Best_Move;
-extern int Nodes;
+extern Bitboard Nodes;
 extern bool Searching;
 extern LINE line;
 extern int Depth;
 extern int Seldepth;
 void Order_Moves(bool White_Turn);
 int Is_Mate();
+void Clear();
 extern int Time_Allocation;
 extern bool STOP_SEARCHING_NOW;
 extern bool Current_Turn;
