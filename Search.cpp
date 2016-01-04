@@ -9,16 +9,9 @@ using namespace std;
 #include <chrono>
 #include "magicmoves.h"
 
-//int Is_Mate();
-//int White_Move_Score = 0;
-//int Black_Move_Score = 0;
-//Bitboard Move_From = 0;
-//Bitboard Move_To = 0;
-//int Best_Move = 0;
-//bool Time_Out = false;
 int Search::Time_Allocation = 0;
 bool Search::Searching = false;
-int Search::Nodes = 0;
+Bitboard Search::Nodes = 0;
 int Search::Depth = 0;
 int Search::Seldepth = 0;
 bool Search::STOP_SEARCHING_NOW = false;
@@ -116,35 +109,9 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
 			f->cmove = 0;
 			::PVline = *f;
 			delete f;
-			for(int t = 0; t < White_Move_Spacer; t++)               
-               {
-               	 White_Move_From_Stack[t] = 0;//Clear the move from stack
-               	 White_Move_To_Stack[t] = 0;//Clear the move to stack
-               	 White_Move_Types[t] = 0;//Clear the move types associated with the moves
-			   }
-			   
-			White_Knight_Spacer = 0;//Clear all of the piece spacers
-			White_King_Spacer = 0;
-			White_Pawn_Spacer = 0;
-			White_Rook_Spacer = 0;
-			White_Bishop_Spacer = 0;
-			White_Queen_Spacer = 0;
-			White_Move_Spacer = 0;
-			    
-			for(int t = 0; t < Black_Move_Spacer; t++)               
-               {
-               	 Black_Move_From_Stack[t] = 0;//Clear the move from stack
-               	 Black_Move_To_Stack[t] = 0;//Clear the move to stack
-               	 Black_Move_Types[t] = 0;//Clear the move types associated with the moves
-			   }
-			   
-			Black_Knight_Spacer = 0;//Clear all of the piece spacers
-			Black_King_Spacer = 0;
-			Black_Pawn_Spacer = 0;
-			Black_Rook_Spacer = 0;
-			Black_Bishop_Spacer = 0;
-			Black_Queen_Spacer = 0;
-			Black_Move_Spacer = 0;
+			
+			Search::Clear();//Clear search stacks, variables, etc.
+			
 			if(STOP_SEARCHING_NOW)
 			{
 				Time_Allocation = 0;
@@ -941,5 +908,40 @@ Search::Is_Mate()
         
         else
         return 0;
+}
+
+void Search::Clear()
+{
+		for(int t = 0; t < White_Move_Spacer; t++)               
+               {
+               	 White_Move_From_Stack[t] = 0;//Clear the move from stack
+               	 White_Move_To_Stack[t] = 0;//Clear the move to stack
+               	 White_Move_Types[t] = 0;//Clear the move types associated with the moves
+			   }
+			   
+			White_Knight_Spacer = 0;//Clear all of the piece spacers
+			White_King_Spacer = 0;
+			White_Pawn_Spacer = 0;
+			White_Rook_Spacer = 0;
+			White_Bishop_Spacer = 0;
+			White_Queen_Spacer = 0;
+			White_Move_Spacer = 0;
+			    
+			for(int t = 0; t < Black_Move_Spacer; t++)               
+               {
+               	 Black_Move_From_Stack[t] = 0;//Clear the move from stack
+               	 Black_Move_To_Stack[t] = 0;//Clear the move to stack
+               	 Black_Move_Types[t] = 0;//Clear the move types associated with the moves
+			   }
+			   
+			Black_Knight_Spacer = 0;//Clear all of the piece spacers
+			Black_King_Spacer = 0;
+			Black_Pawn_Spacer = 0;
+			Black_Rook_Spacer = 0;
+			Black_Bishop_Spacer = 0;
+			Black_Queen_Spacer = 0;
+			Black_Move_Spacer = 0;
+			
+			Search::Nodes = 0;
 }
 
