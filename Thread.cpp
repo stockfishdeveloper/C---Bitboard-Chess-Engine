@@ -16,12 +16,9 @@ mutex output;
 
 void Runthread(void * aArg)
 {
-	typedef std::chrono::high_resolution_clock Time;
-    typedef std::chrono::milliseconds ms;
-    typedef std::chrono::duration<float> fsec;
-    auto t0 = Time::now();
-
-  while(Search::Searching)
+	Timer timer;
+	timer.Start_Clock();
+	while(Search::Searching)
   {
   	//Before copying the LINE we want to make sure we do not copy the LINE with corrupted data
   	//We must use a mutex
@@ -54,13 +51,10 @@ void Runthread(void * aArg)
         	}
 		}
 	}
-  	auto t1 = Time::now();
-  	fsec fs = t1 - t0;
-  	ms d = std::chrono::duration_cast<ms>(fs);    
- 	 	
-    cout << "time " << d.count() << " nodes " << nodes << " nps " << (1000 *(nodes / (d.count() + 1))) << endl;
-    Log << "time " << d.count() << " nodes " << nodes << " nps " << (1000 *(nodes / (d.count() + 1))) << endl;
-    if(d.count() >= (time_allocation / 20))
+  	 	
+    cout << "time " << timer.Stop_Clock() << " nodes " << nodes << " nps " << (1000 *(nodes / (timer.Stop_Clock() + 1))) << endl;
+    Log << "time " << timer.Stop_Clock() << " nodes " << nodes << " nps " << (1000 *(nodes / (timer.Stop_Clock() + 1))) << endl;
+    if(timer.Stop_Clock() >= (time_allocation / 20))
     {
     	Search::STOP_SEARCHING_NOW = true;
     	return;
