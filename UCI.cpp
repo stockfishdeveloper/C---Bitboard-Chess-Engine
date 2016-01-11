@@ -8,6 +8,7 @@
 #include <chrono> 
 #include <thread> //For multithreading--must be using C++11 compiler
 #include "Thread.h"//Threading header file
+#include "Search.h"
 
 using namespace std;
 int CheckUci();
@@ -17,8 +18,8 @@ ofstream Log("Log.txt");//For writing to a text file
 int wtime = 0;
 int btime = 0;
 int Time_Usage = 0;
-
 LINE PVline;
+
 
 int CheckUci()
 {
@@ -79,6 +80,11 @@ Search::Clear();
 
 }
 
+else if(UciCommand == "bench")
+{
+	//auto t1 = Time::now();
+}
+
 else if (Is_Fen)
 {
 Parse_Fen(UciCommand); 
@@ -118,27 +124,17 @@ else if(UciCommand == "go")
  wtime = btime;
  btime = w;
 }
- 
- Search::Searching = true;
- std::thread t(Runthread, &PVline);//Spawn new thread to constantly output infos the the GUI while the search function is running
- 
- using namespace std;
- /* run this program using the console pauser or add your own getch, system("pause") or input loop */
-typedef std::chrono::high_resolution_clock Time;
-    typedef std::chrono::milliseconds ms;
-    typedef std::chrono::duration<float> fsec;
-    auto t0 = Time::now();
+ 	Timer timer;
+ 	Search::Searching = true;
+ 	std::thread t(Runthread, &PVline);//Spawn new thread to constantly output infos the the GUI while the search function is running
+    timer.Start_Clock();
     int h = 0, j = 0;
     Move blank;
 	blank = Search::Think(wtime, btime, h, j);
 	Search::Searching = false;
-    t.join();
-    
-    auto t1 = Time::now();
-    fsec fs = t1 - t0;
-    ms d = std::chrono::duration_cast<ms>(fs);
-    
- float temporary = (Search::Nodes / d.count());
+    t.join();    
+    //auto after = Time::now();  
+	float temporary = (Search::Nodes / timer.Stop_Clock());
  //float temp_and_one = temporary * 1000.0;
  /*cout << "Number of nodes searched: " << Nodes << endl;
  cout << "Time in milliseconds: " << d.count() << endl;
