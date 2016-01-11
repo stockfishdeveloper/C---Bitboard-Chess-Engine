@@ -17,6 +17,7 @@ int Search::Seldepth = 0;
 bool Search::STOP_SEARCHING_NOW = false;
 bool Search::Current_Turn = false;
 bool Search::White_Turn = false;
+
 void Move::Undo_Move()
                 {
                 White_Pieces = White_Pieces2; 
@@ -54,11 +55,8 @@ void Move::Undo_Move()
 
 Move Search::Think(int wtime, int btime, int winc, int binc)
 {
-	typedef std::chrono::high_resolution_clock Time;
-    typedef std::chrono::milliseconds ms;
-    typedef std::chrono::duration<float> fsec;
-    auto t0 = Time::now();
-    
+	Timer timer;
+	timer.Start_Clock();   
     int Wtime = wtime;
 	int Btime = btime;
 	int Winc = winc;
@@ -79,11 +77,8 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
 					assert(Time_Allocation > 0);
 					Depth = q;
     				blank = Search::SearchMax(Spar, Spar2, (q - Plies_Searched) + 1, &PVline);
-    				auto t1 = Time::now();
-					fsec fs = t1 - t0;
-					ms d = std::chrono::duration_cast<ms>(fs);
-					//Time_Usage is the parameter value: if((d.count() * Tine_Usage) > Wtime)
-						if((d.count() * 30) > Wtime)
+    				//Time_Usage is the parameter value: if((d.count() * Tine_Usage) > Wtime)
+						if((timer.Stop_Clock() * 30) > Wtime)
 							{
 								return blank;
 							}
@@ -94,12 +89,9 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
     				Time_Allocation = btime;
     				assert(Time_Allocation > 0);
     				blank = Search::SearchMin(Spar, Spar2, (q - Plies_Searched) + 1, &PVline);
-    				auto t1 = Time::now();
-					fsec fs = t1 - t0;
-					ms d = std::chrono::duration_cast<ms>(fs);
-					Depth = q;
+    				Depth = q;
 					//Time_Usage is the parameter value
-					if((d.count() * 30) > Btime)
+					if((timer.Stop_Clock() * 30) > Btime)
 						{
 							return blank;
 						}
