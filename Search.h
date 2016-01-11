@@ -3,6 +3,8 @@
 #include "Bitboard.h"
 #include "MoveGen.h"
 #include <iostream>
+#include <chrono>
+typedef std::chrono::milliseconds::rep TimePoint; // A value in milliseconds
 
 class Move
 {
@@ -84,6 +86,32 @@ public:
     int cmove = 0;// Number of moves in the line.
     Move argmove[15];  // The line.
     int score = 0;
+};
+class Timer
+{
+		 /* return std::chrono::duration_cast<std::chrono::milliseconds>
+        (std::chrono::steady_clock::now().time_since_epoch()).count();*/
+	public:
+	TimePoint begin_time;
+	TimePoint end_time;
+	Timer()
+	{
+		begin_time = std::chrono::duration_cast<std::chrono::milliseconds>
+        (std::chrono::steady_clock::now().time_since_epoch()).count();
+		end_time = std::chrono::duration_cast<std::chrono::milliseconds>
+        (std::chrono::steady_clock::now().time_since_epoch()).count();
+	}
+	void Start_Clock()
+	{
+		begin_time = std::chrono::duration_cast<std::chrono::milliseconds>
+        (std::chrono::steady_clock::now().time_since_epoch()).count();
+	}
+	int Stop_Clock()
+	{
+		end_time = std::chrono::duration_cast<std::chrono::milliseconds>
+        (std::chrono::steady_clock::now().time_since_epoch()).count();
+		return end_time - begin_time;
+	}
 };
 
 namespace Search
