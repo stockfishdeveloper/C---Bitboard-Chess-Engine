@@ -9,6 +9,7 @@
 #include <thread> //For multithreading--must be using C++11 compiler
 #include "Thread.h"//Threading header file
 #include "Search.h"
+#include "Perft.h"
 
 using namespace std;
 int CheckUci();
@@ -83,6 +84,12 @@ Search::Clear();
 else if(UciCommand == "bench")
 {
 	//auto t1 = Time::now();
+}
+else if(UciCommand == "perft")
+{
+	int depth = 0;
+	cin >> depth;
+	cout << "Nodes: " << Perft(depth) << endl;
 }
 
 else if (Is_Fen)
