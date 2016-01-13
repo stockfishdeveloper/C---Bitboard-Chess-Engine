@@ -87,9 +87,15 @@ else if(UciCommand == "bench")
 }
 else if(UciCommand == "perft")
 {
+	Timer timer;
+	timer.Start_Clock();
 	int depth = 0;
 	cin >> depth;
-	cout << "Nodes: " << Perft(depth) << endl;
+	int nodes = Root_Perft(depth);
+	cout << "\n===========================\n";
+	cout << "Total time (ms) : " << timer.Stop_Clock() << "\n";
+	cout << "Nodes searched  : " << nodes << "\n";
+	cout << "Nodes/second    : " << (nodes / (timer.Stop_Clock() + 1) * 1000)  << "\n";
 }
 
 else if (Is_Fen)
@@ -375,6 +381,16 @@ int Moves_Command()
 		if(First_Part == F)
 		{
 			break;
+		}
+		string f = "pe";
+		if(First_Part == f)
+		{
+			cin.putback('e');
+			cin.putback('p');
+			//string ucicommand;
+			//cin >> ucicommand;
+			//cout << ucicommand;
+			return 0;
 		}
 		cin.get(Second_Part, 3);
 		Log << Second_Part << endl;
