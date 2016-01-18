@@ -2,7 +2,8 @@
 typedef unsigned long long int Bitboard;
 using namespace std;
 //This is an array containing one bit set in each bitboard corresponding to the index of the array; the square A1 is the first (0th) element 
-Bitboard GeneralBoard[64] = {
+Bitboard GeneralBoard[64] = 
+	{
         1, 2, 4, 8, 16, 32, 64, 128, 
         256, 512, 1024, 2048, 4096, 8192, 16384, 32768,
         65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608,
@@ -32,7 +33,8 @@ Bitboard Black_Knights = 0;
 Bitboard Black_Pawns = 0;
 
 //Contains the squares that a knight on a given index can move to. For example, the 0th element has the bits of b3 and c2 set
-Bitboard Knight_Lookup_Table[64] = {
+Bitboard Knight_Lookup_Table[64] = 
+	{
     132096, 329728, 659712, 1319424, 2638848, 5277696, 10489856, 4202496,
     33816580, 84410376, 168886289, 337772578, 675545156, 1351090312, 2685403152LL, 1075839008LL,
     8657044482, 21609056261, 43234889994, 86469779988, 172939559976, 345879119952, 687463207072, 275414786112,
@@ -42,10 +44,11 @@ Bitboard Knight_Lookup_Table[64] = {
     288234782788157440, 576469569871282176, 1224997833292120064, 2449995666584240128, 4899991333168480256, 9799982666336960512ULL, 1152939783987658752, 2305878468463689728,
     1128098930098176, 2257297371824128, 4796069720358912, 9592139440717824, 19184278881435648, 38368557762871296, 4679521487814656, 9077567998918656
 
-};
+	};
 
 //This one is the same as the Knight_Lookup_Table except that this one is for kings
-Bitboard King_Lookup_Table[64] = {
+Bitboard King_Lookup_Table[64] = 
+	{
 770, 1797, 3594, 7188, 14376, 28752, 57504, 49216,
 197123, 460039, 920078, 1840156, 3680312, 7360624, 14721248, 12599488,
 50463488, 117769984, 235539968, 471079936, 942159872, 1884319744, 3768639488LL, 3225468928LL,
@@ -54,14 +57,20 @@ Bitboard King_Lookup_Table[64] = {
 846636838289408, 1975852459884544, 3951704919769088, 7903409839538176, 15806819679076352, 31613639358152704, 63227278716305408, 54114388906344448,
 216739030602088448, 505818229730443264, 1011636459460886528, 2023272918921773056, 4046545837843546112, 8093091675687092224, 16186183351374184448ULL, 13853283560024178688ULL,
 144959613005987840, 362258295026614272, 724516590053228544, 1449033180106457088, 2898066360212914176, 5796132720425828352, 11592265440851656704ULL, 4665729213955833856
-};
+	};
  
- Bitboard H_Pawn_Mask = 36170086419038208;//For masking out A and H pawns so that they cannot capture off of the end of the board
- Bitboard A_Pawn_Mask = 282578800148736;//Same as last comment
+ Bitboard H_Pawn_Mask = 9259542123273814144;//For masking out A and H pawns so that they cannot capture off of the end of the board
+ Bitboard A_Pawn_Mask = 72340172838076673;
+ Bitboard G_Pawn_Mask = 4629771061636907072;
+ Bitboard B_Pawn_Mask = 144680345676153346;
+ Bitboard F_Pawn_Mask = 2314885530818453536;
+ Bitboard C_Pawn_Mask = 289360691352306692;
+ Bitboard E_Pawn_Mask = 1157442765409226768;
+ Bitboard D_Pawn_Mask = 578721382704613384;
 
 //Contains a string representation of the squares of the chess board; for example, the 0th element in the array is "a1"
 string PlayerMoves[64] = 
-{
+	{
 
 "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1", 
 
@@ -79,8 +88,4 @@ string PlayerMoves[64] =
 
 "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8"
 
-};
-
-bool White_Is_In_Check = false;
-bool Black_Is_In_Check = false;
-
+	};
