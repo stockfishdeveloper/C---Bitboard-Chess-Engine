@@ -35,7 +35,13 @@ extern Bitboard King_Lookup_Table[64];
 
  
  extern Bitboard H_Pawn_Mask;//For masking out A and H pawns so that they cannot capture off of the end of the board
- extern Bitboard A_Pawn_Mask;//Same as last comment
+ extern Bitboard A_Pawn_Mask;
+ extern Bitboard G_Pawn_Mask;
+ extern Bitboard B_Pawn_Mask;
+ extern Bitboard F_Pawn_Mask;
+ extern Bitboard C_Pawn_Mask;
+ extern Bitboard E_Pawn_Mask;
+ extern Bitboard D_Pawn_Mask;
 
 //Contains a string representation of the squares of the chess board; for example, the 0th element in the array is "a1"
 extern string PlayerMoves[64];
@@ -46,4 +52,3 @@ extern bool White_Is_In_Check;
 extern bool Black_Is_In_Check;
 
 #endif//Bitboard.h
-
