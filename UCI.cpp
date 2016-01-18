@@ -243,43 +243,43 @@ int Read_Fen(char Current_Square)
 	switch(Current_Square)
 {
 	case '1':
-		if((!((Current_Rank * 2) == 0)) && (!(Current_Rank * 2 & H_Pawn_Mask)))
+		if(!(Current_Rank & H_Pawn_Mask))
 		Current_Rank *= 2;
 		else
 		Current_Rank *= 1;
 		break;
 	case '2':
-		if((!((Current_Rank * 4) == 0)) && (!(Current_Rank * 4 & H_Pawn_Mask)))
+		if(!(Current_Rank & G_Pawn_Mask))
 		Current_Rank *= 4;
 		else
 		Current_Rank *= 2;
 		break;
 	case '3':
-	    if((!((Current_Rank * 8) == 0)) && (!(Current_Rank * 8 & H_Pawn_Mask)))
+	    if(!(Current_Rank & F_Pawn_Mask))
 		Current_Rank *= 8;
 		else
 		Current_Rank *= 4;
 	    break;
 	case '4':
-		if((!((Current_Rank * 16) == 0)) && (!(Current_Rank * 16 & H_Pawn_Mask)))
+		if(!(Current_Rank & E_Pawn_Mask))
 		Current_Rank *= 16;
 		else
 		Current_Rank *= 8;
 		break;
 	case '5':
-		if((!((Current_Rank * 32) == 0)) && (!(Current_Rank * 32 & H_Pawn_Mask)))
+		if(!(Current_Rank & D_Pawn_Mask))
 		Current_Rank *= 32;
 		else
 		Current_Rank *= 16;
 		break;
 	case '6':
-		if((!((Current_Rank * 64) == 0)) && (!(Current_Rank * 64 & H_Pawn_Mask)))
+		if(!(Current_Rank & C_Pawn_Mask))
 		Current_Rank *= 64;
 		else
 		Current_Rank *= 32;
 		break;
 	case '7':
-		if((!((Current_Rank * 128) == 0)) && (!(Current_Rank * 64 & H_Pawn_Mask)))
+		if(!(Current_Rank & B_Pawn_Mask))
 		Current_Rank *= 128;
 		else
 		Current_Rank *= 64;
