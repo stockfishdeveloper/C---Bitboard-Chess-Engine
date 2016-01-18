@@ -204,10 +204,8 @@ Black_Pawns = 0;
 char Current_Square;
 for(int h = 0; h < (Fen.length()); h++)
 {
-	Current_Square = Fen[h];
-	
-
-Read_Fen(Current_Square);
+	Current_Square = Fen[h];	
+	Read_Fen(Current_Square);
 }
 char Curr_Turn;
 cin >> Curr_Turn;
@@ -222,7 +220,7 @@ else
 Search::Current_Turn = false;
 Search::White_Turn = false;
 }
-string Legal_Castling;
+string Legal_Castling = "";
 cin >> Legal_Castling;
 Log << Legal_Castling << endl;
 string En_Passant;
@@ -235,6 +233,8 @@ int Move_Count;
 cin >> Move_Count;
 Log << Move_Count << endl;
 	
+
+				
 return 0;
 }
 
@@ -243,43 +243,43 @@ int Read_Fen(char Current_Square)
 	switch(Current_Square)
 {
 	case '1':
-		if(!((Current_Rank * 2) & (A_Pawn_Mask)))
+		if((!((Current_Rank * 2) == 0)) && (!(Current_Rank * 2 & H_Pawn_Mask)))
 		Current_Rank *= 2;
 		else
 		Current_Rank *= 1;
 		break;
 	case '2':
-		if(!((Current_Rank * 4) & (A_Pawn_Mask)))
+		if((!((Current_Rank * 4) == 0)) && (!(Current_Rank * 4 & H_Pawn_Mask)))
 		Current_Rank *= 4;
 		else
 		Current_Rank *= 2;
 		break;
 	case '3':
-	    if(!((Current_Rank * 8) & (A_Pawn_Mask)))
+	    if((!((Current_Rank * 8) == 0)) && (!(Current_Rank * 8 & H_Pawn_Mask)))
 		Current_Rank *= 8;
 		else
 		Current_Rank *= 4;
 	    break;
 	case '4':
-		if(!((Current_Rank * 16) & (A_Pawn_Mask)))
+		if((!((Current_Rank * 16) == 0)) && (!(Current_Rank * 16 & H_Pawn_Mask)))
 		Current_Rank *= 16;
 		else
 		Current_Rank *= 8;
 		break;
 	case '5':
-		if(!((Current_Rank * 32) & (A_Pawn_Mask)))
+		if((!((Current_Rank * 32) == 0)) && (!(Current_Rank * 32 & H_Pawn_Mask)))
 		Current_Rank *= 32;
 		else
 		Current_Rank *= 16;
 		break;
 	case '6':
-		if(!((Current_Rank * 64) & (A_Pawn_Mask)))
+		if((!((Current_Rank * 64) == 0)) && (!(Current_Rank * 64 & H_Pawn_Mask)))
 		Current_Rank *= 64;
 		else
 		Current_Rank *= 32;
 		break;
 	case '7':
-		if(!((Current_Rank * 128) & (A_Pawn_Mask)))
+		if((!((Current_Rank * 128) == 0)) && (!(Current_Rank * 64 & H_Pawn_Mask)))
 		Current_Rank *= 128;
 		else
 		Current_Rank *= 64;
@@ -314,49 +314,49 @@ int Read_Fen(char Current_Square)
     case 'R':
     	White_Rooks |= Current_Rank;
     	White_Pieces |= Current_Rank;
-    	if(!(Current_Rank & H_Pawn_Mask))
+    	if((!(Current_Rank & H_Pawn_Mask)) && ((Current_Rank != 9223372036854775808)))
     	Current_Rank *= 2;
     	break;
     case 'r':
     	Black_Rooks |= Current_Rank;
     	Black_Pieces |= Current_Rank;
-    	if(!(Current_Rank & H_Pawn_Mask))
+    	if((!(Current_Rank & H_Pawn_Mask)) && ((Current_Rank != 9223372036854775808)))
     	Current_Rank *= 2;
     	break;
     case 'B':
     	White_Bishops |= Current_Rank;
     	White_Pieces |= Current_Rank;
-    	if(!(Current_Rank & H_Pawn_Mask))
+    	if((!(Current_Rank & H_Pawn_Mask)) && ((Current_Rank != 9223372036854775808)))
     	Current_Rank *= 2;
     	break;
     case 'b':
     	Black_Bishops |= Current_Rank;
     	Black_Pieces |= Current_Rank;
-    	if(!(Current_Rank & H_Pawn_Mask))
+    	if((!(Current_Rank & H_Pawn_Mask)) && ((Current_Rank != 9223372036854775808)))
     	Current_Rank *= 2;
     	break;
     case 'N':
     	White_Knights |= Current_Rank;
     	White_Pieces |= Current_Rank;
-    	if(!(Current_Rank & H_Pawn_Mask))
+    	if((!(Current_Rank & H_Pawn_Mask)) && ((Current_Rank != 9223372036854775808)))
     	Current_Rank *= 2;
     	break;
     case 'n':
     	Black_Knights |= Current_Rank;
     	Black_Pieces |= Current_Rank;
-    	if(!(Current_Rank & H_Pawn_Mask))
+    	if((!(Current_Rank & H_Pawn_Mask)) && ((Current_Rank != 9223372036854775808)))
     	Current_Rank *= 2;
     	break;
     case 'P':
     	White_Pawns |= Current_Rank;
     	White_Pieces |= Current_Rank;
-    	if(!(Current_Rank & H_Pawn_Mask))
+    	if((!(Current_Rank & H_Pawn_Mask)) && ((Current_Rank != 9223372036854775808)))
     	Current_Rank *= 2;
     	break;
     case 'p':
     	Black_Pawns |= Current_Rank;
     	Black_Pieces |= Current_Rank;
-    	if(!(Current_Rank & H_Pawn_Mask))
+    	if((!(Current_Rank & H_Pawn_Mask)) && ((Current_Rank != 9223372036854775808)))
     	Current_Rank *= 2;
     	break;
     case '/':
