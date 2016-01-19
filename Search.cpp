@@ -457,22 +457,20 @@ Search::Make_White_Search_Move(const Bitboard& From, const Bitboard& To, const i
                	White_Queens |= To;
                	break;	
                	
-               	/*case 15://White king kingside castling
+               	case 15://Kigside castling
 				White_Pieces |= To;
                	White_Pieces ^= From;
-               	White_Pieces |= 32;
-               	White_Pieces ^= 128;
                	White_Rooks |= 32;
                	White_Rooks ^= 128;
-               	White_King |= To;
-               	White_King ^= From;
-               	break;*/
+               	White_King |= 64;
+               	White_King ^= 16;
+               	break;
 				   	
                	
 			   }
                  
                  //Tidy up for the next call of the move generation functions
-				 for(int t = 0; t < White_Move_Spacer; t++)               
+				 for(int t = 0; t < 150; t++)               
                {
                	 White_Move_From_Stack[t] = 0;//Clear the move from stack
                	 White_Move_To_Stack[t] = 0;//Clear the move to stack
@@ -680,20 +678,18 @@ Search::Make_Black_Search_Move(const Bitboard& From, const Bitboard& To, const i
                	Black_Queens |= To;
                	break;
 				 
-				/*case 15: 			
+				case 15://Kigside castling
 				Black_Pieces |= To;
-            	Black_Pieces ^= From;
-            	Black_Pieces |= 4611686018427387904;
-            	Black_Pieces ^= 1152921504606846976;
-            	Black_Rooks |= 2305843009213693952;
-            	Black_Rooks ^= 9223372036854775808ULL;
-            	Black_King |= To;
-            	Black_King ^= From;
-            	break;*/
+               	Black_Pieces ^= From;
+               	Black_Rooks |= 2305843009213693952;
+               	Black_Rooks ^= 9223372036854775808;
+               	Black_King |= 4611686018427387904;
+               	Black_King ^= 1152921504606846976;
+               	break;
 			   }
                  
                  //Tidy up for the next call of the move generation functions
-				 for(int t = 0; t < Black_Move_Spacer; t++)               
+				 for(int t = 0; t < 150; t++)               
                {
                	 Black_Move_From_Stack[t] = 0;//Clear the move from stack
                	 Black_Move_To_Stack[t] = 0;//Clear the move to stack
@@ -904,7 +900,7 @@ Search::Is_Mate()
 
 void Search::Clear()
 {
-		for(int t = 0; t < White_Move_Spacer; t++)               
+		for(int t = 0; t < 150; t++)               
                {
                	 White_Move_From_Stack[t] = 0;//Clear the move from stack
                	 White_Move_To_Stack[t] = 0;//Clear the move to stack
@@ -917,9 +913,8 @@ void Search::Clear()
 			White_Rook_Spacer = 0;
 			White_Bishop_Spacer = 0;
 			White_Queen_Spacer = 0;
-			White_Move_Spacer = 0;
-			    
-			for(int t = 0; t < Black_Move_Spacer; t++)               
+						    
+			for(int t = 0; t < 150; t++)               
                {
                	 Black_Move_From_Stack[t] = 0;//Clear the move from stack
                	 Black_Move_To_Stack[t] = 0;//Clear the move to stack
@@ -932,8 +927,17 @@ void Search::Clear()
 			Black_Rook_Spacer = 0;
 			Black_Bishop_Spacer = 0;
 			Black_Queen_Spacer = 0;
+					
+			Search::Nodes = 0;
+			Search::Current_Turn = true;
+			Search::White_Turn = true;
+			White_Move_Spacer = 0;
 			Black_Move_Spacer = 0;
 			
+			Search::Current_Turn = true;
+			Search::White_Turn = true;
+			Search::Searching = false;
+			Search::STOP_SEARCHING_NOW = false; 
 			Search::Nodes = 0;
 }
 
