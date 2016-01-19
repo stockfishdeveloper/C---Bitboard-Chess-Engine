@@ -6,18 +6,7 @@ and it has the bit set that the piece in the move moves to. It also takes a Move
 */
 bool White_Is_Legal(const Bitboard& From_Square, const Bitboard& To_Square, const int Move_Type) 
 {
-        int h; 
-        for(int j = 0; j < 64; j++) 
-        {
-                if(White_King & GeneralBoard[j])//Get the index (0-63) of White's king
-                h = j;
-                break;
-        }
-Bitboard BAttacks = Bmagic(h, (White_Pieces | Black_Pieces));
-Bitboard RAttacks = Rmagic(h, (White_Pieces | Black_Pieces));
-Bitboard QAttacks = Qmagic(h, (White_Pieces | Black_Pieces));
-        
-        
+       
 Bitboard White_Pieces2 = White_Pieces; //Make a copy of all normal bitboards to use in this function
 Bitboard Black_Pieces2 = Black_Pieces; 
 Bitboard White_King2 = White_King;
@@ -159,7 +148,7 @@ switch(Move_Type)
                 Black_Pawns2  ^= To_Square; 
                 break;
                                 
-                case 10://Queen nrmal move
+                case 10://Queen normal move
                 White_Pieces2 |= To_Square;
                 White_Pieces2 ^= From_Square;
                 White_Queens2 |= To_Square;
@@ -215,8 +204,31 @@ switch(Move_Type)
                 White_Pieces2 ^= From_Square;
                 White_Queens2 |= To_Square;
                 break;  
+                
+                case 15://Kigside castling
+				White_Pieces2 |= To_Square;
+               	White_Pieces2 ^= From_Square;
+               	White_Pieces2 |= 32;
+               	White_Pieces2 ^= 128;
+               	White_Rooks2 |= 32;
+               	White_Rooks2 ^= 128;
+               	White_King2 |= 64;
+               	White_King2 ^= 16;
+               	break;
         }
         
+        int h; 
+        for(int j = 0; j < 64; j++) 
+        {
+                if(White_King2 & GeneralBoard[j])//Get the index (0-63) of White's king
+                {
+                	h = j;
+                	break;
+            	}
+        }
+Bitboard BAttacks = Bmagic(h, (White_Pieces2 | Black_Pieces2));
+Bitboard RAttacks = Rmagic(h, (White_Pieces2 | Black_Pieces2));
+Bitboard QAttacks = Qmagic(h, (White_Pieces2 | Black_Pieces2));
         
         
         if(BAttacks & (Black_Bishops2))
@@ -256,15 +268,7 @@ switch(Move_Type)
 
 bool Black_Is_Legal(const Bitboard& From_Square, const Bitboard& To_Square, const int Move_Type)
 {
-        int h; 
-        for(int j = 0; j < 64; j++)
-        {
-                if(Black_King & GeneralBoard[j])//Get the index(0-63) of the black king
-                h = j;
-                break;
-        }
-        
-                        
+                              
 Bitboard White_Pieces2 = White_Pieces; 
 Bitboard Black_Pieces2 = Black_Pieces; 
 Bitboard White_King2 = White_King;
@@ -280,9 +284,7 @@ Bitboard Black_Bishops2 = Black_Bishops;
 Bitboard Black_Knights2 = Black_Knights;
 Bitboard Black_Pawns2 = Black_Pawns;
 
-Bitboard BAttacks = Bmagic(h, (White_Pieces2 | Black_Pieces2));
-Bitboard RAttacks = Rmagic(h, (White_Pieces2 | Black_Pieces2));
-Bitboard QAttacks = Qmagic(h, (White_Pieces2 | Black_Pieces2));
+
 switch(Move_Type)
         { 
                
@@ -373,7 +375,7 @@ switch(Move_Type)
                 White_Pieces2 ^= To_Square;
                 White_Queens2 |= To_Square; 
                 White_Queens2 ^= To_Square; 
-                    White_Rooks2 |= To_Square; 
+                White_Rooks2 |= To_Square; 
                 White_Rooks2 ^= To_Square; 
                 White_Bishops2 |= To_Square; 
                 White_Bishops2 ^= To_Square; 
@@ -467,8 +469,20 @@ switch(Move_Type)
                 break;                  
                                 
         }
-                           
         
+            int h; 
+        for(int j = 0; j < 64; j++)
+        {
+                if(Black_King2 & GeneralBoard[j])//Get the index(0-63) of the black king
+                {
+				   	h = j;
+                	break;
+                }				
+		}
+        Bitboard BAttacks = Bmagic(h, (White_Pieces2 | Black_Pieces2));
+		Bitboard RAttacks = Rmagic(h, (White_Pieces2 | Black_Pieces2));
+		Bitboard QAttacks = Qmagic(h, (White_Pieces2 | Black_Pieces2));
+		
         if(BAttacks & (White_Bishops2))
         	return false;
         if(RAttacks & (White_Rooks2))
