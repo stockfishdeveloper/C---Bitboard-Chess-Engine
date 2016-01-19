@@ -187,6 +187,8 @@ return 0;
 
 int Parse_Fen(string Fen)
 {
+Search::Clear();
+
 White_Pieces = 0;
 Black_Pieces = 0;
 White_King = 0;
@@ -207,6 +209,7 @@ for(int h = 0; h < (Fen.length()); h++)
 	Current_Square = Fen[h];	
 	Read_Fen(Current_Square);
 }
+Current_Rank = 72057594037927936;
 char Curr_Turn;
 cin >> Curr_Turn;
 Log << Curr_Turn << endl;
@@ -233,7 +236,6 @@ int Move_Count;
 cin >> Move_Count;
 Log << Move_Count << endl;
 	
-
 				
 return 0;
 }
@@ -380,6 +382,8 @@ int Moves_Command()
 		//cin.get(); 
 		if(First_Part == F)
 		{
+			cin.putback('o');
+			cin.putback('g');
 			break;
 		}
 		string f = "pe";
@@ -459,10 +463,7 @@ int Moves_Command()
 		
 		
 	}
-	
-		cin.putback('o');
-		cin.putback('g');
-		
+			
 	return 0;		
 }
 
@@ -577,6 +578,15 @@ int Parse_Moves(string First, string Second)
 			Black_Knights ^= To;
 			Black_Pawns |= To;
 			Black_Pawns ^= To;			
+		}
+		if(To == 64)
+		{
+			White_Pieces |= 64;
+			White_Pieces ^= 16;
+			White_Pieces |= 32;
+			White_Pieces ^= 128;
+			White_Rooks |= 32;
+			White_Rooks ^= 128;			
 		}
 	    }
 	    if(White_Queens & From)
@@ -707,6 +717,15 @@ int Parse_Moves(string First, string Second)
 			White_Knights ^= To;
 			White_Pawns |= To;
 			White_Pawns ^= To;			
+		}
+		if(To == 4611686018427387904)
+		{
+			Black_Pieces |= 4611686018427387904;
+			Black_Pieces ^= 1152921504606846976;
+			Black_Pieces |= 2305843009213693952;
+			Black_Pieces ^= 9223372036854775808;
+			Black_Rooks |= 2305843009213693952;
+			Black_Rooks ^= 9223372036854775808;			
 		}
 	    }
 	    if(Black_Queens & From)
