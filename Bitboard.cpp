@@ -1,8 +1,10 @@
 #include <string> 
+#include "Bitboard.h"
+#include "Search.h"
 typedef unsigned long long int Bitboard;
 using namespace std;
 //This is an array containing one bit set in each bitboard corresponding to the index of the array; the square A1 is the first (0th) element 
-Bitboard GeneralBoard[64] = 
+Bitboard GeneralBoard[64] =
 	{
         1, 2, 4, 8, 16, 32, 64, 128, 
         256, 512, 1024, 2048, 4096, 8192, 16384, 32768,
@@ -89,3 +91,79 @@ string PlayerMoves[64] =
 "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8"
 
 	};
+	
+void Print_Board()
+{
+	for( int h = 0; h < 64; h++)
+		{
+        	if(GeneralBoard[h] & White_King)
+        	{
+        	cout << "White king is on " << PlayerMoves[h] << endl;
+        	}
+        	
+        	if(GeneralBoard[h] & Black_King)
+        	{
+        	cout << "Black king is on " << PlayerMoves[h] << endl;
+        	}
+        	
+        	if(GeneralBoard[h] & White_Queens)
+        	{
+        	cout << "White queen is on " << PlayerMoves[h] << endl;
+        	}
+        	
+        	if(GeneralBoard[h] & Black_Queens)
+        	{
+        	cout << "Black queen is on " << PlayerMoves[h] << endl;
+        	}
+        	
+        	if(GeneralBoard[h] & White_Rooks)
+        	{
+        	cout << "White rook is on " << PlayerMoves[h] << endl;
+        	}
+        	
+        	if(GeneralBoard[h] & Black_Rooks)
+        	{
+        	cout << "Black rook is on " << PlayerMoves[h] << endl;
+        	}
+        	
+        	if(GeneralBoard[h] & White_Bishops)
+        	{
+        	cout << "White Bishop is on " << PlayerMoves[h] << endl;
+        	}
+        	
+        	if(GeneralBoard[h] & Black_Bishops)
+        	{
+        	cout << "Black Bishop is on " << PlayerMoves[h] << endl;
+        	}
+        	
+        	if(GeneralBoard[h] & White_Knights)
+        	{
+        	cout << "White Knight is on " << PlayerMoves[h] << endl;
+        	}
+        	
+        	if(GeneralBoard[h] & Black_Knights)
+        	{
+        	cout << "Black Knight is on " << PlayerMoves[h] << endl;
+        	}
+        	
+        	if(GeneralBoard[h] & White_Pawns)
+        	{
+        	cout << "White Pawn is on " << PlayerMoves[h] << endl;
+        	}
+        	
+        	if(GeneralBoard[h] & Black_Pawns)
+        	{
+        	cout << "Black Pawn is on " << PlayerMoves[h] << endl;
+        	}       	
+        	//cout << "White king: " << White_King << endl;
+		}	
+	
+		if(Search::White_Turn)
+		{
+			cout << "It is White's turn" << endl;
+		}
+		else
+		{
+			cout << "It is Black's turn" << endl;
+		}
+}
