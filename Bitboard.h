@@ -1,6 +1,7 @@
 #ifndef Bitboard_h_
 #define Bitboard_h_
 #include <string>
+#include <iostream>
 typedef unsigned long long int Bitboard;
 using namespace std;
 //This is an array containing one bit set in each bitboard corresponding to the index of the array; the square A1 is the first (0th) element
@@ -45,10 +46,6 @@ extern Bitboard King_Lookup_Table[64];
 
 //Contains a string representation of the squares of the chess board; for example, the 0th element in the array is "a1"
 extern string PlayerMoves[64];
-
-
-
-extern bool White_Is_In_Check;
-extern bool Black_Is_In_Check;
+void Print_Board();
 
 #endif//Bitboard.h
