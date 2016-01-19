@@ -10,13 +10,15 @@ int Root_Perft(int depth)
 	Search::Current_Turn ? Generate_White_Moves() : Generate_Black_Moves();
 	n_moves = Search::Current_Turn ? White_Move_Spacer : Black_Move_Spacer;
 	//cout << "n_moves: " << n_moves << endl;
+	Move move;
     for (i = 0; i < n_moves; i++)
 	 {
-	   	Move move;
+	   	
 		Search::Current_Turn ? move.From = White_Move_From_Stack[i] : move.From = Black_Move_From_Stack[i];
 		Search::Current_Turn ? move.To = White_Move_To_Stack[i] : move.To = Black_Move_To_Stack[i];
 		Search::Current_Turn ? move.Move_Type = White_Move_Types[i] : move.Move_Type = Black_Move_Types[i];
 		Search::Current_Turn ? move.White_Temp_Move_Spacer = White_Move_Spacer : move.Black_Temp_Move_Spacer = Black_Move_Spacer;
+	
 		if(Search::Current_Turn)
 		{
 			for(int h = 0; h < White_Move_Spacer; h++)
