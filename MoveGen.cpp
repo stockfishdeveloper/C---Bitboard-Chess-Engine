@@ -21,18 +21,18 @@ Bitboard WhiteKnightCount[40];
 Bitboard BlackKnightCount[40];
 Bitboard WhitePawnCount[20];
 Bitboard BlackPawnCount[20];
-Bitboard WhiteRookCount[20];
-Bitboard BlackRookCount[20];
+Bitboard WhiteRookCount[60];
+Bitboard BlackRookCount[60];
 Bitboard WhiteBishopCount[20];
 Bitboard BlackBishopCount[20];
-Bitboard WhiteQueenCount[28];
-Bitboard BlackQueenCount[28];
-Bitboard White_Move_From_Stack[70];//Move stack is just an array of Bitboards(64-bit integers) containing only one bit set in each--the from square or the to square
-Bitboard White_Move_To_Stack[70];
-Bitboard Black_Move_From_Stack[70];
-Bitboard Black_Move_To_Stack[70];
-int White_Move_Types[70];//Array of normal integers that keeps track of the type of each move
-int Black_Move_Types[70];
+Bitboard WhiteQueenCount[150];
+Bitboard BlackQueenCount[150];
+Bitboard White_Move_From_Stack[150];//Move stack is just an array of Bitboards(64-bit integers) containing only one bit set in each--the from square or the to square
+Bitboard White_Move_To_Stack[150];
+Bitboard Black_Move_From_Stack[150];
+Bitboard Black_Move_To_Stack[150];
+int White_Move_Types[150];//Array of normal integers that keeps track of the type of each move
+int Black_Move_Types[150];
 int White_Move_Spacer = 0; // Keeps a "record" of the last move put on the stack so that it knows which index of the array to put the next move in
 int Black_Move_Spacer = 0;
 bool Is_Legal;
@@ -54,7 +54,7 @@ void Generate_White_Moves()
 }        
          White_Knight_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
          
-    }    
+        
     register int j = 0;//Holds the index of the current knight
     register int w = 0; // Use it in a for loop to keep track of the number of iterations
         for(int w = 0; w <= White_Knight_Spacer; w++) // For eack knight found on KnightCount[]; at the beginning of the game it is 2
@@ -96,6 +96,7 @@ void Generate_White_Moves()
         }
 
 White_Knight_Spacer = 0; // Reset the knight count of the current position so that if called again, the function can start from scratch
+}
 
 for(int i = 0; i < 64; i++)
 {
@@ -109,31 +110,32 @@ for(int i = 0; i < 64; i++)
          
     
     
-    j = 0;//Used in a for loop to index the current king
-    w = 0; // Use it in a for loop to keep track of the number of iterations
+    int j = 0;//Used in a for loop to index the current king
+    int w = 0; // Use it in a for loop to keep track of the number of iterations
     for(int w = 0; w <= White_King_Spacer; w++)// For each king found on KnightCount[]
     {    
     for( int i = 0; i < 64; i++)
     {
-        if(WhiteKingCount[w] & (GeneralBoard[i])) // Find the index of the current knight(1-63) and assign this value to j
+        if(WhiteKingCount[w] & (GeneralBoard[i])) // Find the index of the current king(1-63) and assign this value to j
         {
             j = i;
         }
     }        
     //Kingside castling functionality
-	/*Bitboard first = (WhiteKingCount[w] & 16);
+	Bitboard first = (WhiteKingCount[w] & 16);
 	Bitboard second = ((White_Pieces | Black_Pieces) & 96);
 	Bitboard e1 = 16, f1 = 32, g1 = 64, a0 = 0;
 	bool canmovetof1 = White_Is_Legal(e1, f1, 15);
-	bool canmovetog1 = White_Is_Legal(f1, g1, 15);
+	bool canmovetog1 = White_Is_Legal(e1, g1, 15);
 	bool canmovetoe1 = White_Is_Legal(a0, e1, 15); 
-    if(first && (!second) && canmovetof1 && canmovetog1 && canmovetoe1 && (!WhiteHasCastled))
+	bool Rookonh1 = (White_Rooks & 128);
+	if(first && (!second) && canmovetof1 && canmovetog1 && canmovetoe1 && (!WhiteHasCastled) && Rookonh1)
     {
 		White_Move_From_Stack[White_Move_Spacer] = WhiteKingCount[w];
 		Bitboard too = 64;	
 		White_Move_To_Stack[White_Move_Spacer++] = too;
 		White_Move_Types[White_Move_Spacer - 1] = 15;
-	}*/
+	}
     Bitboard Spare = (King_Lookup_Table[j] | WhiteKingCount[w]);// Spare is a bitboard with all legal squares the king can move to and the original square of the knight
     Bitboard Spare2 = White_Pieces & King_Lookup_Table[j]; // Spare2 has all moves that do not capture one of white's own pieces    
     Bitboard Spare3 = ((Spare ^ Spare2) ^ GeneralBoard[j]); // Spare3 is the final result
@@ -177,7 +179,7 @@ if(White_Pawns)//If there are any white pawns
 }        
          White_Pawn_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
         
-    }
+    
            
     j = 0;//Used to keep track of iteration in a for loop
     w = 0; // Use it in a for loop to keep track of the number of iterations
@@ -268,6 +270,7 @@ if(White_Pawns)//If there are any white pawns
         WhitePawnCount[u] = 0;
         }
 White_Pawn_Spacer = 0; // Reset the pawn count of the current position so that if called again, the function can start from scratch
+}
 
 if(White_Rooks)//If there are any white rooks
         {
@@ -281,7 +284,7 @@ if(White_Rooks)//If there are any white rooks
 }        
          White_Rook_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
          
-    }   
+       
     j = 0;//Used i a for loop
     w = 0; // Use it in a for loop to keep track of the number of iterations
     for(int w = 0; w <= White_Rook_Spacer; w++)// For each rook found on RookCount[]
@@ -317,11 +320,12 @@ if(White_Rooks)//If there are any white rooks
     }
 }
      // Tidy up for the next person
-     for(int u = 0; u < 20; u++) // Clear WhiteRookCount[]
+     for(int u = 0; u < 60; u++) // Clear WhiteRookCount[]
     {
         WhiteRookCount[u] = 0;
         }
 White_Rook_Spacer = 0; // Reset the rook count of the current position so that if called again, the function can start from scratch
+}
 
  if(White_Bishops)
         {
@@ -335,7 +339,7 @@ White_Rook_Spacer = 0; // Reset the rook count of the current position so that i
 }        
          White_Bishop_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
          
-    }
+    
     j = 0;
     w = 0; // Use it in a for loop to keep track of the number of iterations
     for(int w = 0; w <= White_Bishop_Spacer; w++)// For each rook found on BishopCount[]
@@ -381,6 +385,7 @@ White_Rook_Spacer = 0; // Reset the rook count of the current position so that i
         
 
 White_Bishop_Spacer = 0; // Reset the bishop count of the current position so that if called again, the function can start from scratch
+}
 
  if(White_Queens)
         {
@@ -394,7 +399,7 @@ White_Bishop_Spacer = 0; // Reset the bishop count of the current position so th
 }        
          White_Queen_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
          
-    }
+    
 
     j = 0;
     w = 0; // Use it in a for loop to keep track of the number of iterations
@@ -435,17 +440,17 @@ White_Bishop_Spacer = 0; // Reset the bishop count of the current position so th
 
     }
 }
-    
+
     
      // Tidy up for the next person
-     for(int u = 0; u < 40; u++) //Clear WhiteQueenCount[]
+     for(int u = 0; u < 150; u++) //Clear WhiteQueenCount[]
     {
         WhiteQueenCount[u] = 0;
         }
-        
+
 
 White_Queen_Spacer = 0; // Reset the queen count of the current position so that if called again, the function can start from scratch
-
+}
 return;
 }
 
@@ -464,7 +469,7 @@ void Generate_Black_Moves()
 }        
         Black_Knight_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
          
-    }
+    
     
     register int j = 0;//Used for the index of the current knight
     register int w = 0; // Use it in a for loop to keep track of the number of iterations
@@ -506,6 +511,7 @@ void Generate_Black_Moves()
         BlackKnightCount[u] = 0;
         }
 Black_Knight_Spacer = 0; // Reset the knight count of the current position so that if called twice, the function can start from scratch
+}
 
 for(int i = 0; i < 64; i++)
 {
@@ -519,8 +525,8 @@ for(int i = 0; i < 64; i++)
          
     
     
-    j = 0;//Used to help control the for loops
-    w = 0; // Use it in a for loop to keep track of the number of iterations
+    int j = 0;//Used to help control the for loops
+    int w = 0; // Use it in a for loop to keep track of the number of iterations
     for(int w = 0; w <= Black_King_Spacer; w++)// For each king found on KingCount[]
     {    
     for( int i = 0; i < 64; i++)
@@ -531,24 +537,25 @@ for(int i = 0; i < 64; i++)
         }
     } 
 	//Kingside castling functionality
-	/*Bitboard first = (BlackKingCount[w] & 16);
+	Bitboard first = (BlackKingCount[w] & 1152921504606846976);
 	Bitboard second = ((White_Pieces | Black_Pieces) & 6917529027641081856);
 	Bitboard e8 = 1152921504606846976, f8 = 2305843009213693952, g8 = 4611686018427387904, a0 = 0;
-	bool canmovetof8 = Black_Is_Legal(e8, f8, 15);
-	bool canmovetog8 = Black_Is_Legal(f8, g8, 15);
-	bool canmovetoe8 = Black_Is_Legal(a0, e8, 15); 
-    if(first && (!second) && canmovetof8 && canmovetog8 && canmovetoe8 && (!BlackHasCastled))
+	bool canmovetof1 = Black_Is_Legal(e8, f8, 15);
+	bool canmovetog1 = Black_Is_Legal(e8, g8, 15);
+	bool canmovetoe1 = Black_Is_Legal(a0, e8, 15); 
+	bool Rookonh1 = (Black_Rooks & 9223372036854775808);
+	if(first && (!second) && canmovetof1 && canmovetog1 && canmovetoe1 && (!BlackHasCastled) && Rookonh1)
     {
 		Black_Move_From_Stack[Black_Move_Spacer] = BlackKingCount[w];
 		Bitboard too = 4611686018427387904;	
 		Black_Move_To_Stack[Black_Move_Spacer++] = too;
 		Black_Move_Types[Black_Move_Spacer - 1] = 15;
-	}*/   
+	}
      
     Bitboard Spare = (King_Lookup_Table[j] | BlackKingCount[w]);// Spare is a bitboard with all legal empty squares the king can move to and the original square of the king
     Bitboard Spare2 = Black_Pieces & King_Lookup_Table[j]; // Spare2 has all moves that do not capture one of black's own pieces    
     Bitboard Spare3 = ((Spare ^ Spare2) ^ GeneralBoard[j]); // Spare3 is the final result
-        for(int r = 0; r < 10; r++) // For each legal square found in Spare3 for the current king
+        for(int r = 0; r < 64; r++) // For each legal square found in Spare3 for the current king
     {
         if(GeneralBoard[r] & Spare3)//If a square is found that the king can legally move to 
         { 
@@ -589,10 +596,10 @@ if(Black_Pawns)//If there are any black pawns
 }        
          Black_Pawn_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
          
-    }
+    
         
-    j = 0;//Used in a for loop
-    w = 0; // Use it in a for loop to keep track of the number of iterations
+    int j = 0;//Used in a for loop
+    int w = 0; // Use it in a for loop to keep track of the number of iterations
     for(int w = 0; w <= Black_Pawn_Spacer; w++)// For each pawn found on PawnCount[]
     {    
     for( int i = 0; i < 64; i++)
@@ -682,6 +689,7 @@ if(Black_Pawns)//If there are any black pawns
         }
 
 Black_Pawn_Spacer = 0; // Reset the pawn count of the current position so that if called again, the function can start from scratch
+}
 
 if(Black_Rooks)//If there are any black rooks, 
         {
@@ -695,7 +703,7 @@ if(Black_Rooks)//If there are any black rooks,
 }        
          Black_Rook_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
          
-    }
+    
         
     j = 0;//Used in a for loop
     w = 0; // Use it in a for loop to keep track of the number of iterations
@@ -735,11 +743,12 @@ if(Black_Rooks)//If there are any black rooks,
     
     
      // Tidy up for the next person
-     for(int u = 0; u < 20; u++) //Clear BlackRookCount[]
+     for(int u = 0; u < 60; u++) //Clear BlackRookCount[]
     {
         BlackRookCount[u] = 0;
         }
         Black_Rook_Spacer = 0; // Reset the rook count of the current position so that if called again, the function can start from scratch
+    }
         
         if(Black_Bishops)
         {
@@ -753,7 +762,7 @@ if(Black_Rooks)//If there are any black rooks,
 }        
          Black_Bishop_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
          
-    }   
+       
     j = 0;
     w = 0; // Use it in a for loop to keep track of the number of iterations
     for(int w = 0; w <= Black_Bishop_Spacer; w++)// For each rook found on BishopCount[]
@@ -796,6 +805,7 @@ if(Black_Rooks)//If there are any black rooks,
         BlackBishopCount[u] = 0;
         }
         Black_Bishop_Spacer = 0; // Reset the bishop count of the current position so that if called again, the function can start from scratch
+    }
         
         if(Black_Queens)
         {
@@ -809,7 +819,7 @@ if(Black_Rooks)//If there are any black rooks,
 }        
          Black_Queen_Spacer--; // Outside the loop, make sure that I don't get mixed up; I have to make the Spacer one smaller
          
-    }
+    
         
     j = 0;
     w = 0; // Use it in a for loop to keep track of the number of iterations
@@ -853,13 +863,14 @@ if(Black_Rooks)//If there are any black rooks,
     
     
      // Tidy up for the next person
-     for(int u = 0; u < 40; u++) //Clear BlackQueenCount
+     for(int u = 0; u < 150; u++) //Clear BlackQueenCount
     {
         BlackQueenCount[u] = 0;
         }
         
 
 Black_Queen_Spacer = 0; // Reset the queen count of the current position so that if called again, the function can start from scratch
+}
 
 return;
 }
