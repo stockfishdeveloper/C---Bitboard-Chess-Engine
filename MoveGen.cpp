@@ -25,14 +25,14 @@ Bitboard WhiteRookCount[60];
 Bitboard BlackRookCount[60];
 Bitboard WhiteBishopCount[20];
 Bitboard BlackBishopCount[20];
-Bitboard WhiteQueenCount[150];
-Bitboard BlackQueenCount[150];
-Bitboard White_Move_From_Stack[150];//Move stack is just an array of Bitboards(64-bit integers) containing only one bit set in each--the from square or the to square
-Bitboard White_Move_To_Stack[150];
-Bitboard Black_Move_From_Stack[150];
-Bitboard Black_Move_To_Stack[150];
-int White_Move_Types[150];//Array of normal integers that keeps track of the type of each move
-int Black_Move_Types[150];
+Bitboard WhiteQueenCount[100];
+Bitboard BlackQueenCount[100];
+Bitboard White_Move_From_Stack[100];//Move stack is just an array of Bitboards(64-bit integers) containing only one bit set in each--the from square or the to square
+Bitboard White_Move_To_Stack[100];
+Bitboard Black_Move_From_Stack[100];
+Bitboard Black_Move_To_Stack[100];
+int White_Move_Types[100];//Array of normal integers that keeps track of the type of each move
+int Black_Move_Types[100];
 int White_Move_Spacer = 0; // Keeps a "record" of the last move put on the stack so that it knows which index of the array to put the next move in
 int Black_Move_Spacer = 0;
 bool Is_Legal;
@@ -443,7 +443,7 @@ White_Bishop_Spacer = 0; // Reset the bishop count of the current position so th
 
     
      // Tidy up for the next person
-     for(int u = 0; u < 150; u++) //Clear WhiteQueenCount[]
+     for(int u = 0; u < 100; u++) //Clear WhiteQueenCount[]
     {
         WhiteQueenCount[u] = 0;
         }
@@ -863,7 +863,7 @@ if(Black_Rooks)//If there are any black rooks,
     
     
      // Tidy up for the next person
-     for(int u = 0; u < 150; u++) //Clear BlackQueenCount
+     for(int u = 0; u < 100; u++) //Clear BlackQueenCount
     {
         BlackQueenCount[u] = 0;
         }
