@@ -66,13 +66,14 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
 	Spar.Score = -100000;
  	Move Spar2;
  	Spar2.Score = 100000; 
-	const int MAXDEPTH = 30;
+	const int MAXDEPTH = 40;
 	int Plies_Searched = 0;
 		
 	for(int q = 0; q < MAXDEPTH; q++)
 		{
 			if(White_Turn == true)
 				{
+					Search::Order_Moves(Current_Turn);
 					Time_Allocation = wtime;
 					assert(Time_Allocation > 0);
 					Depth = q;
@@ -86,6 +87,7 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
 				
     		else
     			{
+    				Search::Order_Moves(Current_Turn);
     				Time_Allocation = btime;
     				assert(Time_Allocation > 0);
     				blank = Search::SearchMin(Spar, Spar2, (q - Plies_Searched) + 1, &PVline);
@@ -103,7 +105,7 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
 			delete f;
 			
 			Search::Clear();//Clear search stacks, variables, etc.
-			
+						
 			if(STOP_SEARCHING_NOW)
 			{
 				Time_Allocation = 0;
@@ -144,7 +146,6 @@ Move Search::SearchMax(Move alpha, Move beta, int depth, LINE * pline)
 		}
 		
 	Generate_White_Moves();
-	Search::Order_Moves(Current_Turn);
 	register Move move;
 	move.White_Temp_Move_Spacer = White_Move_Spacer;
 	for(int h = 0; h < White_Move_Spacer; h++)
@@ -216,7 +217,6 @@ Move Search::SearchMin(Move alpha, Move beta, int depth, LINE * pline)
 			}
 			
 		Generate_Black_Moves();
-		Search::Order_Moves(Current_Turn);
 		register Move move;
 		move.Black_Temp_Move_Spacer = Black_Move_Spacer;
 		for(int h = 0; h < Black_Move_Spacer; h++)
@@ -470,7 +470,7 @@ Search::Make_White_Search_Move(const Bitboard& From, const Bitboard& To, const i
 			   }
                  
                  //Tidy up for the next call of the move generation functions
-				 for(int t = 0; t < 150; t++)               
+				 for(int t = 0; t < 100; t++)               
                {
                	 White_Move_From_Stack[t] = 0;//Clear the move from stack
                	 White_Move_To_Stack[t] = 0;//Clear the move to stack
@@ -689,7 +689,7 @@ Search::Make_Black_Search_Move(const Bitboard& From, const Bitboard& To, const i
 			   }
                  
                  //Tidy up for the next call of the move generation functions
-				 for(int t = 0; t < 150; t++)               
+				 for(int t = 0; t < 100; t++)               
                {
                	 Black_Move_From_Stack[t] = 0;//Clear the move from stack
                	 Black_Move_To_Stack[t] = 0;//Clear the move to stack
@@ -793,13 +793,13 @@ void Search::Order_Moves(bool Whites_Turn)
 		Black_Move_From_Stack[i] = Black_Move_From_Stack2[i];
 		for(int i = 0; i < 70; i++)
 		Black_Move_To_Stack[i] = Black_Move_To_Stack2[i];
-		for(int i = 0; i < 70; i++)
+		/*for(int i = 0; i < 70; i++)
 		{
 		Black_Move_Types[i] = Black_Move_Types2[i];
 		Log << Black_Move_Types[i] << " ";
 		if(i == 68)
 		Log << endl;
-		}
+		}*/
 	}
 	return;
 }
@@ -900,7 +900,7 @@ Search::Is_Mate()
 
 void Search::Clear()
 {
-		for(int t = 0; t < 150; t++)               
+		for(int t = 0; t < 100; t++)               
                {
                	 White_Move_From_Stack[t] = 0;//Clear the move from stack
                	 White_Move_To_Stack[t] = 0;//Clear the move to stack
@@ -914,7 +914,7 @@ void Search::Clear()
 			White_Bishop_Spacer = 0;
 			White_Queen_Spacer = 0;
 						    
-			for(int t = 0; t < 150; t++)               
+			for(int t = 0; t < 100; t++)               
                {
                	 Black_Move_From_Stack[t] = 0;//Clear the move from stack
                	 Black_Move_To_Stack[t] = 0;//Clear the move to stack
@@ -928,16 +928,15 @@ void Search::Clear()
 			Black_Bishop_Spacer = 0;
 			Black_Queen_Spacer = 0;
 					
-			Search::Nodes = 0;
-			Search::Current_Turn = true;
-			Search::White_Turn = true;
+			//Search::Nodes = 0;
+			//Search::Current_Turn = true;
+			//Search::White_Turn = true;
 			White_Move_Spacer = 0;
 			Black_Move_Spacer = 0;
 			
-			Search::Current_Turn = true;
-			Search::White_Turn = true;
-			Search::Searching = false;
-			Search::STOP_SEARCHING_NOW = false; 
-			Search::Nodes = 0;
+			//Search::Current_Turn = true;
+			//Search::White_Turn = true;
+			//Search::STOP_SEARCHING_NOW = false; 
+			//Search::Nodes = 0;
 }
 
