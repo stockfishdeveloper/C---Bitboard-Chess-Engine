@@ -139,7 +139,7 @@ else if(UciCommand == "go")
 }
  	Timer timer;
  	Search::Searching = true;
- 	std::thread t(Runthread, &PVline);//Spawn new thread to constantly output infos the the GUI while the search function is running
+ 	std::thread t(Runthread, &timer);//Spawn new thread to constantly output infos the the GUI while the search function is running
     timer.Start_Clock();
     int h = 0, j = 0;
     Move blank;
