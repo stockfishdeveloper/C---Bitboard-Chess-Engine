@@ -13,7 +13,7 @@ bool turn = false;
 int f;
 mutex output;
 // This is the child thread function
-
+LINE pvline;
 void Runthread(void * aArg)
 {
 	Timer timer;
@@ -27,14 +27,14 @@ void Runthread(void * aArg)
   	int seldepth = Search::Seldepth;
   	int nodes = Search::Nodes;
   	int time_allocation = Search::Time_Allocation;
-  	LINE pvline = PVline;
+  	pvline = ::PVline;
   	output.unlock();
   	
   	cout << "info multipv 1 depth " << depth << " seldepth " << seldepth << " score cp " << pvline.score << " pv ";
   	Log << "<< " << "info multipv 1 depth " << depth << " seldepth " << seldepth << " score cp " << pvline.score << " pv ";
   	for(int i = 0; i < pvline.cmove; i++)
     {
-    	for( int h = 0; h < 20; h++)
+    	for( int h = 0; h < 64; h++)
 			{
         	if(GeneralBoard[h] & pvline.argmove[i].From)
         	{
@@ -42,7 +42,7 @@ void Runthread(void * aArg)
         	Log << PlayerMoves[h];
         	}
         }
-        	for( int h = 0; h < 20; h++)
+        	for( int h = 0; h < 64; h++)
         {
         	if(GeneralBoard[h] & pvline.argmove[i].To)
         	{
