@@ -1,13 +1,13 @@
 using namespace std;
 #include <iostream>
-#include <cstring>
 #include <cassert>
 #include "Bitboard.h"
 #include "Search.h"
 #include "Eval.h"
 #include "UCI.h"
-#include <chrono>
+#include "Thread.h"
 #include "magicmoves.h"
+#include <windows.h>
 
 int Search::Time_Allocation = 0;
 bool Search::Searching = false;
@@ -17,6 +17,7 @@ int Search::Seldepth = 0;
 bool Search::STOP_SEARCHING_NOW = false;
 bool Search::Current_Turn = false;
 bool Search::White_Turn = false;
+bool Search::Output_Pv = false;
 
 void Move::Undo_Move()
                 {
@@ -54,77 +55,187 @@ void Move::Undo_Move()
 }
 
 Move Search::Think(int wtime, int btime, int winc, int binc)
-{
+{ 	
+	Move movestack[45];
+	int index = 0;
+	Move Best; 
+	Best.Score = -10000;
 	Timer timer;
 	timer.Start_Clock();   
     int Wtime = wtime;
 	int Btime = btime;
 	int Winc = winc;
 	int Binc = binc;
-	Move blank;
-	Move Spar;
-	Spar.Score = -100000;
- 	Move Spar2;
- 	Spar2.Score = 100000; 
+	Move move;
+	Move rootAlpha;
+	rootAlpha.Score = -100000;
+ 	Move rootBeta;
+ 	rootBeta.Score = 100000; 
 	const int MAXDEPTH = 40;
 	int Plies_Searched = 0;
-		
+	LINE line;
 	for(int q = 0; q < MAXDEPTH; q++)
-		{
+		{	
+			Search::Clear();
 			if(White_Turn == true)
 				{
-					Search::Order_Moves(Current_Turn);
 					Time_Allocation = wtime;
 					assert(Time_Allocation > 0);
 					Depth = q;
-    				blank = Search::SearchMax(Spar, Spar2, (q - Plies_Searched) + 1, &PVline);
-    				//Time_Usage is the parameter value: if((d.count() * Tine_Usage) > Wtime)
-						if((timer.Stop_Clock() * 30) > Wtime)
+    				Seldepth = q;
+					Generate_White_Moves();
+					//Search::Order_Moves(Current_Turn);
+					move.White_Temp_Move_Spacer = White_Move_Spacer;
+					for(int h = 0; h < White_Move_Spacer; h++)
+						{
+							move.White_Temp_Move_From_Stack[h] = move.Convert_Bitboard(White_Move_From_Stack[h]);
+							move.White_Temp_Move_To_Stack[h] = move.Convert_Bitboard(White_Move_To_Stack[h]);
+							move.White_Temp_Move_Types[h] = White_Move_Types[h];
+						}
+					Output_Pv = false;		
+					for(int i = 0; i < White_Move_Spacer; i++)
+						{ 
+							Nodes++;
+							move.From = White_Move_From_Stack[i];
+							move.To = White_Move_To_Stack[i];
+							move.Move_Type = White_Move_Types[i];
+							if(q >= 3)
 							{
-								return blank;
+							output.lock();
+							cout << "info currmove " << PlayerMoves[(move.Convert_Bitboard(move.From))] << PlayerMoves[(move.Convert_Bitboard(move.To))];
+							Log << "info currmove " << PlayerMoves[(move.Convert_Bitboard(move.From))] << PlayerMoves[(move.Convert_Bitboard(move.To))];
+							cout << " currmovenumber " << (i + 1) << endl;
+							Log << " currmovenumber " << (i + 1) << endl;
+							output.unlock();
 							}
+			
+							Make_White_Search_Move(move.From, move.To, move.Move_Type);
+							Move Temp_Move = SearchMin(rootAlpha, rootBeta, (q + 1), &line);
+							move.Undo_Move();
+    						//Time_Usage is the parameter value: if((d.count() * Time_Usage) > Wtime)
+    						if(Temp_Move.Score < Best.Score)
+								{
+									movestack[index++] = move;
+								}
+			
+							else if(Temp_Move.Score >= Best.Score)
+								{
+									::PVline.argmove[0] = move;
+									::PVline.score = Temp_Move.Score;
+									::PVline.cmove += 1;
+									memcpy(::PVline.argmove + 1, line.argmove, PVline.cmove * sizeof(Move));
+            						Best = move;
+            						Best.Score = Temp_Move.Score;
+            						output.lock();
+            						cout << "info pv ";
+            						::PVline.Output();
+            						cout << endl;
+            						output.unlock();
+            					}
+							if((timer.Get_Time() * 30) > Wtime)
+								{
+									return Best;
+								}
+						}
+					Output_Pv = true;
+									
 				}
 				
-    		else
+    		if(!White_Turn)
     			{
-    				Search::Order_Moves(Current_Turn);
     				Time_Allocation = btime;
-    				assert(Time_Allocation > 0);
-    				blank = Search::SearchMin(Spar, Spar2, (q - Plies_Searched) + 1, &PVline);
-    				Depth = q;
-					//Time_Usage is the parameter value
-					if((timer.Stop_Clock() * 30) > Btime)
+					assert(Time_Allocation > 0);
+					Depth = q;
+    				Seldepth = q;
+					Generate_Black_Moves();
+					//Search::Order_Moves(Current_Turn);
+					move.Black_Temp_Move_Spacer = Black_Move_Spacer;
+					for(int h = 0; h < Black_Move_Spacer; h++)
 						{
-							return blank;
+							move.Black_Temp_Move_From_Stack[h] = move.Convert_Bitboard(Black_Move_From_Stack[h]);
+							move.Black_Temp_Move_To_Stack[h] = move.Convert_Bitboard(Black_Move_To_Stack[h]);
+							move.Black_Temp_Move_Types[h] = Black_Move_Types[h];
 						}
+					Output_Pv = false;		
+					for(int i = 0; i < Black_Move_Spacer; i++)
+						{ 
+							Nodes++;
+							move.From = Black_Move_From_Stack[i];
+							move.To = Black_Move_To_Stack[i];
+							move.Move_Type = Black_Move_Types[i];
+							if(q >= 3)
+							{
+							output.lock();
+							cout << "info currmove " << PlayerMoves[(move.Convert_Bitboard(move.From))] << PlayerMoves[(move.Convert_Bitboard(move.To))];
+							Log << "info currmove " << PlayerMoves[(move.Convert_Bitboard(move.From))] << PlayerMoves[(move.Convert_Bitboard(move.To))];
+							cout << " currmovenumber " << (i + 1) << endl;
+							Log << " currmovenumber " << (i + 1) << endl;
+							output.unlock();
+							}
+			
+							Make_Black_Search_Move(move.From, move.To, move.Move_Type);
+							Move Temp_Move = SearchMax(rootAlpha, rootBeta, (q + 1), &PVline);
+							move.Undo_Move();
+    						//Time_Usage is the parameter value: if((d.count() * Time_Usage) > Wtime)
+    						if(Temp_Move.Score < Best.Score)
+								{
+									movestack[index++] = move;
+								}
+			
+							else if(Temp_Move.Score >= Best.Score)
+								{
+									::PVline.argmove[0] = move;
+									::PVline.score = Temp_Move.Score;
+									::PVline.cmove += 1;
+            						Best = move;
+            						Best.Score = Temp_Move.Score;
+								}
+							if((timer.Get_Time() * 30) > Btime)
+								{
+									return Best;
+								}
+						}
+					Output_Pv = true;
 				}
-	
+				
+				
+			output.lock();
+			cout << "info depth " << q << endl;
+			Log << "info depth " << q << endl;
+			output.unlock();
 			LINE* f = new LINE;
 			f->cmove = 0;
 			::PVline = *f;
+			line = *f;
 			delete f;
 			
 			Search::Clear();//Clear search stacks, variables, etc.
 						
 			if(STOP_SEARCHING_NOW)
-			{
-				Time_Allocation = 0;
-				return blank;
-			}
-			if ((blank.Score <= Spar.Score) || (blank.Score >= Spar2.Score))
-			{
-				Spar.Score = -100000;
-				Spar2.Score = 100000;
-			}
+				{
+					Time_Allocation = 0;
+					return Best;
+				}
+			if ((move.Score <= rootAlpha.Score) || (move.Score >= rootBeta.Score))
+				{
+					rootAlpha.Score = -100000;
+					rootBeta.Score = 100000;
+				}
 			else
-			{
-			Spar.Score = blank.Score - 50;
-			Spar2.Score = blank.Score + 50;
-			}
+				{
+					rootAlpha.Score = move.Score - 50;
+					rootBeta.Score = move.Score + 50;
+				}
 			//STOP_SEARCHING_NOW = false;
+			for(int i = 0; i < index; i++)
+			{
+				Move h;
+				movestack[i] = h;
+				index = 0;
 			}
+		}
 		
-	return blank;
+	return Best;
 }
 
 Move Search::SearchMax(Move alpha, Move beta, int depth, LINE * pline)
@@ -180,10 +291,10 @@ Move Search::SearchMax(Move alpha, Move beta, int depth, LINE * pline)
 					return beta;
 				}
 			
-			if(Temp_Move.Score > alpha.Score)
+			else if(Temp_Move.Score > alpha.Score)
 				{
 					pline->argmove[0] = move;
-					::PVline.score = Temp_Move.Score;
+					pline->score = Temp_Move.Score;
             		memcpy(pline->argmove + 1, line.argmove, line.cmove * sizeof(Move));
 					pline->cmove = line.cmove + 1;
 
@@ -250,10 +361,10 @@ Move Search::SearchMin(Move alpha, Move beta, int depth, LINE * pline)
 				return alpha;
 			}
 			
-			if(Temp_Move.Score < beta.Score)
+			else if(Temp_Move.Score < beta.Score)
 			{
 				pline->argmove[0] = move;
-				::PVline.score = Temp_Move.Score;
+				pline->score = Temp_Move.Score;
             memcpy(pline->argmove + 1, line.argmove,
 
                 line.cmove * sizeof(Move));
