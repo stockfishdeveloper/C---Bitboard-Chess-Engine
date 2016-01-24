@@ -93,9 +93,9 @@ else if(UciCommand == "perft")
 	cin >> depth;
 	int nodes = Root_Perft(depth);
 	cout << "\n===========================\n";
-	cout << "Total time (ms) : " << timer.Stop_Clock() << "\n";
+	cout << "Total time (ms) : " << timer.Get_Time() << "\n";
 	cout << "Nodes searched  : " << nodes << "\n";
-	cout << "Nodes/second    : " << (nodes / (timer.Stop_Clock() + 1) * 1000)  << "\n";
+	cout << "Nodes/second    : " << (nodes / (timer.Get_Time() + 1) * 1000)  << "\n";
 }
 
 else if (Is_Fen)
@@ -139,6 +139,7 @@ else if(UciCommand == "go")
 }
  	Timer timer;
  	Search::Searching = true;
+ 	Search::Time_Allocation = 10000;
  	std::thread t(Runthread, &timer);//Spawn new thread to constantly output infos the the GUI while the search function is running
     timer.Start_Clock();
     int h = 0, j = 0;
@@ -147,7 +148,7 @@ else if(UciCommand == "go")
 	Search::Searching = false;
     t.join();    
     //auto after = Time::now();  
-	float temporary = (Search::Nodes / timer.Stop_Clock());
+	float temporary = (Search::Nodes / timer.Get_Time());
  //float temp_and_one = temporary * 1000.0;
  /*cout << "Number of nodes searched: " << Nodes << endl;
  cout << "Time in milliseconds: " << d.count() << endl;
