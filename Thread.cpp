@@ -22,14 +22,14 @@ void Runthread(void * aArg)
   {
   	//Before copying the LINE we want to make sure we do not copy the LINE with corrupted data
   	//We must use a mutex
+  	if(Search::Output_Pv == true)
+  	{
   	output.lock();
   	int depth = Search::Depth;
   	int seldepth = Search::Seldepth;
   	int nodes = Search::Nodes;
   	int time_allocation = Search::Time_Allocation;
   	pvline = ::PVline;
-  	output.unlock();
-  	
   	cout << "info multipv 1 depth " << depth << " seldepth " << seldepth << " score cp " << pvline.score << " pv ";
   	Log << "<< " << "info multipv 1 depth " << depth << " seldepth " << seldepth << " score cp " << pvline.score << " pv ";
   	for(int i = 0; i < pvline.cmove; i++)
@@ -52,13 +52,15 @@ void Runthread(void * aArg)
 		}
 	}
   	 	
-    cout << "time " << timer.Stop_Clock() << " nodes " << nodes << " nps " << (1000 *(nodes / (timer.Stop_Clock() + 1))) << endl;
-    Log << "time " << timer.Stop_Clock() << " nodes " << nodes << " nps " << (1000 *(nodes / (timer.Stop_Clock() + 1))) << endl;
-    if(timer.Stop_Clock() >= (time_allocation / 20))
+    cout << " time " << timer.Get_Time() << " nodes " << nodes << " nps " << (1000 *(nodes / (timer.Get_Time() + 1))) << endl;
+    Log << " time " << timer.Get_Time() << " nodes " << nodes << " nps " << (1000 *(nodes / (timer.Get_Time() + 1))) << endl;
+    output.unlock();
+	}
+    if(timer.Get_Time() >= (Search::Time_Allocation / 30))
     {
     	Search::STOP_SEARCHING_NOW = true;
     	return;
 	}
-    Sleep(500);
+    //Sleep(500);
   } 
 }
