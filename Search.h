@@ -4,6 +4,7 @@
 #include "MoveGen.h"
 #include <iostream>
 #include <chrono>
+
 typedef std::chrono::milliseconds::rep TimePoint; // A value in milliseconds
 
 class Move
@@ -13,12 +14,12 @@ class Move
                 Bitboard To;
                 int Move_Type;
                 int Score;
-                int White_Temp_Move_From_Stack[60];
-                int White_Temp_Move_To_Stack[60];
-                int Black_Temp_Move_From_Stack[60];
-                int Black_Temp_Move_To_Stack[60];
-                int White_Temp_Move_Types[60];
-                int Black_Temp_Move_Types[60];
+                int White_Temp_Move_From_Stack[100];
+                int White_Temp_Move_To_Stack[100];
+                int Black_Temp_Move_From_Stack[100];
+                int Black_Temp_Move_To_Stack[100];
+                int White_Temp_Move_Types[100];
+                int Black_Temp_Move_Types[100];
                 int White_Temp_Move_Spacer; 
                 int Black_Temp_Move_Spacer;
                 
@@ -37,7 +38,7 @@ class Move
                 Bitboard Black_Knights2;
                 Bitboard Black_Pawns2;
                 
-                int Convert_Bitboard(Bitboard board)
+                const int Convert_Bitboard(const Bitboard& board) const
                 {
                 	if(board == 0)
                     return 0;
@@ -48,7 +49,7 @@ class Move
                     }
                 }
                 
-                Bitboard Unconvert_Int(int number)
+                const Bitboard Unconvert_Int(const int& number) const
                 {
                         return GeneralBoard[number];
                 }
@@ -84,8 +85,30 @@ class LINE
 {
 public:
     int cmove = 0;// Number of moves in the line.
-    Move argmove[15];  // The line.
+    Move argmove[20];  // The line.
     int score = 0;
+    void Output()
+    {
+    	for(int i = 0; i < cmove; i++)
+    {
+    	for( int h = 0; h < 64; h++)
+			{
+        	if(GeneralBoard[h] & argmove[i].From)
+        	{
+        	cout << PlayerMoves[h];
+        	//Log << PlayerMoves[h];
+        	}
+        }
+        	for( int h = 0; h < 64; h++)
+        {
+        	if(GeneralBoard[h] & argmove[i].To)
+        	{
+        	cout << PlayerMoves[h] << " ";
+        	//Log << PlayerMoves[h] << " ";
+        	}
+		}
+	}
+	}
 };
 class Timer
 {
@@ -110,7 +133,11 @@ class Timer
 	{
 		end_time = std::chrono::duration_cast<std::chrono::milliseconds>
         (std::chrono::steady_clock::now().time_since_epoch()).count();
-		return end_time - begin_time;
+	}
+	int Get_Time()
+	{
+		return (std::chrono::duration_cast<std::chrono::milliseconds>
+        (std::chrono::steady_clock::now().time_since_epoch()).count() - begin_time);
 	}
 };
 
@@ -136,6 +163,7 @@ extern int Seldepth;
 void Order_Moves(bool White_Turn);
 int Is_Mate();
 void Clear();
+extern bool Output_Pv;
 extern int Time_Allocation;
 extern bool STOP_SEARCHING_NOW;
 extern bool Current_Turn;
