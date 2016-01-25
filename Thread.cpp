@@ -22,7 +22,7 @@ void Runthread(void * aArg)
   {
   	//Before copying the LINE we want to make sure we do not copy the LINE with corrupted data
   	//We must use a mutex
-  	if(Search::Output_Pv == true)
+  	/*if(Search::Output_Pv == true)
   	{
   	output.lock();
   	int depth = Search::Depth;
@@ -55,7 +55,7 @@ void Runthread(void * aArg)
     cout << " time " << timer.Get_Time() << " nodes " << nodes << " nps " << (1000 *(nodes / (timer.Get_Time() + 1))) << endl;
     Log << " time " << timer.Get_Time() << " nodes " << nodes << " nps " << (1000 *(nodes / (timer.Get_Time() + 1))) << endl;
     output.unlock();
-	}
+	}*/
     if(timer.Get_Time() >= (Search::Time_Allocation / 30))
     {
     	Search::STOP_SEARCHING_NOW = true;
