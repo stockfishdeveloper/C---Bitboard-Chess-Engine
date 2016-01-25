@@ -83,7 +83,7 @@ Search::Clear();
 
 else if(UciCommand == "bench")
 {
-	//auto t1 = Time::now();
+	//cout << Eval::Evaluate_Position() << endl;
 }
 else if(UciCommand == "perft")
 {
@@ -160,13 +160,15 @@ else if(UciCommand == "go")
         	if(GeneralBoard[h] & blank.From)
         	{
         	cout << "bestmove " << PlayerMoves[h];
+        	Log << "<< bestmove " << PlayerMoves[h];
         	}
 		}
 		for( int h = 0; h < 64; h++)
         {
         	if(GeneralBoard[h] & blank.To)
         	{
-        	cout  << PlayerMoves[h] << endl;
+        	cout << PlayerMoves[h] << endl;
+        	Log << PlayerMoves[h] << endl;
         	}
 		}
 		
