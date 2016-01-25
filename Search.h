@@ -4,6 +4,7 @@
 #include "MoveGen.h"
 #include <iostream>
 #include <chrono>
+#include <string>
 
 typedef std::chrono::milliseconds::rep TimePoint; // A value in milliseconds
 
@@ -87,15 +88,17 @@ public:
     int cmove = 0;// Number of moves in the line.
     Move argmove[20];  // The line.
     int score = 0;
-    void Output()
+    string Output()
     {
+    	string f = "";
     	for(int i = 0; i < cmove; i++)
     {
     	for( int h = 0; h < 64; h++)
 			{
         	if(GeneralBoard[h] & argmove[i].From)
         	{
-        	cout << PlayerMoves[h];
+        		f += PlayerMoves[h];
+        	//cout << PlayerMoves[h];
         	//Log << PlayerMoves[h];
         	}
         }
@@ -103,11 +106,14 @@ public:
         {
         	if(GeneralBoard[h] & argmove[i].To)
         	{
-        	cout << PlayerMoves[h] << " ";
+        	f += PlayerMoves[h];
+        	f += " ";
+        	//cout << PlayerMoves[h] << " ";
         	//Log << PlayerMoves[h] << " ";
         	}
 		}
 	}
+	return f;
 	}
 };
 class Timer
