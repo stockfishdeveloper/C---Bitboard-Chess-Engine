@@ -57,7 +57,7 @@ void Move::Undo_Move()
 Move Search::Think(int wtime, int btime, int winc, int binc)
 { 	
 	Move Best; 
-	Best.Score = -10000;
+	//Search::Current_Turn ? Best.Score = -10000 : Best.Score = 10000;
 	Timer timer;
 	timer.Start_Clock();   
     int Wtime = wtime;
@@ -73,7 +73,7 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
 	int Plies_Searched = 0;
 	LINE line;
 	for(int q = 0; q < MAXDEPTH; q++)
-		{	
+		{	Search::Current_Turn ? Best.Score = -10000 : Best.Score = 10000;
 			Search::Clear();
 			if(White_Turn == true)
 				{
@@ -96,7 +96,7 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
 							move.From = White_Move_From_Stack[i];
 							move.To = White_Move_To_Stack[i];
 							move.Move_Type = White_Move_Types[i];
-							if(timer.Get_Time() >= 1000)
+							if(q >= 2)
 							{
 							output.lock();
 							cout << "info currmove " << PlayerMoves[(move.Convert_Bitboard(move.From))] << PlayerMoves[(move.Convert_Bitboard(move.To))];
@@ -110,12 +110,11 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
 							Move Temp_Move = SearchMin(rootAlpha, rootBeta, (q + 1), &line);
 							move.Undo_Move();
     						//Time_Usage is the parameter value: if((d.count() * Time_Usage) > Wtime)
-    						if(Temp_Move.Score < Best.Score)
-								{
-									//movestack[index++] = move;
-								}
-			
-							else if(Temp_Move.Score >= Best.Score)
+    						if(Temp_Move.Score >= rootBeta.Score)
+                                {  
+                                    break;                                                                       
+                                }
+    						if(Temp_Move.Score > Best.Score)
 								{
 									LINE* f = new LINE;
 									f->cmove = 0;
@@ -128,20 +127,22 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
             						Best = move;
             						Best.Score = Temp_Move.Score;
             						output.lock();
-            						cout << "info multipv 1 depth " << q + 1 << " seldepth " << Search::Seldepth << " score cp " << ::PVline.score;
-            						Log << "<< info multipv 1 depth " << q + 1 << " seldepth " << Search::Seldepth << " score cp " << ::PVline.score;
+            						cout << "info multipv 1 depth " << q + 5 << " seldepth " << Search::Seldepth << " score cp " << ::PVline.score;
+            						Log << "<< info multipv 1 depth " << q + 5 << " seldepth " << Search::Seldepth << " score cp " << ::PVline.score;
             						cout << " pv " << ::PVline.Output() << line.Output();
             						Log << " pv " << ::PVline.Output() << line.Output();
 									cout << "time " << timer.Get_Time() << " nodes " << Search::Nodes << " nps " << (1000 *(Search::Nodes / (timer.Get_Time() + 1))) << endl;
 									Log << "time " << timer.Get_Time() << " nodes " << Search::Nodes << " nps " << (1000 *(Search::Nodes / (timer.Get_Time() + 1))) << endl;
             						output.unlock();
+            						//rootAlpha.Score = Temp_Move.Score;
             					}
+            				}
 							if((timer.Get_Time() * 30) > Wtime)
 								{
 									return Best;
 								}
 								
-						}
+						
 													
 				}
 				
@@ -166,7 +167,7 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
 							move.From = Black_Move_From_Stack[i];
 							move.To = Black_Move_To_Stack[i];
 							move.Move_Type = Black_Move_Types[i];
-							if(q >= 3)
+							if(q >= 2)
 							{
 							output.lock();
 							cout << "info currmove " << PlayerMoves[(move.Convert_Bitboard(move.From))] << PlayerMoves[(move.Convert_Bitboard(move.To))];
@@ -180,12 +181,11 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
 							Move Temp_Move = SearchMax(rootAlpha, rootBeta, (q + 1), &line);
 							move.Undo_Move();
     						//Time_Usage is the parameter value: if((d.count() * Time_Usage) > Wtime)
-    						if(Temp_Move.Score < Best.Score)
-								{
-									//movestack[index++] = move;
-								}
-			
-							else if(Temp_Move.Score >= Best.Score)
+    						if(Temp_Move.Score <= rootAlpha.Score)
+                                {               
+                                    break;
+                                }
+							else if(Temp_Move.Score < Best.Score)
 								{
 									LINE* f = new LINE;
 									f->cmove = 0;
@@ -199,13 +199,14 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
             						Best = move;
             						Best.Score = Temp_Move.Score;
             						output.lock();
-            						cout << "info multipv 1 depth " << q << " seldepth " << Search::Seldepth << " score cp " << ::PVline.score;
-            						Log << "info multipv 1 depth " << q << " seldepth " << Search::Seldepth << " score cp " << ::PVline.score;
+            						cout << "info multipv 1 depth " << q + 5 << " seldepth " << Search::Seldepth << " score cp " << -::PVline.score;
+            						Log << "info multipv 1 depth " << q + 5 << " seldepth " << Search::Seldepth << " score cp " << -::PVline.score;
             						cout << " pv " << ::PVline.Output() << line.Output();
             						Log << " pv " << ::PVline.Output() << line.Output();
 									cout << "time " << timer.Get_Time() << " nodes " << Search::Nodes << " nps " << (1000 *(Search::Nodes / (timer.Get_Time() + 1))) << endl;
 									Log << "time " << timer.Get_Time() << " nodes " << Search::Nodes << " nps " << (1000 *(Search::Nodes / (timer.Get_Time() + 1))) << endl;
             						output.unlock();
+            						//rootBeta.Score = Temp_Move.Score;
             					}
 							if((timer.Get_Time() * 30) > Btime)
 								{
