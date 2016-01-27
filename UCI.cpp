@@ -32,7 +32,7 @@ while (cin >> UciCommand)
 	Log << ">> " << UciCommand << endl;
 	if(UciCommand == "uci")
 	{
-cout << "id name Chess\n";
+cout << "id name Chess real\n";
 cout << "id author David Cimbalista\n";
 cout << "option name TimePerMove type spin default 3 min 1 max 5\n";
 cout << "uciok\n";
