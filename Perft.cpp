@@ -9,7 +9,6 @@ int Root_Perft(int depth)
     if (depth == 0) return 1;
 	Search::Current_Turn ? Generate_White_Moves() : Generate_Black_Moves();
 	n_moves = Search::Current_Turn ? White_Move_Spacer : Black_Move_Spacer;
-	//cout << "n_moves: " << n_moves << endl;
 	Move move;
     for (i = 0; i < n_moves; i++)
 	 {
@@ -69,7 +68,7 @@ int Perft(int depth)
 	Search::Current_Turn ? Generate_White_Moves() : Generate_Black_Moves();
 	n_moves = Search::Current_Turn ? White_Move_Spacer : Black_Move_Spacer;
 	//cout << "n_moves: " << n_moves << endl;
-    for (i = 0; i < n_moves; i++)
+	for (i = 0; i < n_moves; i++)
 	 {
 	   	Move move;
 		Search::Current_Turn ? move.From = White_Move_From_Stack[i] : move.From = Black_Move_From_Stack[i];
