@@ -3,9 +3,11 @@
 using namespace std;
 #include <fstream>
 #include "Search.h"
+#include <chrono>
 extern LINE PVline;
 extern ofstream Log;
 extern int CheckUci();
+//extern int Compute_Time(auto before, auto after);
 int MakeMove(Move&);
 int Moves_Command();
 int Parse_Moves(string First_Part, string Second_Part, string Promotion_Type);
