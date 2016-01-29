@@ -4,12 +4,10 @@ using namespace std;
 #include "UCI.h"
 
 int main()
-{
-initmagicmoves();//Thanks, Pradu 
-cout << "Chess, a chess engine by\nDavid Cimbalista\nCopyright (c) 2015" << endl;
-CheckUci();
-
-    return 0;
-
-}
+	{
+		initmagicmoves();//Thanks, Pradu 
+		cout << "Chess, a chess engine by\nDavid Cimbalista\nCopyright (c) 2015" << endl;
+		CheckUci(); //Main command loop
+    	return 0;
+	}
          
