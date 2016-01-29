@@ -32,7 +32,7 @@ while (cin >> UciCommand)
 	Log << ">> " << UciCommand << endl;
 	if(UciCommand == "uci")
 	{
-cout << "id name Chess real\n";
+cout << "id name Chess\n";
 cout << "id author David Cimbalista\n";
 cout << "option name TimePerMove type spin default 3 min 1 max 5\n";
 cout << "uciok\n";
@@ -191,6 +191,11 @@ return 0;
 int Parse_Fen(string Fen)
 {
 Search::Clear();
+Search::Searching = false;
+wtime = 0;
+btime = 0;
+Search::STOP_SEARCHING_NOW = false; 
+Search::Nodes = 0;
 
 White_Pieces = 0;
 Black_Pieces = 0;
@@ -239,7 +244,6 @@ int Move_Count;
 cin >> Move_Count;
 Log << Move_Count << endl;
 	
-				
 return 0;
 }
 
