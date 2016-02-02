@@ -1,6 +1,7 @@
 using namespace std;
 #include "Bitboard.h"
 #include "MoveGen.h"
+#include "Search.h"
 #include "magicmoves.h"
 
 int White_Knight_Spacer = 0; 
@@ -125,11 +126,12 @@ for(int i = 0; i < 64; i++)
 	Bitboard first = (WhiteKingCount[w] & 16);
 	Bitboard second = ((White_Pieces | Black_Pieces) & 96);
 	Bitboard e1 = 16, f1 = 32, g1 = 64, a0 = 0;
-	bool canmovetof1 = White_Is_Legal(e1, f1, 15);
-	bool canmovetog1 = White_Is_Legal(e1, g1, 15);
-	bool canmovetoe1 = White_Is_Legal(a0, e1, 15); 
+	bool canmovetof1 = White_Is_Legal(e1, f1, 12);
+	bool canmovetog1 = White_Is_Legal(e1, g1, 12);
+	bool canmovetoe1 = White_Is_Legal(a0, e1, 12); 
 	bool Rookonh1 = (White_Rooks & 128);
-	if(first && (!second) && canmovetof1 && canmovetog1 && canmovetoe1 && (!WhiteHasCastled) && Rookonh1)
+	int notincheck = Search::Is_Mate();
+	if(first && (!second) && canmovetof1 && canmovetog1 && canmovetoe1 && (!WhiteHasCastled) && Rookonh1 && (notincheck != -10000))
     {
 		White_Move_From_Stack[White_Move_Spacer] = WhiteKingCount[w];
 		Bitboard too = 64;	
@@ -540,11 +542,12 @@ for(int i = 0; i < 64; i++)
 	Bitboard first = (BlackKingCount[w] & 1152921504606846976);
 	Bitboard second = ((White_Pieces | Black_Pieces) & 6917529027641081856);
 	Bitboard e8 = 1152921504606846976, f8 = 2305843009213693952, g8 = 4611686018427387904, a0 = 0;
-	bool canmovetof1 = Black_Is_Legal(e8, f8, 15);
-	bool canmovetog1 = Black_Is_Legal(e8, g8, 15);
-	bool canmovetoe1 = Black_Is_Legal(a0, e8, 15); 
+	bool canmovetof1 = Black_Is_Legal(e8, f8, 12);
+	bool canmovetog1 = Black_Is_Legal(e8, g8, 12);
+	bool canmovetoe1 = Black_Is_Legal(a0, e8, 12); 
 	bool Rookonh1 = (Black_Rooks & 9223372036854775808);
-	if(first && (!second) && canmovetof1 && canmovetog1 && canmovetoe1 && (!BlackHasCastled) && Rookonh1)
+	int notincheck = Search::Is_Mate();
+	if(first && (!second) && canmovetof1 && canmovetog1 && canmovetoe1 && (!BlackHasCastled) && Rookonh1 && (notincheck != 10000))
     {
 		Black_Move_From_Stack[Black_Move_Spacer] = BlackKingCount[w];
 		Bitboard too = 4611686018427387904;	
