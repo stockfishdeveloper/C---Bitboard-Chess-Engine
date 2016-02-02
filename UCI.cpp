@@ -3,6 +3,8 @@
 #include "UCI.h"
 #include <string>
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 #include <ctime>
 #include "windows.h"
 #include <chrono> 
@@ -32,7 +34,8 @@ while (cin >> UciCommand)
 	Log << ">> " << UciCommand << endl;
 	if(UciCommand == "uci")
 	{
-cout << "id name Chess\n";
+cout << "id name ";
+cout << setfill('0') << Engine_Info() << "\n";
 cout << "id author David Cimbalista\n";
 cout << "option name TimePerMove type spin default 3 min 1 max 5\n";
 cout << "uciok\n";
@@ -167,8 +170,20 @@ else if(UciCommand == "go")
         {
         	if(GeneralBoard[h] & blank.To)
         	{
-        	cout << PlayerMoves[h] << endl;
-        	Log << PlayerMoves[h] << endl;
+        	cout << PlayerMoves[h];
+        	Log << PlayerMoves[h];
+        	if((blank.To & Eigth_Rank_White) && (blank.From & Seventh_Rank_White) && ((blank.Move_Type == 13) || (blank.Move_Type == 14)))
+        	{
+        		cout << "q" << endl;
+        		Log << "q" << endl;
+			}
+			else if((blank.To & Eigth_Rank_Black) && (blank.From & Seventh_Rank_Black) && ((blank.Move_Type == 13) || (blank.Move_Type == 14)))
+        	{
+        		cout << "q" << endl;
+        		Log << "q" << endl;
+			}
+			else
+			cout << endl;
         	}
 		}
 		
@@ -586,7 +601,7 @@ int Parse_Moves(string First, string Second)
 			Black_Pawns |= To;
 			Black_Pawns ^= To;			
 		}
-		if(To == 64)
+		if((To == 64) && From == 16)
 		{
 			White_Pieces |= 64;
 			White_Pieces ^= 16;
@@ -614,17 +629,7 @@ int Parse_Moves(string First, string Second)
 			Black_Pawns |= To;
 			Black_Pawns ^= To;			
 		}
-		if((To == 64) && (From == 16) && (White_King & From) && (White_King & To))
-		{
-			White_Pieces |= To;
-            White_Pieces ^= From;
-            White_Pieces |= 32;
-            White_Pieces ^= 128;
-            White_Rooks |= 32;
-            White_Rooks ^= 128;
-            White_King |= To;
-            White_King ^= From;
-		}
+		
 	    }
 	}
 	else
@@ -725,7 +730,7 @@ int Parse_Moves(string First, string Second)
 			White_Pawns |= To;
 			White_Pawns ^= To;			
 		}
-		if(To == 4611686018427387904)
+		if((To == 4611686018427387904) && From == 1152921504606846976)
 		{
 			Black_Pieces |= 4611686018427387904;
 			Black_Pieces ^= 1152921504606846976;
@@ -753,17 +758,7 @@ int Parse_Moves(string First, string Second)
 			White_Pawns |= To;
 			White_Pawns ^= To;			
 		}
-		if((To == 4611686018427387904) && (From == 1152921504606846976) && (Black_King & From) && (Black_King & To))
-		{
-			Black_Pieces |= To;
-            Black_Pieces ^= From;
-            Black_Pieces |= 4611686018427387904;
-            Black_Pieces ^= 1152921504606846976;
-            Black_Rooks |= 2305843009213693952;
-            Black_Rooks ^= 9223372036854775808ULL;
-            Black_King |= To;
-            Black_King ^= From;
-		}
+		
 		}
 		
 	}
@@ -1060,4 +1055,18 @@ int Parse_Moves(string First, string Second, string Promotion_Type)
 	}
 	
 return 0;	
+}
+string Engine_Info()
+{
+	string Version = "";
+		const string months("Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec");
+  		string month, day, year;
+  		stringstream ss, date(__DATE__); // From compiler, format is "Sep 21 2008"
+  		cout << "Chess " << Version << setfill('0');
+  		if (Version.empty())
+  			{
+      			date >> month >> day >> year;
+      			cout << setw(2) << day << setw(2) << (1 + months.find(month) / 4) << year.substr(2);
+  			}
+  			return Version;
 }
