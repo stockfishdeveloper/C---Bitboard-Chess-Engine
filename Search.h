@@ -166,7 +166,7 @@ extern bool Searching;
 extern LINE line;
 extern int Depth;
 extern int Seldepth;
-void Order_Moves(bool White_Turn);
+Move* Order_Moves(Move* moves, bool Whites_Turn, int elements);
 int Is_Mate();
 void Clear();
 extern bool Output_Pv;
