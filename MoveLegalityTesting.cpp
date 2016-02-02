@@ -243,14 +243,14 @@ Bitboard QAttacks = Qmagic(h, (White_Pieces2 | Black_Pieces2));
         	return false;
         
         Bitboard Spare = Black_Pawns2;
-        Spare |= A_Pawn_Mask;
-        Spare ^= A_Pawn_Mask;
+        Spare |= H_Pawn_Mask;
+        Spare ^= H_Pawn_Mask;
         if((Spare >> 7) & White_King2)
         	return false;
         
         Bitboard Spare2 = Black_Pawns2;
-        Spare2 |= H_Pawn_Mask;
-        Spare2 ^= H_Pawn_Mask;
+        Spare2 |= A_Pawn_Mask;
+        Spare2 ^= A_Pawn_Mask;
         if((Spare2 >> 9) & White_King2)
         	return false;
         
@@ -495,14 +495,14 @@ switch(Move_Type)
         	return false;
         
     	Bitboard Spare = White_Pawns2;
-        Spare |= A_Pawn_Mask;
-        Spare ^= A_Pawn_Mask;
+        Spare |= H_Pawn_Mask;
+        Spare ^= H_Pawn_Mask;
         if((Spare << 9) & Black_King2)
         	return false;
         
         Bitboard Spare2 = White_Pawns2;
-        Spare2 |= H_Pawn_Mask;
-        Spare2 ^= H_Pawn_Mask;
+        Spare2 |= A_Pawn_Mask;
+        Spare2 ^= A_Pawn_Mask;
         if((Spare2 << 7) & Black_King2)
         	return false;
         
