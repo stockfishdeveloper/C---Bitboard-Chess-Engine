@@ -6,7 +6,8 @@ using namespace std;
 int main()
 	{
 		initmagicmoves();//Thanks, Pradu 
-		cout << "Chess, a chess engine by\nDavid Cimbalista\nCopyright (c) 2015" << endl;
+		cout << Engine_Info();
+		cout << "\nA chess engine by David Cimbalista\nCopyright (c) 2015" << endl;
 		CheckUci(); //Main command loop
     	return 0;
 	}
