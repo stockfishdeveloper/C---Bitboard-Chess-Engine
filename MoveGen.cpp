@@ -37,8 +37,10 @@ int Black_Move_Types[100];
 int White_Move_Spacer = 0; // Keeps a "record" of the last move put on the stack so that it knows which index of the array to put the next move in
 int Black_Move_Spacer = 0;
 bool Is_Legal;
-bool WhiteHasCastled = false;
-bool BlackHasCastled = false;
+bool WhiteCanCastleK = true;
+bool WhiteCanCastleQ = true;
+bool BlackCanCastleK = true;
+bool BlackCanCastleQ = true;
 
 void Generate_White_Moves()
 {
@@ -131,7 +133,7 @@ for(int i = 0; i < 64; i++)
 	bool canmovetoe1 = White_Is_Legal(a0, e1, 12); 
 	bool Rookonh1 = (White_Rooks & 128);
 	int notincheck = Search::Is_Mate();
-	if(first && (!second) && canmovetof1 && canmovetog1 && canmovetoe1 && (!WhiteHasCastled) && Rookonh1 && (notincheck != -10000))
+	if(first && (!second) && canmovetof1 && canmovetog1 && canmovetoe1 && (WhiteCanCastleK) && Rookonh1 && (notincheck != -10000))
     {
 		White_Move_From_Stack[White_Move_Spacer] = WhiteKingCount[w];
 		Bitboard too = 64;	
@@ -547,7 +549,7 @@ for(int i = 0; i < 64; i++)
 	bool canmovetoe1 = Black_Is_Legal(a0, e8, 12); 
 	bool Rookonh1 = (Black_Rooks & 9223372036854775808);
 	int notincheck = Search::Is_Mate();
-	if(first && (!second) && canmovetof1 && canmovetog1 && canmovetoe1 && (!BlackHasCastled) && Rookonh1 && (notincheck != 10000))
+	if(first && (!second) && canmovetof1 && canmovetog1 && canmovetoe1 && (BlackCanCastleK) && Rookonh1 && (notincheck != 10000))
     {
 		Black_Move_From_Stack[Black_Move_Spacer] = BlackKingCount[w];
 		Bitboard too = 4611686018427387904;	
