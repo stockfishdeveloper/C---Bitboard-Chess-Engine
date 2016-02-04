@@ -525,6 +525,14 @@ int Parse_Moves(string First, string Second)
 			Black_Pawns |= To;
 			Black_Pawns ^= To;			
 		}
+		if(From == 1)
+		{
+			WhiteCanCastleQ = false;
+		}
+		if(From == 128)
+		{
+			WhiteCanCastleK = false;
+		}
 	    }
 	    if(White_Knights & From)
 		{
@@ -580,7 +588,13 @@ int Parse_Moves(string First, string Second)
 			Black_Knights |= To;
 			Black_Knights ^= To;
 			Black_Pawns |= To;
-			Black_Pawns ^= To;			
+			Black_Pawns ^= To;
+			return 0;			
+		}
+		if(((Black_Pawns << 8) & To) && (From & 1095216660480))
+		{
+			Black_Pawns ^= (To >> 8);
+			Black_Pieces ^= (To >> 8);
 		}
 	    }
 	    if(White_King & From)
@@ -610,6 +624,17 @@ int Parse_Moves(string First, string Second)
 			White_Rooks |= 32;
 			White_Rooks ^= 128;			
 		}
+		if(To == 4 && From == 16)
+		{
+			White_Pieces |= 4;
+			White_Pieces ^= 16;
+			White_Pieces |= 8;
+			White_Pieces ^= 1;
+			White_Rooks |= 8;
+			White_Rooks ^= 1;
+		}
+		WhiteCanCastleK = false;
+		WhiteCanCastleQ = false;
 	    }
 	    if(White_Queens & From)
 		{
@@ -653,6 +678,14 @@ int Parse_Moves(string First, string Second)
 			White_Knights ^= To;
 			White_Pawns |= To;
 			White_Pawns ^= To;			
+		}
+		if(From == 72057594037927936)
+		{
+			BlackCanCastleQ = false;
+		}
+		if(From == 9223372036854775808)
+		{
+			BlackCanCastleK = false;
 		}
 	    }
 	    if(Black_Knights & From)
@@ -709,7 +742,13 @@ int Parse_Moves(string First, string Second)
 			White_Knights |= To;
 			White_Knights ^= To;
 			White_Pawns |= To;
-			White_Pawns ^= To;			
+			White_Pawns ^= To;
+			return 0;			
+		}
+		if(((White_Pawns >> 8) & To) && (From & 4278190080))
+		{
+			White_Pawns ^= (To << 8);
+			White_Pieces ^= (To << 8);
 		}
 	    }
 	    if(Black_King & From)
@@ -739,6 +778,17 @@ int Parse_Moves(string First, string Second)
 			Black_Rooks |= 2305843009213693952;
 			Black_Rooks ^= 9223372036854775808;			
 		}
+		if(To == 288230376151711744 && From == 1152921504606846976)
+		{
+			Black_Pieces |= 288230376151711744;
+			Black_Pieces ^= 1152921504606846976;
+			Black_Pieces |= 576460752303423488;
+			Black_Pieces ^= 72057594037927936;
+			Black_Rooks |= 576460752303423488;
+			Black_Rooks ^= 72057594037927936;
+		}
+		BlackCanCastleK = false;
+		BlackCanCastleQ = false;
 	    }
 	    if(Black_Queens & From)
 		{
@@ -762,6 +812,7 @@ int Parse_Moves(string First, string Second)
 		}
 		
 	}
+	Print_Board();
 return 0;	
 }
 
