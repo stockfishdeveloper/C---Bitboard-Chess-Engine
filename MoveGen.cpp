@@ -253,14 +253,8 @@ if(White_Pawns)//If there are any white pawns
                 {
         White_Move_From_Stack[White_Move_Spacer] = WhitePawnCount[w];  // Move_From_Stack gets original position of pawn(s)
         White_Move_To_Stack[White_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
-        White_Move_Types[White_Move_Spacer - 1] = 2;//It is a normal pawn move
-        if((White_Move_To_Stack[White_Move_Spacer - 1]) & Black_Pieces)
-        White_Move_Types[White_Move_Spacer - 1] = 1;//Or, if it captures, it is a capture move
-            if((White_Move_To_Stack[White_Move_Spacer - 1]) & Eigth_Rank_White)//If it pusehes its way to promotion,
-            White_Move_Types[White_Move_Spacer - 1] = 14;//Tel MakeMove()
-                if((White_Move_To_Stack[White_Move_Spacer - 1] & Eigth_Rank_White) & Black_Pieces)//Or if it captures its way onto the eighth rank,
-            White_Move_Types[White_Move_Spacer - 1] = 13;//Then tell MakeMove()
-        }
+        White_Move_Types[White_Move_Spacer - 1] = y;//It is a normal pawn move
+       			}
     }
     
 
@@ -659,7 +653,7 @@ if(Black_Pawns)//If there are any black pawns
     {
         if(GeneralBoard[r] & Spare1)
         { 
-        int y = 2;//It is assumed to bea regular pawn move
+        int y = 2;//It is assumed to be a regular pawn move
         if(GeneralBoard[r] & White_Pieces)//But if it captures,
         y--;//Tell MakeMove()
         if(GeneralBoard[r] & Eigth_Rank_Black)//If it pushes to the eighth rank,
@@ -671,15 +665,8 @@ if(Black_Pawns)//If there are any black pawns
         //cout << "It can move to " << PlayerMoves[r] << endl;
         Black_Move_From_Stack[Black_Move_Spacer] = BlackPawnCount[w];  // Move_From_Stack gets original position of knight(s)
         Black_Move_To_Stack[Black_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
-        Black_Move_Types[Black_Move_Spacer - 1] = 2;
-        if((Black_Move_To_Stack[Black_Move_Spacer - 1]) & White_Pieces)
-        Black_Move_Types[Black_Move_Spacer - 1] = 1;
-            if((Black_Move_To_Stack[Black_Move_Spacer - 1]) & Eigth_Rank_Black)
-            Black_Move_Types[Black_Move_Spacer - 1] = 14;
-                if((Black_Move_To_Stack[Black_Move_Spacer - 1] & Eigth_Rank_Black) & White_Pieces)
-            Black_Move_Types[Black_Move_Spacer - 1] = 13;
-                    
-    }
+        Black_Move_Types[Black_Move_Spacer - 1] = y;
+        		}
     }
     
 
