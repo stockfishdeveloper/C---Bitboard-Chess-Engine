@@ -150,8 +150,8 @@ class Timer
 namespace Search
 { 
 Move Think(int wtime, int btime, int winc, int binc);
-int SearchMax(int alpha, int beta, int depth, LINE * pline);
-int SearchMin(int alpha, int beta, int depth, LINE * pline);
+int SearchMax(int alpha, int beta, int depth, LINE * pline, bool donullmove);
+int SearchMin(int alpha, int beta, int depth, LINE * pline, bool donullmove);
 int Make_White_Search_Move(const Bitboard& From, const Bitboard& To, const int Move_Type);
 int Make_Black_Search_Move(const Bitboard& From, const Bitboard& To, const int Move_Type);
 //extern bool Fake_Current_Turn;
