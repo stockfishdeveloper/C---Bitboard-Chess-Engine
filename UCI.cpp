@@ -812,7 +812,6 @@ int Parse_Moves(string First, string Second)
 		}
 		
 	}
-	Print_Board();
 return 0;	
 }
 
@@ -897,7 +896,7 @@ int Parse_Moves(string First, string Second, string Promotion_Type)
 	    if(White_Pawns & From)
 		{
 		White_Pawns ^= From;
-		White_Pawns |= To;
+		//White_Pawns |= To;
 		if(Black_Pieces & To)
 		{
 			Black_Pieces ^= To;
@@ -1016,7 +1015,7 @@ int Parse_Moves(string First, string Second, string Promotion_Type)
 	    if(Black_Pawns & From)
 		{
 		Black_Pawns ^= From;
-		Black_Pawns |= To;
+		//Black_Pawns |= To;
 		if(White_Pieces & To)
 		{
 			White_Pieces ^= To;
@@ -1104,7 +1103,6 @@ int Parse_Moves(string First, string Second, string Promotion_Type)
 		else
 		Black_Knights |= To;
 	}
-	
 return 0;	
 }
 string Engine_Info()
