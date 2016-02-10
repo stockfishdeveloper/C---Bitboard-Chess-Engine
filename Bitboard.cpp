@@ -158,7 +158,7 @@ void Print_Board()
         	//cout << "White king: " << White_King << endl;
 		}	
 	
-		if(Search::White_Turn)
+		if(Search::Current_Turn)
 		{
 			cout << "It is White's turn" << endl;
 		}
