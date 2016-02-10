@@ -3,7 +3,6 @@
 #include "Bitboard.h"
 #include <iostream>
 extern bool Current_Turn;
-extern bool White_Turn;
 void Generate_White_Moves();
 void Generate_Black_Moves();
 bool White_Is_Legal(const Bitboard& From_Square, const Bitboard& To_Square, const int Move_Type);//Tests for legality
@@ -43,7 +42,9 @@ extern int White_Queen_Spacer;
 extern int Black_Queen_Spacer;
 extern int White_Move_Spacer; // Keeps a "record" of the last move put on the stack so that it knows which index of the array to put the next move in
 extern int Black_Move_Spacer;
-extern bool WhiteHasCastled;
-extern bool BlackHasCastled;
+extern bool WhiteCanCastleK;
+extern bool WhiteCanCastleQ;
+extern bool BlackCanCastleK;
+extern bool BlackCanCastleQ;
 
 #endif
