@@ -73,7 +73,6 @@ Black_Bishops = 2594073385365405696;
 Black_Knights = 4755801206503243776;
 Black_Pawns = 71776119061217280;
 Search::Current_Turn = true;
-Search::White_Turn = true;
 Search::Searching = false;
 wtime = 0;
 btime = 0;
@@ -239,12 +238,10 @@ Log << Curr_Turn << endl;
 if(Curr_Turn == 'w')
 {
 Search::Current_Turn = true;
-Search::White_Turn = true;
 }
 else
 {
 Search::Current_Turn = false;
-Search::White_Turn = false;
 }
 string Legal_Castling = "";
 cin >> Legal_Castling;
@@ -480,7 +477,6 @@ int Moves_Command()
 			
 			
 		}
-		Search::White_Turn ^= 1;
 		Search::Current_Turn ^= 1;
 		
 		
@@ -503,7 +499,7 @@ int Parse_Moves(string First, string Second)
 		if(PlayerMoves[i] == Second)
 		To = GeneralBoard[i];
 	}
-	if(Search::White_Turn)
+	if(Search::Current_Turn)
 	{
 		White_Pieces ^= From;
 		White_Pieces |= To;
@@ -832,7 +828,7 @@ int Parse_Moves(string First, string Second, string Promotion_Type)
 		if(PlayerMoves[i] == Second)
 		To = GeneralBoard[i];
 	}
-	if(Search::White_Turn)
+	if(Search::Current_Turn)
 	{
 		White_Pieces ^= From;
 		White_Pieces |= To;
@@ -1077,32 +1073,33 @@ int Parse_Moves(string First, string Second, string Promotion_Type)
 	string Knight = "n";
 	if(Promotion_Type == Queen)
 	{
-		if(Search::White_Turn)
+		if(Search::Current_Turn)
 		White_Queens |= To;
 		else
 		Black_Queens |= To;
 	}
 	if(Promotion_Type == Rook)
 	{
-		if(Search::White_Turn)
+		if(Search::Current_Turn)
 		White_Rooks |= To;
 		else
 		Black_Rooks |= To;
 	}
 	if(Promotion_Type == Bishop)
 	{
-		if(Search::White_Turn)
+		if(Search::Current_Turn)
 		White_Bishops |= To;
 		else
 		Black_Bishops |= To;
 	}
 	if(Promotion_Type == Knight)
 	{
-		if(Search::White_Turn)
+		if(Search::Current_Turn)
 		White_Knights |= To;
 		else
 		Black_Knights |= To;
 	}
+	Print_Board();
 return 0;	
 }
 string Engine_Info()
