@@ -16,7 +16,6 @@ int Search::Depth = 0;
 int Search::Seldepth = 0;
 bool Search::STOP_SEARCHING_NOW = false;
 bool Search::Current_Turn = false;
-bool Search::White_Turn = false;
 bool Search::Output_Pv = false;
 
 void Move::Undo_Move()
@@ -51,8 +50,7 @@ void Move::Undo_Move()
                 Black_Move_Types[h] = Black_Temp_Move_Types[h];
                 }
                 Search::Current_Turn ^= 1;
-                Search::White_Turn ^= 1;
-}
+				}
 
 Move Search::Think(int wtime, int btime, int winc, int binc)
 { 	
@@ -76,7 +74,7 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
 	for(int q = 1; q < MAXDEPTH; q++)
 		{	
 			//Search::Clear();
-			if(White_Turn == true)
+			if(Current_Turn == true)
 				{
 					Time_Allocation = wtime;
 					//assert(Time_Allocation > 0);
@@ -121,7 +119,7 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
 							}
 			
 							Make_White_Search_Move(move.From, move.To, move.Move_Type);
-							int Temp_Move = SearchMin(rootAlpha, rootBeta, (q), &line, (q > 3 ? true : false));
+							int Temp_Move = SearchMin(rootAlpha, rootBeta, (q), &line, false);
 							move.Undo_Move();
 							(rootstack[i]).Score = Temp_Move;
 							if (Temp_Move < rootAlpha)
@@ -225,7 +223,7 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
 							}
 			
 							Make_Black_Search_Move(move.From, move.To, move.Move_Type);
-							int Temp_Move = SearchMax(rootAlpha, rootBeta, (q), &line, (q > 3 ? true : false));
+							int Temp_Move = SearchMax(rootAlpha, rootBeta, (q), &line, false);
 							move.Undo_Move();
 							(rootstack[i]).Score = Temp_Move;
 							if (Temp_Move < rootAlpha)
@@ -368,7 +366,6 @@ int Search::SearchMax(int alpha, int beta, int depth, LINE * pline, bool donullm
 	if((Search::Is_Mate() != -10000) && (donullmove) && (depth > 3))
 	{
 	Search::Current_Turn = false;
-	Search::White_Turn = false;
 	Generate_Black_Moves();
 	register Move move;
 	move.Black_Temp_Move_Spacer = Black_Move_Spacer;
@@ -392,20 +389,18 @@ int Search::SearchMax(int alpha, int beta, int depth, LINE * pline, bool donullm
 			move.Move_Type = Black_Move_Types[i];
 			Nodes++;
 			Make_Black_Search_Move(Black_Move_From_Stack[i], Black_Move_To_Stack[i], Black_Move_Types[i]);
-			int Temp_Move = SearchMax(alpha, beta, (depth > 3 ? depth - 1 - 2 : depth - 1), &line, false);
-			Search::Seldepth = (depth > 3 ? Search::Depth + 3 : Search::Depth + 1);
+			Search::Seldepth = Search::Depth + 3;
+			int Temp_Move = SearchMax(beta, beta + 1, depth - 1 - 2, &line, false);
 			move.Undo_Move();
-			if(Temp_Move <= alpha)
+			if(Temp_Move >= beta)
 			{
 				Search::Current_Turn = true;
-				Search::White_Turn = true;
-				return alpha;
+				return beta;
 			}
 			
 		}
 		Search::Current_Turn = true;
-		Search::White_Turn = true;
-		
+			
 	}
 	/************************************************************************
 	*************************************************************************
@@ -437,7 +432,7 @@ int Search::SearchMax(int alpha, int beta, int depth, LINE * pline, bool donullm
 			move.To = White_Move_To_Stack[i];
 			move.Move_Type = White_Move_Types[i];
 			Make_White_Search_Move(White_Move_From_Stack[i], White_Move_To_Stack[i], White_Move_Types[i]);
-			int Temp_Move = SearchMin(alpha, beta, (depth > 3 ? depth - 1 - 2 : depth - 1), &line, true);
+			int Temp_Move = SearchMin(alpha, beta, depth - 1, &line, true);
 			move.Undo_Move();
 			if(Temp_Move >= beta)
 				{
@@ -482,7 +477,6 @@ int Search::SearchMin(int alpha, int beta, int depth, LINE * pline, bool donullm
 	if((Search::Is_Mate() != 10000) && (donullmove) && (depth > 3))
 	{
 		Search::Current_Turn = true;
-		Search::White_Turn = true;
 		register Move move;
 		move.White_Temp_Move_Spacer = White_Move_Spacer;
 		Generate_White_Moves();
@@ -507,18 +501,16 @@ int Search::SearchMin(int alpha, int beta, int depth, LINE * pline, bool donullm
 			move.To = White_Move_To_Stack[i];
 			move.Move_Type = White_Move_Types[i];
 			Make_White_Search_Move(White_Move_From_Stack[i], White_Move_To_Stack[i], White_Move_Types[i]);
-			int Temp_Move = SearchMin(alpha, beta, (depth > 3 ? depth - 1 - 2 : depth - 1), &line, false);
-			Search::Seldepth = (depth > 3 ? Search::Depth + 3 : Search::Depth + 1);
+			Search::Seldepth = Search::Depth + 3;
+			int Temp_Move = SearchMin(alpha - 1, alpha, depth - 1 - 2, &line, false);
 			move.Undo_Move();
-			if(Temp_Move >= beta)
+			if(Temp_Move <= alpha)
 				{//cout << "NULL MOVE CUTTOFF!" << endl;
 					Search::Current_Turn = false;
-					Search::White_Turn = false;
-					return beta;
+					return alpha;
 				}		
 		}
 		Search::Current_Turn = false;
-		Search::White_Turn = false;
 		//cout << "Done with pruning" << endl;
 	}
 	/************************************************************************
@@ -551,7 +543,7 @@ int Search::SearchMin(int alpha, int beta, int depth, LINE * pline, bool donullm
 			
 			Nodes++;
 			Make_Black_Search_Move(Black_Move_From_Stack[i], Black_Move_To_Stack[i], Black_Move_Types[i]);
-			int Temp_Move = SearchMax(alpha, beta, (depth > 3 ? depth - 1 - 2 : depth - 1), &line, false);
+			int Temp_Move = SearchMax(alpha, beta, depth - 1, &line, false);
 			move.Undo_Move();
 			if(Temp_Move <= alpha)
 			{
@@ -789,7 +781,6 @@ Search::Make_White_Search_Move(const Bitboard& From, const Bitboard& To, const i
 			    White_Move_Spacer = 0;
 		
 			    Search::Current_Turn = false;
-			    Search::White_Turn = false;
 			    return 0;
 
 }
@@ -1008,7 +999,6 @@ Search::Make_Black_Search_Move(const Bitboard& From, const Bitboard& To, const i
 			    Black_Move_Spacer = 0;
 		
 			    Search::Current_Turn  = true;
-			    Search::White_Turn = true;
 			    return 0;
 
 }
@@ -1198,13 +1188,8 @@ void Search::Clear()
 					
 			//Search::Nodes = 0;
 			//Search::Current_Turn = true;
-			//Search::White_Turn = true;
 			White_Move_Spacer = 0;
 			Black_Move_Spacer = 0;
-			
-			//Search::Current_Turn = true;
-			//Search::White_Turn = true;
-			//Search::STOP_SEARCHING_NOW = false; 
-			//Search::Nodes = 0;
+		
 }
 
