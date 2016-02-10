@@ -173,7 +173,6 @@ extern bool Output_Pv;
 extern int Time_Allocation;
 extern bool STOP_SEARCHING_NOW;
 extern bool Current_Turn;
-extern bool White_Turn;
 }
 
 #endif
