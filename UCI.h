@@ -16,4 +16,5 @@ int Read_Fen(char Current_Square);
 extern Bitboard Current_Rank;
 extern string UciCommand;
 extern int Time_Usage;
+extern string Engine_Info();
 #endif
