@@ -9,7 +9,7 @@ using namespace std;
 //********************************************************************
 
 //White Knights
-int Eval::WNpsqt[64] =
+const int Eval::WNpsqt[64] =
             {
                 -20, -5, -7, -2, -2, -7, -5, -25,
                 -15, -2,  0,  0,  0,  0, -3, -5,
@@ -22,7 +22,7 @@ int Eval::WNpsqt[64] =
                 };
         
 //Black Knights         
-int Eval::BNpsqt[64] =
+const int Eval::BNpsqt[64] =
                 {                       
                         -15, -13, -11, -9, -9, -11, -13, -15,
                         -10,  -8, -5,  -3, -2, -2,  -6,  -8,
@@ -35,29 +35,52 @@ int Eval::BNpsqt[64] =
                 };
         
 //White Pawns   
-int Eval::WPpsqt[64] =
+const int Eval::WPpsqt[64] =
                 {
                         0, 0, 0, 0, 0, 0, 0, 0,
                         0, 0, 0, 0, 0, 0, 0, 0,
-                        2, 2, 3, 4, 4, 3, 2, 2,
-                        3, 4, 6, 7, 7, 6, 4, 3,
+                        2, 2, 4, 6, 6, 4, 2, 2,
+                        3, 7, 9, 15, 15, 9, 7, 3,
                         5, 6, 7, 8, 8, 7, 6, 5,
                         25, 23, 22, 21, 21, 22, 23, 25,  
                         0, 0, 0, 0, 0, 0, 0, 0        
                 };
         
 //Black Pawns   
-int Eval::BPpsqt[64] =
+const int Eval::BPpsqt[64] =
                 {
                         0, 0, 0, 0, 0, 0, 0, 0,
                         25, 23, 22, 21, 21, 22, 23, 25,
                         2, 2, 3, 4, 4, 3, 2, 2,
                         3, 4, 5, 6, 6, 5, 4, 3,
-                        5, 6, 7, 8, 8, 7, 6, 5,
-                        2, 2, 3, 4, 4, 3, 2, 2,  
+                        5, 6, 9, 15, 15, 9, 6, 5,
+                        2, 2, 5, 8, 8, 5, 2, 2,  
                         0, 0, 0, 0, 0, 0, 0, 0,
                         0, 0, 0, 0, 0, 0, 0, 0
                 };
+                
+const int Eval::WKpsqt[64] = 
+{
+	5, 25, 0, -10, -5, -5, 15, 5,
+    -5, -5, -5, -5, -5, -5, -5, -5,
+    -5, -5, -5, -5, -5, -5, -5, -5,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,  
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0
+};
+const int Eval::BKpsqt[64] = 
+{	
+0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0,
+-5, -5, -5, -5, -5, -5, -5, -5,
+-5, -5, -5, -5, -5, -5, -5, -5,
+5, 10, -3, -50, -10, 5, 10, 5
+};
         
                 
 //********************************************************************
@@ -65,14 +88,19 @@ int Eval::BPpsqt[64] =
 //********************************************************************
                 
 //Evaluates the current position based on the bitboards in Bitboard.cpp         
-int Eval::Evaluate_Position() 
+const int Eval::Evaluate_Position() 
         {
                 int White_Score = 0; //White's Score
                 int Black_Score = 0; //Black's Score
         
+        		int wk = 20, bk = 20;
             register int i = 0; //A little optimization
         for(i = 0; i < 64; i++)
                 {
+                /*if(GeneralBoard[i] & White_King)
+				wk = i;	
+				if(GeneralBoard[i] & Black_King)
+				bk = i;	*/
                 bool IsWhitePawns = GeneralBoard[i] & White_Pawns;
                 bool IsWhiteKnights = GeneralBoard[i] & White_Knights;
                 bool IsWhiteBishops = GeneralBoard[i] & White_Bishops;
@@ -133,6 +161,8 @@ int Eval::Evaluate_Position()
                 }
             }
             
+            /*White_Score += WKpsqt[wk];
+            Black_Score += BKpsqt[bk];*/
         //********************************************************************
                 //Assign scores to the pieces with the piece square tables
             //********************************************************************
