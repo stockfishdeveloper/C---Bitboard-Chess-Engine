@@ -169,10 +169,11 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
                     output.unlock();
                     rootAlpha = Temp_Move;
                 }
-                if(STOP_SEARCHING_NOW)
-                {
-                    return Best;
-                }
+                if(timer.Get_Time() >= (Search::Time_Allocation / 30))
+        			{
+            			Search::STOP_SEARCHING_NOW = true;
+            			return Best;
+        			}
             }
 
         }
@@ -206,7 +207,6 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
                 move.From = Black_Move_From_Stack[i];
                 move.To = Black_Move_To_Stack[i];
                 move.Move_Type = Black_Move_Types[i];
-                rootstack[count] = move;
                 if(Black_Move_Spacer == 1)
                 {
                     Best = move;
@@ -274,23 +274,24 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
                     output.unlock();
                     rootBeta = Temp_Move;
                 }
-                if(STOP_SEARCHING_NOW)
-                {
-                    return Best;
-                }
+                if(timer.Get_Time() >= (Search::Time_Allocation / 30))
+        			{
+            			Search::STOP_SEARCHING_NOW = true;
+            			return Best;
+        			}
 
             }
 
         }
 
 
-		for(int i = 0; i < count; i++)
+		/*for(int i = 1; i < count; i++)
 		{
 			if((rootstack[i].Move_Type % 2) > 0)
-			rootstack[i].Score += 50;
+				rootstack[i].Score += (Current_Turn ? 20 : -20);
 			if((rootstack[i].Move_Type == 13) || (rootstack[i].Move_Type == 14))
-			rootstack[i].Score += 200;
-		}
+				rootstack[i].Score += (Current_Turn ? 40 : -40);
+		}*/
         Move* n = Search::Order_Moves(rootstack, Current_Turn, count);
         for(int i = 0; i < count; i++)
         {

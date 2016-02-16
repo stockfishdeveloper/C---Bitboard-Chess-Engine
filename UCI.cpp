@@ -143,13 +143,13 @@ int CheckUci()
             Timer timer;
             Search::Searching = true;
             Search::Time_Allocation = 10000;
-            std::thread t(Runthread, &timer);//Spawn new thread to constantly output infos the the GUI while the search function is running
+            //std::thread t(Runthread, &timer);//Spawn new thread to constantly output infos the the GUI while the search function is running
             timer.Start_Clock();
             int h = 0, j = 0;
             Move blank;
             blank = Search::Think(wtime, btime, h, j);
             Search::Searching = false;
-            t.join();
+            //t.join();
             //auto after = Time::now();
             float temporary = (Search::Nodes / timer.Get_Time());
 //float temp_and_one = temporary * 1000.0;
@@ -479,8 +479,9 @@ int Moves_Command()
 
         }
         Search::Current_Turn ^= 1;
-
-
+//cout << "Black_Pieces: " << Black_Pieces << endl;
+//cout << "White_Pieces: " << White_Pieces << endl;
+//Print_Board();
     }
 
     return 0;
@@ -615,7 +616,6 @@ int Parse_Moves(string First, string Second)
             if((To == 64) && From == 16)
             {
                 White_Pieces |= 64;
-                White_Pieces ^= 16;
                 White_Pieces |= 32;
                 White_Pieces ^= 128;
                 White_Rooks |= 32;
@@ -624,7 +624,6 @@ int Parse_Moves(string First, string Second)
             if(To == 4 && From == 16)
             {
                 White_Pieces |= 4;
-                White_Pieces ^= 16;
                 White_Pieces |= 8;
                 White_Pieces ^= 1;
                 White_Rooks |= 8;
@@ -769,7 +768,6 @@ int Parse_Moves(string First, string Second)
             if((To == 4611686018427387904) && From == 1152921504606846976)
             {
                 Black_Pieces |= 4611686018427387904;
-                Black_Pieces ^= 1152921504606846976;
                 Black_Pieces |= 2305843009213693952;
                 Black_Pieces ^= 9223372036854775808;
                 Black_Rooks |= 2305843009213693952;
@@ -778,7 +776,6 @@ int Parse_Moves(string First, string Second)
             if(To == 288230376151711744 && From == 1152921504606846976)
             {
                 Black_Pieces |= 288230376151711744;
-                Black_Pieces ^= 1152921504606846976;
                 Black_Pieces |= 576460752303423488;
                 Black_Pieces ^= 72057594037927936;
                 Black_Rooks |= 576460752303423488;
