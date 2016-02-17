@@ -79,7 +79,6 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
             Time_Allocation = wtime;
             //assert(Time_Allocation > 0);
             Depth = q;
-            Seldepth = q;
             if(q == 1) Generate_White_Moves();
             move.White_Temp_Move_Spacer = White_Move_Spacer;
             for(int h = 0; h < White_Move_Spacer; h++)
@@ -119,7 +118,7 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
                 }
 
                 Make_White_Search_Move(move.From, move.To, move.Move_Type);
-                int Temp_Move = SearchMin(rootAlpha, rootBeta, (q), &line, false);
+                int Temp_Move = SearchMin(rootAlpha, rootBeta, (q), &line, true);
                 move.Undo_Move();
                 (rootstack[i]).Score = Temp_Move;
                 if (Temp_Move < rootAlpha)
@@ -183,7 +182,6 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
             Time_Allocation = btime;
             //assert(Time_Allocation > 0);
             Depth = q;
-            Seldepth = q;
             if(q == 1) Generate_Black_Moves();
             move.Black_Temp_Move_Spacer = Black_Move_Spacer;
             for(int h = 0; h < Black_Move_Spacer; h++)
@@ -223,7 +221,7 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
                 }
 
                 Make_Black_Search_Move(move.From, move.To, move.Move_Type);
-                int Temp_Move = SearchMax(rootAlpha, rootBeta, (q), &line, false);
+                int Temp_Move = SearchMax(rootAlpha, rootBeta, (q), &line, true);
                 move.Undo_Move();
                 (rootstack[i]).Score = Temp_Move;
                 if (Temp_Move < rootAlpha)
@@ -351,21 +349,18 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
 
 int Search::SearchMax(int alpha, int beta, int depth, LINE * pline, bool donullmove)
 {
-    Seldepth = depth;
-    LINE line;
-
     /*if(STOP_SEARCHING_NOW)
     return alpha;*/
 
     if(depth == 1)
     {
-        int Best;
         ++Nodes;
-        Best = Eval::Evaluate_Position();
+        alpha = Eval::Evaluate_Position();
         pline->cmove = 0;
-        pline->score = Best;
-        return Best;
+        return alpha;
     }
+    LINE line;
+
 
     /*NULLMOVE PRUNING*******************************************************
     *************************************************************************
@@ -373,56 +368,21 @@ int Search::SearchMax(int alpha, int beta, int depth, LINE * pline, bool donullm
     /*if((Search::Is_Mate() != -10000) && (donullmove) && (depth > 3))
     {
         Search::Current_Turn = false;
-        Generate_Black_Moves();
-        register Move move;
-        move.Black_Temp_Move_Spacer = Black_Move_Spacer;
-        for(int h = 0; h < Black_Move_Spacer; h++)
-        {
-            move.Black_Temp_Move_From_Stack[h] = move.Convert_Bitboard(Black_Move_From_Stack[h]);
-            move.Black_Temp_Move_To_Stack[h] = move.Convert_Bitboard(Black_Move_To_Stack[h]);
-            move.Black_Temp_Move_Types[h] = Black_Move_Types[h];
-        }
-        if(Black_Move_Spacer == 0)
-        {
-            alpha = Is_Mate();
-            pline->score = alpha;
-            pline->cmove = depth;
-            return alpha;
-        }
-        for(int i = 0; i < Black_Move_Spacer; i++)
-        {
-            move.From = Black_Move_From_Stack[i];
-            move.To = Black_Move_To_Stack[i];
-            move.Move_Type = Black_Move_Types[i];
-            Nodes++;
-            Make_Black_Search_Move(Black_Move_From_Stack[i], Black_Move_To_Stack[i], Black_Move_Types[i]);
-            Search::Seldepth = Search::Depth + 3;
-            int Temp_Move = SearchMax(alpha, beta, depth - 3, &line, false);
-            move.Undo_Move();
-            if(Temp_Move >= beta)
+        int Temp_Move = SearchMin(0 - beta, 1 - beta, depth - 3, &line, false);
+        if(Temp_Move >= beta)
             {
-                //cout << "NULL MOVE ALPHA CUTOFF!" << endl;
+                //cout << "NULL MOVE BETA CUTOFF!" << endl;
                 Search::Current_Turn = true;
-                return beta;
+                return Temp_Move;
             }
 
-        }
-        Search::Current_Turn = true;
-
-    }*/
+    }
+        Search::Current_Turn = true;*/
     /************************************************************************
     *************************************************************************
     *************************************************************************/
     Generate_White_Moves();
     register Move move;
-    move.White_Temp_Move_Spacer = White_Move_Spacer;
-    for(int h = 0; h < White_Move_Spacer; h++)
-    {
-        move.White_Temp_Move_From_Stack[h] = move.Convert_Bitboard(White_Move_From_Stack[h]);
-        move.White_Temp_Move_To_Stack[h] = move.Convert_Bitboard(White_Move_To_Stack[h]);
-        move.White_Temp_Move_Types[h] = White_Move_Types[h];
-    }
-
     if(White_Move_Spacer == 0)
     {
         alpha = Is_Mate();
@@ -464,79 +424,39 @@ int Search::SearchMax(int alpha, int beta, int depth, LINE * pline, bool donullm
 
 int Search::SearchMin(int alpha, int beta, int depth, LINE * pline, bool donullmove)
 {
-    Seldepth = depth;
-    LINE line;
-
     /*if(STOP_SEARCHING_NOW)
     return beta;*/
-
     if(depth == 1)
     {
-        int Best;
+        //int Best;
         ++Nodes;
-        Best = Eval::Evaluate_Position();
+        alpha = Eval::Evaluate_Position();
         pline->cmove = 0;
-        pline->score = Best;
-        return Best;
+        //pline->score = Best;
+        return alpha;
     }
+    LINE line;
     /*NULLMOVE PRUNING*******************************************************
     *************************************************************************
     *************************************************************************/
     /*if((Search::Is_Mate() != 10000) && (donullmove) && (depth > 3))
     {
         Search::Current_Turn = true;
-        register Move move;
-        move.White_Temp_Move_Spacer = White_Move_Spacer;
-        Generate_White_Moves();
-        for(int h = 0; h < White_Move_Spacer; h++)
-        {
-            move.White_Temp_Move_From_Stack[h] = move.Convert_Bitboard(White_Move_From_Stack[h]);
-            move.White_Temp_Move_To_Stack[h] = move.Convert_Bitboard(White_Move_To_Stack[h]);
-            move.White_Temp_Move_Types[h] = White_Move_Types[h];
-        }
-
-        if(White_Move_Spacer == 0)
-        {
-            beta = Is_Mate();
-            pline->score = beta;
-            pline->cmove = depth;
-            return beta;
-        }
-        for(int i = 0; i < White_Move_Spacer; i++)
-        {
-            //cout << "In min null pruning" << endl;
-            Nodes++;
-            move.From = White_Move_From_Stack[i];
-            move.To = White_Move_To_Stack[i];
-            move.Move_Type = White_Move_Types[i];
-            Make_White_Search_Move(White_Move_From_Stack[i], White_Move_To_Stack[i], White_Move_Types[i]);
-            Search::Seldepth = Search::Depth + 3;
-            int Temp_Move = SearchMin(alpha, beta, depth - 3, &line, false);
-            move.Undo_Move();
-            if(Temp_Move <= alpha)
+        int Temp_Move = SearchMax(alpha, alpha + 1, depth - 3, &line, false);
+        if(Temp_Move <= alpha)
             {
-                //cout << "NULL MOVE BETA CUTTOFF!" << endl;
+                //cout << "NULL MOVE ALPHA CUTTOFF!" << endl;
                 Search::Current_Turn = false;
-                return alpha;
+                return Temp_Move;
             }
-        }
-        Search::Current_Turn = false;
-        //cout << "Done with pruning" << endl;
-    }*/
+    }
+        Search::Current_Turn = false; */
     /************************************************************************
     *************************************************************************
     *************************************************************************/
 
     Generate_Black_Moves();
     register Move move;
-    move.Black_Temp_Move_Spacer = Black_Move_Spacer;
-    for(int h = 0; h < Black_Move_Spacer; h++)
-    {
-        move.Black_Temp_Move_From_Stack[h] = move.Convert_Bitboard(Black_Move_From_Stack[h]);
-        move.Black_Temp_Move_To_Stack[h] = move.Convert_Bitboard(Black_Move_To_Stack[h]);
-        move.Black_Temp_Move_Types[h] = Black_Move_Types[h];
-    }
-
     if(Black_Move_Spacer == 0)
     {
         beta = Is_Mate();
