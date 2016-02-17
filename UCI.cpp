@@ -150,14 +150,6 @@ int CheckUci()
             blank = Search::Think(wtime, btime, h, j);
             Search::Searching = false;
             //t.join();
-            //auto after = Time::now();
-            float temporary = (Search::Nodes / timer.Get_Time());
-//float temp_and_one = temporary * 1000.0;
-            /*cout << "Number of nodes searched: " << Nodes << endl;
-            cout << "Time in milliseconds: " << d.count() << endl;
-            cout << "KNps: " << temporary << endl;
-            cout << "Best move score: " << blank.Score << endl;*/
-
             for( int h = 0; h < 64; h++)
             {
                 if(GeneralBoard[h] & blank.From)
