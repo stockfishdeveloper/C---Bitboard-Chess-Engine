@@ -106,7 +106,7 @@ const int Eval::BBpsqt[64] =
 int White_Score = 0; //White's Score
 int Black_Score = 0; //Black's Score
 int wk = 0, bk = 0;
-const int Doubled_Pawn_Penalty = 20;
+const int Doubled_Pawn_Penalty = 10;
 //********************************************************************
 //Material
 //********************************************************************
