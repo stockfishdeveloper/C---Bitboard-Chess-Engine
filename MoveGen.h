@@ -3,8 +3,8 @@
 #include "Bitboard.h"
 #include <iostream>
 extern bool Current_Turn;
-void Generate_White_Moves();
-void Generate_Black_Moves();
+void Generate_White_Moves(const bool caps);
+void Generate_Black_Moves(const bool caps);
 bool White_Is_Legal(const Bitboard& From_Square, const Bitboard& To_Square, const int Move_Type);//Tests for legality
 bool Black_Is_Legal(const Bitboard& From_Square, const Bitboard& To_Square, const int Move_Type);//Tests for legality
 extern bool Is_Legal;
