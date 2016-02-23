@@ -42,7 +42,7 @@ bool WhiteCanCastleQ = true;
 bool BlackCanCastleK = true;
 bool BlackCanCastleQ = true;
 
-void Generate_White_Moves()
+void Generate_White_Moves(const bool caps)
 {
     if(White_Knights)//If there are any white knights on the board
     {
@@ -72,11 +72,27 @@ void Generate_White_Moves()
             }
 
             Bitboard Spare = (Knight_Lookup_Table[j] | WhiteKnightCount[w]);// Spare is a bitboard with all legal squares the knight can move to and the original square of the knight
-            Bitboard Spare2 = White_Pieces & Knight_Lookup_Table[j]; // Spare2 has all moves that do not capture one of white's own pieces
+            Bitboard Spare2 = White_Pieces & Knight_Lookup_Table[j]; // Spare2 has all moves that capture one of white's own pieces
             Bitboard Spare3 = ((Spare ^ Spare2) ^ GeneralBoard[j]); // Knight_Pos is the final result
             for(int r = 0; r < 64; r++) // For each legal square found in Spare3 for the current knight
             {
-                if(GeneralBoard[r] & Spare3)//If the for loop index of GeneralBoard  is a square the knight can move to
+                
+			if(caps)
+				{
+					if(GeneralBoard[r] & Spare3 & Black_Pieces)
+                	{
+                    if(White_Is_Legal(WhiteKnightCount[w], GeneralBoard[r], 3))//Pass the move to the Is_Legal() function and if it returns true, then the move is legal, otherwise, the move is ditched
+                    {
+                        White_Move_From_Stack[White_Move_Spacer] = WhiteKnightCount[w];  // Move_From_Stack gets original position of knight(s)
+                        White_Move_To_Stack[White_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
+                        White_Move_Types[White_Move_Spacer - 1] = 3;//Make it a "plain" move
+                    }
+
+                	}
+				}
+			else
+			{
+				if(GeneralBoard[r] & Spare3)//If the for loop index of GeneralBoard  is a square the knight can move to
                 {
                     int y = 4;//This move will be a "Normal" knight move
                     if(GeneralBoard[r] & Black_Pieces)//If the move captures a black piece, it is a knight capture
@@ -92,6 +108,7 @@ void Generate_White_Moves()
                 }
 
             }
+        }
         }
         for(int u = 0; u < 40; u++) // Tidy up for the next person by emptying the KnightCount array
         {
@@ -124,7 +141,9 @@ void Generate_White_Moves()
                 j = i;
             }
         }
-        //Kingside castling functionality
+        if(!caps)
+		{
+		//Kingside castling functionality
         Bitboard first = (WhiteKingCount[w] & 16);
         Bitboard second = ((White_Pieces | Black_Pieces) & 96);
         Bitboard e1 = 16, f1 = 32, g1 = 64, a0 = 0;
@@ -140,12 +159,28 @@ void Generate_White_Moves()
             White_Move_To_Stack[White_Move_Spacer++] = too;
             White_Move_Types[White_Move_Spacer - 1] = 15;
         }
+    	}
         Bitboard Spare = (King_Lookup_Table[j] | WhiteKingCount[w]);// Spare is a bitboard with all legal squares the king can move to and the original square of the knight
         Bitboard Spare2 = White_Pieces & King_Lookup_Table[j]; // Spare2 has all moves that do not capture one of white's own pieces
         Bitboard Spare3 = ((Spare ^ Spare2) ^ GeneralBoard[j]); // Spare3 is the final result
         for(int r = 0; r < 64; r++) // For each legal square found in Spare3 for the current king
         {
-            if(GeneralBoard[r] & Spare3)//If it finds a square the king can legally move to
+            if(caps)
+            {
+            	if(GeneralBoard[r] & Spare3 & Black_Pieces)//If it finds a square the king can legally move to
+            {
+                if(White_Is_Legal(WhiteKingCount[w], GeneralBoard[r], 11))//If the move is legal, e.g. does not leave the white king in check, then put it on the move stack
+                {
+                    White_Move_From_Stack[White_Move_Spacer] = WhiteKingCount[w];  // Move_From_Stack gets original position of the white king
+                    White_Move_To_Stack[White_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a single square it can move to
+                    White_Move_Types[White_Move_Spacer - 1] = 11;//Else it is just a "normal" king move
+
+                }
+            }
+			}
+			else
+			{
+				if(GeneralBoard[r] & Spare3)//If it finds a square the king can legally move to
             {
                 int y = 12;//It is a king "normal" move
                 if(GeneralBoard[r] & Black_Pieces)//If it is a capture move, we have to decrement the move type accordingly
@@ -158,6 +193,7 @@ void Generate_White_Moves()
 
                 }
             }
+        	}
 
 
         }
@@ -240,7 +276,21 @@ void Generate_White_Moves()
 
             for(int r = 0; r < 64; r++) // For each legal square found in Spare1 for the current pawn
             {
-                if(GeneralBoard[r] & Spare1)
+                if(caps)
+                {
+                	if(GeneralBoard[r] & Spare1 & Black_Pieces)
+                {
+                    if(White_Is_Legal(WhitePawnCount[w], GeneralBoard[r], 1))//If the move is legal,
+                    {
+                        White_Move_From_Stack[White_Move_Spacer] = WhitePawnCount[w];  // Move_From_Stack gets original position of pawn(s)
+                        White_Move_To_Stack[White_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
+                        White_Move_Types[White_Move_Spacer - 1] = 1;//It is a normal pawn move
+                    }
+                }
+				}
+				else
+				{
+				if(GeneralBoard[r] & Spare1)
                 {
                     int y = 2;//The move is first considered a "normal" pawn move
                     if(GeneralBoard[r] & Black_Pieces)//But if is captures one of black's pieces,
@@ -256,6 +306,7 @@ void Generate_White_Moves()
                         White_Move_Types[White_Move_Spacer - 1] = y;//It is a normal pawn move
                     }
                 }
+            	}
 
 
             }
@@ -301,7 +352,22 @@ void Generate_White_Moves()
 
             for(int r = 0; r < 64; r++) // For each legal square found in Spare1 for the current rook
             {
-                if(GeneralBoard[r] & Spare1)
+                if(caps)
+                {
+                	if(GeneralBoard[r] & Spare1 & Black_Pieces)
+                {
+                    if(White_Is_Legal(WhiteRookCount[w], GeneralBoard[r], 7))//If the current move is legal,
+                    {
+                        White_Move_From_Stack[White_Move_Spacer] = WhiteRookCount[w];  // Move_From_Stack gets original position of rook(s)
+                        White_Move_To_Stack[White_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
+                        White_Move_Types[White_Move_Spacer - 1] = 7;//Else it is a "plain" sliding move
+
+                    }
+                }
+				}
+				else
+				{
+				if(GeneralBoard[r] & Spare1)
                 {
                     int y = 8;//It is assumed to be a "normal" rook move
                     if(GeneralBoard[r] & Black_Pieces)//But if it captures a black piece,
@@ -314,6 +380,7 @@ void Generate_White_Moves()
 
                     }
                 }
+            	}
 
             }
         }
@@ -356,7 +423,22 @@ void Generate_White_Moves()
 
             for(int r = 0; r < 64; r++) // For each legal square found in Spare1 for the current bishop
             {
-                if(GeneralBoard[r] & Spare1)
+                if(caps)
+                {
+                	if(GeneralBoard[r] & Spare1 & Black_Pieces)
+                {
+                    if(White_Is_Legal(WhiteBishopCount[w], GeneralBoard[r], 5))
+                    {
+                        White_Move_From_Stack[White_Move_Spacer] = WhiteBishopCount[w];  // Move_From_Stack gets original position of bishop(s)
+                        White_Move_To_Stack[White_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
+                        White_Move_Types[White_Move_Spacer - 1] = 5;
+
+                    }
+                }
+				}
+				else
+				{
+				if(GeneralBoard[r] & Spare1)
                 {
                     int y = 6;
                     if(GeneralBoard[r] & Black_Pieces)
@@ -369,6 +451,7 @@ void Generate_White_Moves()
 
                     }
                 }
+            	}
 
 
             }
@@ -421,7 +504,22 @@ void Generate_White_Moves()
 
             for(int r = 0; r < 64; r++) // For each legal square found in Spare1 for the current queen
             {
-                if(GeneralBoard[r] & Spare3)
+                if(caps)
+                {
+                	if(GeneralBoard[r] & Spare3 & Black_Pieces)
+                {
+                    if(White_Is_Legal(WhiteQueenCount[w], GeneralBoard[r], 9))
+                    {
+                        White_Move_From_Stack[White_Move_Spacer] = WhiteQueenCount[w];  // Move_From_Stack gets original position of queen(s)
+                        White_Move_To_Stack[White_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
+                        White_Move_Types[White_Move_Spacer - 1] = 9;
+
+                    }
+                }
+				}
+				else
+				{
+				if(GeneralBoard[r] & Spare3)
                 {
                     int y = 10;
                     if(GeneralBoard[r] & Black_Pieces)
@@ -434,6 +532,7 @@ void Generate_White_Moves()
 
                     }
                 }
+            	}
 
 
             }
@@ -452,7 +551,7 @@ void Generate_White_Moves()
     return;
 }
 
-void Generate_Black_Moves()
+void Generate_Black_Moves(const bool caps)
 {
     if(Black_Knights)//If there are any black knights
     {
@@ -486,7 +585,22 @@ void Generate_Black_Moves()
             Bitboard Spare3 = ((Spare ^ Spare2) ^ GeneralBoard[j]); // Knight_Pos is the final result
             for(int r = 0; r < 64; r++) // For each legal square found in Spare3 for the current knight
             {
-                if(GeneralBoard[r] & Spare3)//If the current iteration has the square value that the knight can got to
+                if(caps)
+                {
+                	if(GeneralBoard[r] & Spare3 & White_Pieces)
+                {
+                    if(Black_Is_Legal(BlackKnightCount[w], GeneralBoard[r], 3))//If Is_Legal returns true, then the move is legal; if false, the current move is trashed
+                    {
+                        Black_Move_From_Stack[Black_Move_Spacer] = BlackKnightCount[w];  // Move_From_Stack gets original position of knight(s)
+                        Black_Move_To_Stack[Black_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
+                        Black_Move_Types[Black_Move_Spacer - 1] = 3;//Or else is is called a "normal" kight move
+
+                    }
+                }
+				}
+				else
+				{
+				if(GeneralBoard[r] & Spare3)//If the current iteration has the square value that the knight can got to
                 {
                     int y = 4;//The move as of right now is a "normal" knight move
                     if(GeneralBoard[r] & White_Pieces)//If it captures the opponent's piece, then we must make the move a capture knight move
@@ -499,6 +613,7 @@ void Generate_Black_Moves()
 
                     }
                 }
+            	}
 
             }
 
@@ -534,6 +649,8 @@ void Generate_Black_Moves()
                 j = i;
             }
         }
+        if(!caps)
+        {
         //Kingside castling functionality
         Bitboard first = (BlackKingCount[w] & 1152921504606846976);
         Bitboard second = ((White_Pieces | Black_Pieces) & 6917529027641081856);
@@ -550,13 +667,30 @@ void Generate_Black_Moves()
             Black_Move_To_Stack[Black_Move_Spacer++] = too;
             Black_Move_Types[Black_Move_Spacer - 1] = 15;
         }
+    	}
 
         Bitboard Spare = (King_Lookup_Table[j] | BlackKingCount[w]);// Spare is a bitboard with all legal empty squares the king can move to and the original square of the king
         Bitboard Spare2 = Black_Pieces & King_Lookup_Table[j]; // Spare2 has all moves that do not capture one of black's own pieces
         Bitboard Spare3 = ((Spare ^ Spare2) ^ GeneralBoard[j]); // Spare3 is the final result
         for(int r = 0; r < 64; r++) // For each legal square found in Spare3 for the current king
         {
-            if(GeneralBoard[r] & Spare3)//If a square is found that the king can legally move to
+            if(caps)
+            {
+            	if(GeneralBoard[r] & Spare3 & White_Pieces)//If a square is found that the king can legally move to
+            {
+                if(Black_Is_Legal(BlackKingCount[w], GeneralBoard[r], 11))//If the move is legal
+                {
+                    Black_Move_From_Stack[Black_Move_Spacer] = BlackKingCount[w];  // Move_From_Stack gets original position of king
+                    Black_Move_To_Stack[Black_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
+                    Black_Move_Types[Black_Move_Spacer - 1] = 1;//Or else it is just a "normal" move
+
+                }
+
+            }
+			}
+			else
+			{
+			if(GeneralBoard[r] & Spare3)//If a square is found that the king can legally move to
             {
                 int y = 12;//It is automatically called a "normal" king move
                 if(GeneralBoard[r] & White_Pieces)//If it captures a white piece, then we have to decrement y which tells MakeMove() that the move is a king capture
@@ -570,6 +704,7 @@ void Generate_Black_Moves()
                 }
 
             }
+        	}
         }
 
     }
@@ -651,7 +786,21 @@ void Generate_Black_Moves()
             }
             for(int r = 0; r < 64; r++) // For each legal square found in Spare1 for the current pawn
             {
-                if(GeneralBoard[r] & Spare1)
+                if(caps)
+                {
+					if(GeneralBoard[r] & Spare1 & White_Pieces)
+                {
+                    if(Black_Is_Legal(BlackPawnCount[w], GeneralBoard[r], 1))
+                    {
+                        Black_Move_From_Stack[Black_Move_Spacer] = BlackPawnCount[w];  // Move_From_Stack gets original position of knight(s)
+                        Black_Move_To_Stack[Black_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
+                        Black_Move_Types[Black_Move_Spacer - 1] = 1;
+                    }
+                }
+				}
+				else
+				{
+				if(GeneralBoard[r] & Spare1)
                 {
                     int y = 2;//It is assumed to be a regular pawn move
                     if(GeneralBoard[r] & White_Pieces)//But if it captures,
@@ -668,6 +817,7 @@ void Generate_Black_Moves()
                         Black_Move_Types[Black_Move_Spacer - 1] = y;
                     }
                 }
+            	}
 
 
             }
@@ -715,7 +865,22 @@ void Generate_Black_Moves()
 
             for(int r = 0; r < 64; r++) // For each legal square found in Spare1 for the current rook
             {
-                if(GeneralBoard[r] & Spare1)
+                if(caps)
+                {
+                	if(GeneralBoard[r] & Spare1)
+                {
+                    if(Black_Is_Legal(BlackRookCount[w], GeneralBoard[r], 7))
+                    {
+                        Black_Move_From_Stack[Black_Move_Spacer] = BlackRookCount[w];  // Move_From_Stack gets original position of rook(s)
+                        Black_Move_To_Stack[Black_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
+                        Black_Move_Types[Black_Move_Spacer - 1] = 7;
+
+                    }
+                }
+				}
+				else
+				{
+				if(GeneralBoard[r] & Spare1)
                 {
                     int y = 8;
                     if(GeneralBoard[r] & White_Pieces)
@@ -728,6 +893,7 @@ void Generate_Black_Moves()
 
                     }
                 }
+            	}
 
 
             }
@@ -773,7 +939,22 @@ void Generate_Black_Moves()
 
             for(int r = 0; r < 64; r++) // For each legal square found in Spare1 for the current bishop
             {
-                if(GeneralBoard[r] & Spare1)
+                if(caps)
+                {
+                	if(GeneralBoard[r] & Spare1)
+                {
+                    if(Black_Is_Legal(BlackBishopCount[w], GeneralBoard[r], 5))
+                    {
+                        Black_Move_From_Stack[Black_Move_Spacer] = BlackBishopCount[w];  // Move_From_Stack gets original position of bishop(s)
+                        Black_Move_To_Stack[Black_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
+                        Black_Move_Types[Black_Move_Spacer - 1] = 5;
+
+                    }
+                }
+				}
+				else
+				{
+				if(GeneralBoard[r] & Spare1)
                 {
                     int y = 6;
                     if(GeneralBoard[r] & White_Pieces)
@@ -786,6 +967,7 @@ void Generate_Black_Moves()
 
                     }
                 }
+            	}
 
             }
         }
@@ -835,7 +1017,22 @@ void Generate_Black_Moves()
 
             for(int r = 0; r < 64; r++) // For each legal square found in Spare1 for the current queen
             {
-                if(GeneralBoard[r] & Spare3)
+                if(caps)
+                {
+                	if(GeneralBoard[r] & Spare3)
+                {
+                    if(Black_Is_Legal(BlackQueenCount[w], GeneralBoard[r], 9))
+                    {
+                        Black_Move_From_Stack[Black_Move_Spacer] = BlackQueenCount[w];  // Move_From_Stack gets original position of queen(s)
+                        Black_Move_To_Stack[Black_Move_Spacer++] = GeneralBoard[r]; // Move_To_Stack gets a square it can move to
+                        Black_Move_Types[Black_Move_Spacer - 1] = 9;
+
+                    }
+                }
+				}
+				else
+				{
+				if(GeneralBoard[r] & Spare3)
                 {
                     int y = 10;
                     if(GeneralBoard[r] & White_Pieces)
@@ -848,6 +1045,7 @@ void Generate_Black_Moves()
 
                     }
                 }
+            	}
 
 
             }
