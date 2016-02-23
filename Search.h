@@ -168,8 +168,11 @@ namespace Search
 Move Think(int wtime, int btime, int winc, int binc);
 int SearchMax(int alpha, int beta, int depth, LINE * pline, bool donullmove);
 int SearchMin(int alpha, int beta, int depth, LINE * pline, bool donullmove);
+int QuiesceMax(int alpha, int beta);
+int QuiesceMin(int alpha, int beta);
 int Make_White_Search_Move(const Bitboard& From, const Bitboard& To, const int Move_Type);
 int Make_Black_Search_Move(const Bitboard& From, const Bitboard& To, const int Move_Type);
+bool MVV_LVA(int Move_Type, Bitboard To, bool WhiteToMove);
 //extern bool Fake_Current_Turn;
 //extern bool Fake_Whte_Turn;
 //extern int White_Move_Score;
