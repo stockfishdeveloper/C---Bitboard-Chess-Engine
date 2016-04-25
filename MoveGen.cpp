@@ -658,7 +658,7 @@ void Generate_Black_Moves(const bool caps)
         bool canmovetof1 = Black_Is_Legal(e8, f8, 12);
         bool canmovetog1 = Black_Is_Legal(e8, g8, 12);
         bool canmovetoe1 = Black_Is_Legal(a0, e8, 12);
-        bool Rookonh1 = (Black_Rooks & 9223372036854775808);
+        bool Rookonh1 = (Black_Rooks & 9223372036854775808ULL);
         int notincheck = Search::Is_Mate();
         if(first && (!second) && canmovetof1 && canmovetog1 && canmovetoe1 && (BlackCanCastleK) && Rookonh1 && (notincheck != 10000))
         {
@@ -1064,3 +1064,4 @@ void Generate_Black_Moves(const bool caps)
 
     return;
 }
+
