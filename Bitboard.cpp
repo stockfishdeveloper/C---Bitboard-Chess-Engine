@@ -34,6 +34,8 @@ Bitboard Black_Bishops = 0;
 Bitboard Black_Knights = 0;
 Bitboard Black_Pawns = 0;
 
+Bitboard CurrZobkey = 0;
+
 //Contains the squares that a knight on a given index can move to. For example, the 0th element has the bits of b3 and c2 set
 Bitboard Knight_Lookup_Table[64] =
 {
@@ -61,7 +63,7 @@ Bitboard King_Lookup_Table[64] =
     144959613005987840, 362258295026614272, 724516590053228544, 1449033180106457088, 2898066360212914176, 5796132720425828352, 11592265440851656704ULL, 4665729213955833856
 };
 
-Bitboard H_Pawn_Mask = 9259542123273814144;//For masking out A and H pawns so that they cannot capture off of the end of the board
+Bitboard H_Pawn_Mask = 9259542123273814144ULL;//For masking out A and H pawns so that they cannot capture off of the end of the board
 Bitboard A_Pawn_Mask = 72340172838076673;
 Bitboard G_Pawn_Mask = 4629771061636907072;
 Bitboard B_Pawn_Mask = 144680345676153346;
