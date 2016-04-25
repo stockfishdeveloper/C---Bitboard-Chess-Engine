@@ -1,6 +1,7 @@
 using namespace std;
 #include "Eval.h"
 #include "Bitboard.h"
+#include "Endgame.h"
 #include "Search.h"
 
 //********************************************************************
@@ -180,9 +181,24 @@ const int Eval::Evaluate_Position()
     Black_Score -= (Doubled_Pawn_Penalty * (__builtin_popcountll(Black_Pawns & F_Pawn_Mask) - 1));
     Black_Score -= (Doubled_Pawn_Penalty * (__builtin_popcountll(Black_Pawns & G_Pawn_Mask) - 1));
     Black_Score -= (Doubled_Pawn_Penalty * (__builtin_popcountll(Black_Pawns & H_Pawn_Mask) - 1));
-    
+    if(__builtin_popcountll(White_Pieces | Black_Pieces) <= 10)
+                {
+                	if(White_Score > Black_Score)
+                	{
+                	White_Score  += (Drive_To_Corner(false));
+					White_Score -= Dist_Betw(White_King, Black_King);
+					}
+                	else
+                	{
+                	Black_Score  += (Drive_To_Corner(true));
+					Black_Score -= Dist_Betw(White_King, Black_King);
+					}
+				}
+	else
+	{			
     White_Score += WKpsqt[wk];
     Black_Score += BKpsqt[bk];
+	}
         
     return (White_Score - Black_Score); //Return the score from WHITE'S perspective
 }
