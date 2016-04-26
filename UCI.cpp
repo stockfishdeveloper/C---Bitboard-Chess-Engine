@@ -13,6 +13,7 @@
 #include "Search.h"
 #include "Perft.h"
 
+#include "Nalimov\TBINDEX.h"
 using namespace std;
 int CheckUci();
 string UciCommand;
@@ -38,6 +39,7 @@ int CheckUci()
             cout << setfill('0') << Engine_Info() << "\n";
             cout << "id author David Cimbalista\n";
             cout << "option name TimePerMove type spin default 3 min 1 max 5\n";
+            cout << "option name NalimovPath type string default NULL\n";
             cout << "uciok\n";
         }
         else if(UciCommand == "isready")
@@ -124,6 +126,95 @@ int CheckUci()
                 cin >> value2;
                 Time_Usage = value2;
             }
+            if(optionname == "NalimovPath")
+            {
+            	string option;
+            	cin >> option;
+            	cout << IInitializeTb(option.c_str()) << " man tablebases found" << endl;
+            	int pieces[10];
+            	int wpieces[16];
+            	int bpieces[16];
+            	int wc = 0, bc = 0;
+            	pieces[0] = __builtin_popcountll(White_Pawns);
+            	pieces[1] = __builtin_popcountll(White_Knights);
+            	pieces[2] = __builtin_popcountll(White_Bishops);
+            	pieces[3] = __builtin_popcountll(White_Rooks);
+            	pieces[4] = __builtin_popcountll(White_Queens);
+            	pieces[5] = __builtin_popcountll(Black_Pawns);
+            	pieces[6] = __builtin_popcountll(Black_Knights);
+            	pieces[7] = __builtin_popcountll(Black_Bishops);
+            	pieces[8] = __builtin_popcountll(Black_Rooks);
+            	pieces[9] = __builtin_popcountll(Black_Queens);
+            	int tbid = IDescFindFromCounters(pieces);
+            	cout << "Tablebase " << tbid << endl; 
+            	Move m;
+            	while(m.White_Pawns2)
+            	{
+            		int b = m.Convert_Bitboard(White_Pawns);
+            		wpieces[wc++] = b;
+            		m.White_Pawns2 ^= GeneralBoard[b];
+				}
+				while(m.White_Knights2)
+            	{
+            		int b = m.Convert_Bitboard(White_Knights);
+            		wpieces[wc++] = b;
+            		m.White_Knights2 ^= GeneralBoard[b];
+				}
+				while(m.White_Bishops2)
+            	{
+            		int b = m.Convert_Bitboard(White_Bishops);
+            		wpieces[wc++] = b;
+            		m.White_Bishops2 ^= GeneralBoard[b];
+				}
+				while(m.White_Rooks2)
+            	{
+            		int b = m.Convert_Bitboard(White_Rooks);
+            		wpieces[wc++] = b;
+            		m.White_Rooks2 ^= GeneralBoard[b];
+				}
+				while(m.White_Queens2)
+            	{
+            		int b = m.Convert_Bitboard(White_Queens);
+            		wpieces[wc++] = b;
+            		m.White_Queens2 ^= GeneralBoard[b];
+				}
+				
+				while(m.Black_Pawns2)
+            	{
+            		int b = m.Convert_Bitboard(Black_Pawns);
+            		bpieces[bc++] = b;
+            		m.Black_Pawns2 ^= GeneralBoard[b];
+				}
+				while(m.Black_Knights2)
+            	{
+            		int b = m.Convert_Bitboard(Black_Knights);
+            		bpieces[bc++] = b;
+            		m.Black_Knights2 ^= GeneralBoard[b];
+				}
+				while(m.White_Bishops2)
+            	{
+            		int b = m.Convert_Bitboard(Black_Bishops);
+            		bpieces[bc++] = b;
+            		m.Black_Bishops2 ^= GeneralBoard[b];
+				}
+				while(m.Black_Rooks2)
+            	{
+            		int b = m.Convert_Bitboard(Black_Rooks);
+            		bpieces[bc++] = b;
+            		m.Black_Rooks2 ^= GeneralBoard[b];
+				}
+				while(m.Black_Queens2)
+            	{
+            		int b = m.Convert_Bitboard(Black_Queens);
+            		bpieces[bc++] = b;
+            		m.Black_Queens2 ^= GeneralBoard[b];
+				}
+				wpieces[15] = m.Convert_Bitboard(White_King);
+				bpieces[15] = m.Convert_Bitboard(Black_King);
+				unsigned long tbindex = PfnIndCalcFun(tbid, Search::Current_Turn);
+            	cout << "Index " << tbindex << endl;
+            	cout << "Score is " << TbtProbeTable(tbid, 1, tbindex) << endl;
+			}
         }
 
         else if(UciCommand == "go")
@@ -328,49 +419,49 @@ int Read_Fen(char Current_Square)
     case 'R':
         White_Rooks |= Current_Rank;
         White_Pieces |= Current_Rank;
-        if((!(Current_Rank & H_Pawn_Mask)) && ((Current_Rank != 9223372036854775808)))
+        if((!(Current_Rank & H_Pawn_Mask)) && ((Current_Rank != 9223372036854775808ULL)))
             Current_Rank *= 2;
         break;
     case 'r':
         Black_Rooks |= Current_Rank;
         Black_Pieces |= Current_Rank;
-        if((!(Current_Rank & H_Pawn_Mask)) && ((Current_Rank != 9223372036854775808)))
+        if((!(Current_Rank & H_Pawn_Mask)) && ((Current_Rank != 9223372036854775808ULL)))
             Current_Rank *= 2;
         break;
     case 'B':
         White_Bishops |= Current_Rank;
         White_Pieces |= Current_Rank;
-        if((!(Current_Rank & H_Pawn_Mask)) && ((Current_Rank != 9223372036854775808)))
+        if((!(Current_Rank & H_Pawn_Mask)) && ((Current_Rank != 9223372036854775808ULL)))
             Current_Rank *= 2;
         break;
     case 'b':
         Black_Bishops |= Current_Rank;
         Black_Pieces |= Current_Rank;
-        if((!(Current_Rank & H_Pawn_Mask)) && ((Current_Rank != 9223372036854775808)))
+        if((!(Current_Rank & H_Pawn_Mask)) && ((Current_Rank != 9223372036854775808ULL)))
             Current_Rank *= 2;
         break;
     case 'N':
         White_Knights |= Current_Rank;
         White_Pieces |= Current_Rank;
-        if((!(Current_Rank & H_Pawn_Mask)) && ((Current_Rank != 9223372036854775808)))
+        if((!(Current_Rank & H_Pawn_Mask)) && ((Current_Rank != 9223372036854775808ULL)))
             Current_Rank *= 2;
         break;
     case 'n':
         Black_Knights |= Current_Rank;
         Black_Pieces |= Current_Rank;
-        if((!(Current_Rank & H_Pawn_Mask)) && ((Current_Rank != 9223372036854775808)))
+        if((!(Current_Rank & H_Pawn_Mask)) && ((Current_Rank != 9223372036854775808ULL)))
             Current_Rank *= 2;
         break;
     case 'P':
         White_Pawns |= Current_Rank;
         White_Pieces |= Current_Rank;
-        if((!(Current_Rank & H_Pawn_Mask)) && ((Current_Rank != 9223372036854775808)))
+        if((!(Current_Rank & H_Pawn_Mask)) && ((Current_Rank != 9223372036854775808ULL)))
             Current_Rank *= 2;
         break;
     case 'p':
         Black_Pawns |= Current_Rank;
         Black_Pieces |= Current_Rank;
-        if((!(Current_Rank & H_Pawn_Mask)) && ((Current_Rank != 9223372036854775808)))
+        if((!(Current_Rank & H_Pawn_Mask)) && ((Current_Rank != 9223372036854775808ULL)))
             Current_Rank *= 2;
         break;
     case '/':
@@ -385,7 +476,7 @@ int Moves_Command()
     char First_Part[5];
     char Second_Part[5];
     string Promotion_Type;
-    while(First_Part != "go")
+    while(true)
     {
         cin.get();
         cin.get(First_Part, 3);
@@ -447,13 +538,17 @@ int Moves_Command()
         for(int i = 0; i < 64; i++)
         {
             if(First_Part == PlayerMoves[i])
-                Fr = GeneralBoard[i];
+            {
+            	Fr = GeneralBoard[i];
+            }
 
         }
         for(int i = 0; i < 64; i++)
         {
             if(Second_Part == PlayerMoves[i])
-                T_o = GeneralBoard[i];
+            {
+            	T_o = GeneralBoard[i];
+            }
 
         }
         if(((T_o & Eigth_Rank_White) && (Fr & Seventh_Rank_White) && (Fr & White_Pawns)) || ((T_o & Eigth_Rank_Black) && (Fr & Seventh_Rank_Black) && (Fr & Black_Pawns)))
@@ -473,16 +568,15 @@ int Moves_Command()
         Search::Current_Turn ^= 1;
 //cout << "Black_Pieces: " << Black_Pieces << endl;
 //cout << "White_Pieces: " << White_Pieces << endl;
-//Print_Board();
+	//Print_Board();
     }
-
-    return 0;
+	return 0;
 }
 
 int Parse_Moves(string First, string Second)
 {
-    Bitboard From;
-    Bitboard To;
+    Bitboard From = 0;
+    Bitboard To = 0;
     for(int i = 0; i < 64; i++)
     {
         if(PlayerMoves[i] == First)
@@ -671,7 +765,7 @@ int Parse_Moves(string First, string Second)
             {
                 BlackCanCastleQ = false;
             }
-            if(From == 9223372036854775808)
+            if(From == 9223372036854775808ULL)
             {
                 BlackCanCastleK = false;
             }
@@ -761,9 +855,9 @@ int Parse_Moves(string First, string Second)
             {
                 Black_Pieces |= 4611686018427387904;
                 Black_Pieces |= 2305843009213693952;
-                Black_Pieces ^= 9223372036854775808;
+                Black_Pieces ^= 9223372036854775808ULL;
                 Black_Rooks |= 2305843009213693952;
-                Black_Rooks ^= 9223372036854775808;
+                Black_Rooks ^= 9223372036854775808ULL;
             }
             if(To == 288230376151711744 && From == 1152921504606846976)
             {
@@ -807,8 +901,8 @@ int Parse_Moves(string First, string Second)
 
 int Parse_Moves(string First, string Second, string Promotion_Type)
 {
-    Bitboard From;
-    Bitboard To;
+    Bitboard From = 0;
+    Bitboard To = 0;
     for(int i = 0; i < 64; i++)
     {
         if(PlayerMoves[i] == First)
@@ -1094,15 +1188,15 @@ int Parse_Moves(string First, string Second, string Promotion_Type)
 }
 string Engine_Info()
 {
-    string Version = "";
+    string Version = "1.2";
     const string months("Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec");
     string month, day, year;
     stringstream ss, date(__DATE__); // From compiler, format is "Sep 21 2008"
     cout << "Chess " << Version << setfill('0');
-    if (Version.empty())
+    /*if (Version.empty())
     {
         date >> month >> day >> year;
         cout << setw(2) << day << setw(2) << (1 + months.find(month) / 4) << year.substr(2);
-    }
-    return Version;
+    }*/
+    return "";
 }
