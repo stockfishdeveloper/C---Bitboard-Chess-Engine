@@ -38,7 +38,9 @@ public:
     Bitboard Black_Knights2;
     Bitboard Black_Pawns2;
 
-    const int Convert_Bitboard(const Bitboard& board) const
+	//Bitboard Zobrist;
+	
+	const int Convert_Bitboard(const Bitboard& board) const
     {
         if(board == 0)
             return 0;
@@ -47,13 +49,14 @@ public:
             if(board & GeneralBoard[i])
                 return i;
         }
+        return 0;
     }
 
     const Bitboard Unconvert_Int(const int& number) const
     {
         return GeneralBoard[number];
     }
-
+    
     void Undo_Move();
 
     Move()
@@ -76,9 +79,7 @@ public:
         To = 0;
         Move_Type = 0;
         Score = 0;
-        White_Temp_Move_Spacer = 0;
-        Black_Temp_Move_Spacer = 0;
-		White_Temp_Move_Spacer = White_Move_Spacer;
+        White_Temp_Move_Spacer = White_Move_Spacer;
 			for(int h = 0; h < White_Move_Spacer; h++)
     		{
         		White_Temp_Move_From_Stack[h] = Convert_Bitboard(White_Move_From_Stack[h]);
@@ -155,6 +156,7 @@ public:
     {
         end_time = std::chrono::duration_cast<std::chrono::milliseconds>
                    (std::chrono::steady_clock::now().time_since_epoch()).count();
+                   return end_time;
     }
     int Get_Time()
     {
@@ -172,7 +174,7 @@ int QuiesceMax(int alpha, int beta);
 int QuiesceMin(int alpha, int beta);
 int Make_White_Search_Move(const Bitboard& From, const Bitboard& To, const int Move_Type);
 int Make_Black_Search_Move(const Bitboard& From, const Bitboard& To, const int Move_Type);
-bool MVV_LVA(int Move_Type, Bitboard To, bool WhiteToMove);
+bool MVV_LVA(int& Move_Type, Bitboard& To, bool WhiteToMove);
 //extern bool Fake_Current_Turn;
 //extern bool Fake_Whte_Turn;
 //extern int White_Move_Score;
@@ -185,7 +187,7 @@ extern bool Searching;
 extern LINE line;
 extern int Depth;
 extern int Seldepth;
-Move* Order_Moves(Move* moves, bool Whites_Turn, int elements);
+void Order_Moves(Move* moves, bool Whites_Turn, int elements);
 int Is_Mate();
 void Clear();
 extern bool Output_Pv;
