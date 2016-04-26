@@ -16,8 +16,6 @@ int Root_Perft(int depth)
         Search::Current_Turn ? move.From = White_Move_From_Stack[i] : move.From = Black_Move_From_Stack[i];
         Search::Current_Turn ? move.To = White_Move_To_Stack[i] : move.To = Black_Move_To_Stack[i];
         Search::Current_Turn ? move.Move_Type = White_Move_Types[i] : move.Move_Type = Black_Move_Types[i];
-        Search::Current_Turn ? move.White_Temp_Move_Spacer = White_Move_Spacer : move.Black_Temp_Move_Spacer = Black_Move_Spacer;
-
         Search::Current_Turn ? Search::Make_White_Search_Move(White_Move_From_Stack[i], White_Move_To_Stack[i], White_Move_Types[i]) : Search::Make_Black_Search_Move(Black_Move_From_Stack[i], Black_Move_To_Stack[i], Black_Move_Types[i]);
         for( int h = 0; h < 64; h++)
         {
@@ -50,14 +48,12 @@ int Perft(int depth)
     Search::Current_Turn ? Generate_White_Moves(false) : Generate_Black_Moves(false);
     n_moves = Search::Current_Turn ? White_Move_Spacer : Black_Move_Spacer;
     //cout << "n_moves: " << n_moves << endl;
+    Move move;
     for (i = 0; i < n_moves; i++)
     {
-        Move move;
         Search::Current_Turn ? move.From = White_Move_From_Stack[i] : move.From = Black_Move_From_Stack[i];
         Search::Current_Turn ? move.To = White_Move_To_Stack[i] : move.To = Black_Move_To_Stack[i];
         Search::Current_Turn ? move.Move_Type = White_Move_Types[i] : move.Move_Type = Black_Move_Types[i];
-        Search::Current_Turn ? move.White_Temp_Move_Spacer = White_Move_Spacer : move.Black_Temp_Move_Spacer = Black_Move_Spacer;
-        
         Search::Current_Turn ? Search::Make_White_Search_Move(White_Move_From_Stack[i], White_Move_To_Stack[i], White_Move_Types[i]) : Search::Make_Black_Search_Move(Black_Move_From_Stack[i], Black_Move_To_Stack[i], Black_Move_Types[i]);
         nodes += Perft(depth - 1);
         move.Undo_Move();
