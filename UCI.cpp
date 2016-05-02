@@ -14,6 +14,8 @@
 #include "Perft.h"
 
 #include "Nalimov\TBINDEX.h"
+#include "MoveGen.h"
+		#include "Experimental_Move_Generation.h"
 using namespace std;
 int CheckUci();
 string UciCommand;
@@ -36,7 +38,7 @@ int CheckUci()
         if(UciCommand == "uci")
         {
             cout << "id name ";
-            cout << setfill('0') << Engine_Info() << "\n";
+            cout << setfill('0') << Engine_Info() << " test\n";
             cout << "id author David Cimbalista\n";
             cout << "option name TimePerMove type spin default 3 min 1 max 5\n";
             cout << "option name NalimovPath type string default NULL\n";
@@ -85,11 +87,48 @@ int CheckUci()
             Search::Clear();
 
         }
-
-        else if(UciCommand == "bench")
+		else if(UciCommand == "bench")
         {
-            //cout << Eval::Evaluate_Position() << endl;
+            Timer time;
+            time.Start_Clock();
+            for(int i = 0; i < 1000000; i++)
+            {
+            	Generate_White_Moves(false);
+            	Search::Clear();
+            	Generate_Black_Moves(false);
+            	Search::Clear();
+			}
+			cout << time.Get_Time() << endl;
+			Search::Clear();
+			time.Start_Clock();
+            for(int i = 0; i < 1000000; i++)
+            {
+            	Exp_Generate_White_Moves(false);
+            	White_Move_Spacer = 0;
+            	Exp_Generate_Black_Moves(false);
+            	Black_Move_Spacer = 0;
+			}
+			cout << time.Get_Time() << endl;
+			Search::Clear();
+			/*Generate_Black_Moves(true);
+			for(int i = 0; i < Black_Move_Spacer; i++)
+			{
+            for( int h = 0; h < 64; h++)
+        {
+            if(GeneralBoard[h] & Black_Move_From_Stack[i])
+            {
+                cout << PlayerMoves[h];
+            }
         }
+        for( int h = 0; h < 64; h++)
+        {
+            if(GeneralBoard[h] & Black_Move_To_Stack[i])
+            {
+                cout  << PlayerMoves[h] << endl;
+            }
+        }
+    		}*/
+		}
         else if(UciCommand == "perft")
         {
             Timer timer;
@@ -499,6 +538,13 @@ int Moves_Command()
             //cout << ucicommand;
             return 0;
         }
+        string g = "be";
+        if(First_Part == g)
+        {
+        	cin.putback('e');
+            cin.putback('b');
+            return 0;
+		}
         cin.get(Second_Part, 3);
         Log << Second_Part << endl;
         string a8 = "a8";
@@ -1188,15 +1234,15 @@ int Parse_Moves(string First, string Second, string Promotion_Type)
 }
 string Engine_Info()
 {
-    string Version = "1.2";
+    string Version = "";
     const string months("Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec");
     string month, day, year;
     stringstream ss, date(__DATE__); // From compiler, format is "Sep 21 2008"
     cout << "Chess " << Version << setfill('0');
-    /*if (Version.empty())
+    if (Version.empty())
     {
         date >> month >> day >> year;
         cout << setw(2) << day << setw(2) << (1 + months.find(month) / 4) << year.substr(2);
-    }*/
-    return "";
+    }
+    return Version;
 }
