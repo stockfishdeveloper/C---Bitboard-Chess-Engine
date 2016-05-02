@@ -35,21 +35,20 @@ void Move::Undo_Move()
     Black_Knights = Black_Knights2;
     Black_Pawns = Black_Pawns2;
     White_Move_Spacer = White_Temp_Move_Spacer;
-    Black_Move_Spacer = Black_Temp_Move_Spacer;
     for(int h = 0; h < White_Temp_Move_Spacer; h++)
     {
         White_Move_From_Stack[h] = Unconvert_Int(White_Temp_Move_From_Stack[h]);
         White_Move_To_Stack[h] = Unconvert_Int(White_Temp_Move_To_Stack[h]);
         White_Move_Types[h] = White_Temp_Move_Types[h];
     }
-
+	Black_Move_Spacer = Black_Temp_Move_Spacer;
     for(int h = 0; h < Black_Temp_Move_Spacer; h++)
     {
         Black_Move_From_Stack[h] = Unconvert_Int(Black_Temp_Move_From_Stack[h]);
         Black_Move_To_Stack[h] = Unconvert_Int(Black_Temp_Move_To_Stack[h]);
         Black_Move_Types[h] = Black_Temp_Move_Types[h];
     }
-    Search::Current_Turn ^= 1;
+	Search::Current_Turn ^= 1;
 }
 
 Move Search::Think(int wtime, int btime, int winc, int binc)
@@ -178,8 +177,8 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
                         cout << "cp " << Temp_Move;
                         Log << "cp " << Temp_Move;
                     }
-                    cout << " pv " << ::PVline.Output();
-                    Log << " pv " << ::PVline.Output();
+                    cout << " pv " << ::PVline.Output() << line.Output();
+                    Log << " pv " << ::PVline.Output() << line.Output();
                     cout << "time " << timer.Get_Time() << " nodes " << Search::Nodes << " nps " << (1000 *(Search::Nodes / (timer.Get_Time() + 1))) << endl;
                     Log << "time " << timer.Get_Time() << " nodes " << Search::Nodes << " nps " << (1000 *(Search::Nodes / (timer.Get_Time() + 1))) << endl;
                     output.unlock();
@@ -298,8 +297,8 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
                         cout << "cp " << -Temp_Move;
                         Log << "cp " << -Temp_Move;
                     }
-                    cout << " pv " << ::PVline.Output();
-                    Log << " pv " << ::PVline.Output();
+                    cout << " pv " << ::PVline.Output() << line.Output();
+                    Log << " pv " << ::PVline.Output() << line.Output();
                     cout << "time " << timer.Get_Time() << " nodes " << Search::Nodes << " nps " << (1000 *(Search::Nodes / (timer.Get_Time() + 1))) << endl;
                     Log << "time " << timer.Get_Time() << " nodes " << Search::Nodes << " nps " << (1000 *(Search::Nodes / (timer.Get_Time() + 1))) << endl;
                     output.unlock();
@@ -348,8 +347,7 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
 
         //count = 0;
 
-
-        output.lock();
+		output.lock();
         cout << "info depth " << q + 1 << endl;
         Log << "info depth " << q + 1 << endl;
         output.unlock();
@@ -366,8 +364,8 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
             Time_Allocation = 0;
             return Best;
         }
-        if ((Best.Score <= rootAlpha) || (Best.Score >= rootBeta))
-        	{
+        /*if ((Best.Score <= rootAlpha) || (Best.Score >= rootBeta))
+        	{cout << "This shouldnt print " << endl;
         		rootAlpha = -100000;
         		rootBeta = 100000;
         	}
@@ -375,9 +373,9 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
         	{
         		rootAlpha = Best.Score - 50;
         		rootBeta = Best.Score + 50;
-        	}
+        	}*/
         //rootAlpha = -100000;
-        //rootBeta = 100000;
+    	//rootBeta = 100000;
     }
 
     return Best;
@@ -733,12 +731,6 @@ Search::Make_White_Search_Move(const Bitboard& From, const Bitboard& To, const i
         White_Move_To_Stack[t] = 0;//Clear the move to stack
         White_Move_Types[t] = 0;//Clear the move types associated with the moves
     }
-    White_Knight_Spacer = 0;//Clear all of the piece spacers
-    White_King_Spacer = 0;
-    White_Pawn_Spacer = 0;
-    White_Rook_Spacer = 0;
-    White_Bishop_Spacer = 0;
-    White_Queen_Spacer = 0;
     White_Move_Spacer = 0;
 
     Search::Current_Turn = false;
@@ -951,12 +943,6 @@ Search::Make_Black_Search_Move(const Bitboard& From, const Bitboard& To, const i
         Black_Move_To_Stack[t] = 0;//Clear the move to stack
         Black_Move_Types[t] = 0;//Clear the move types associated with the moves
     }
-    Black_Knight_Spacer = 0;//Clear all of the piece spacers
-    Black_King_Spacer = 0;
-    Black_Pawn_Spacer = 0;
-    Black_Rook_Spacer = 0;
-    Black_Bishop_Spacer = 0;
-    Black_Queen_Spacer = 0;
     Black_Move_Spacer = 0;
 
     Search::Current_Turn  = true;
@@ -1130,13 +1116,6 @@ void Search::Clear()
         White_Move_Types[t] = 0;//Clear the move types associated with the moves
     }
 	Search::Depth = 0;
-    White_Knight_Spacer = 0;//Clear all of the piece spacers
-    White_King_Spacer = 0;
-    White_Pawn_Spacer = 0;
-    White_Rook_Spacer = 0;
-    White_Bishop_Spacer = 0;
-    White_Queen_Spacer = 0;
-
     for(int t = 0; t < 100; t++)
     {
         Black_Move_From_Stack[t] = 0;//Clear the move from stack
@@ -1144,12 +1123,6 @@ void Search::Clear()
         Black_Move_Types[t] = 0;//Clear the move types associated with the moves
     }
 
-    Black_Knight_Spacer = 0;//Clear all of the piece spacers
-    Black_King_Spacer = 0;
-    Black_Pawn_Spacer = 0;
-    Black_Rook_Spacer = 0;
-    Black_Bishop_Spacer = 0;
-    Black_Queen_Spacer = 0;
     White_Move_Spacer = 0;
     Black_Move_Spacer = 0;
 
