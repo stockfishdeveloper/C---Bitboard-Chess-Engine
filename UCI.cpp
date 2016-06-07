@@ -1,13 +1,10 @@
-#include <fstream>//For writing the game to a text file
 #include "Bitboard.h"
 #include "UCI.h"
 #include <string>
-#include <iostream>
 #include <iomanip>
 #include <sstream>
 #include <ctime>
 #include "windows.h"
-#include <chrono>
 #include <thread> //For multithreading--must be using C++11 compiler
 #include "Thread.h"//Threading header file
 #include "Search.h"
@@ -15,7 +12,7 @@
 
 #include "Nalimov\TBINDEX.h"
 #include "MoveGen.h"
-		#include "Experimental_Move_Generation.h"
+#include "Util.h"
 using namespace std;
 int CheckUci();
 string UciCommand;
@@ -38,7 +35,7 @@ int CheckUci()
         if(UciCommand == "uci")
         {
             cout << "id name ";
-            cout << setfill('0') << Engine_Info() << " test\n";
+            cout << setfill('0') << Engine_Info() << "\n";
             cout << "id author David Cimbalista\n";
             cout << "option name TimePerMove type spin default 3 min 1 max 5\n";
             cout << "option name NalimovPath type string default NULL\n";
@@ -103,9 +100,9 @@ int CheckUci()
 			time.Start_Clock();
             for(int i = 0; i < 1000000; i++)
             {
-            	Exp_Generate_White_Moves(false);
+            	Generate_White_Moves(false);
             	White_Move_Spacer = 0;
-            	Exp_Generate_Black_Moves(false);
+            	Generate_Black_Moves(false);
             	Black_Move_Spacer = 0;
 			}
 			cout << time.Get_Time() << endl;
