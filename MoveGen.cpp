@@ -4,7 +4,7 @@ using namespace std;
 #include "Search.h"
 #include "magicmoves.h"
 
-#include "Experimental_Move_Generation.h"
+#include "Util.h"
 Bitboard White_Move_From_Stack[100];//Move stack is just an array of Bitboards(64-bit integers) containing only one bit set in each--the from square or the to square
 Bitboard White_Move_To_Stack[100];
 Bitboard Black_Move_From_Stack[100];
