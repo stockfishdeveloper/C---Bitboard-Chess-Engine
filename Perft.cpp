@@ -1,16 +1,15 @@
 #include "Perft.h"
 #include "Search.h"
-
 int Root_Perft(int depth)
 {
-    int n_moves, i;
+    int n_moves;
     Bitboard nodes = 0;
 
     if (depth == 0) return 1;
     Search::Current_Turn ? Generate_White_Moves(false) : Generate_Black_Moves(false);
     n_moves = Search::Current_Turn ? White_Move_Spacer : Black_Move_Spacer;
     Move move;
-    for (i = 0; i < n_moves; i++)
+    for(int i = 0; i < n_moves; i++)
     {
 
         Search::Current_Turn ? move.From = White_Move_From_Stack[i] : move.From = Black_Move_From_Stack[i];
@@ -41,15 +40,14 @@ int Root_Perft(int depth)
 }
 int Perft(int depth)
 {
-    int n_moves, i;
-    Bitboard nodes = 0;
-
     if (depth == 0) return 1;
+    int n_moves;
+    Bitboard nodes = 0;
     Search::Current_Turn ? Generate_White_Moves(false) : Generate_Black_Moves(false);
     n_moves = Search::Current_Turn ? White_Move_Spacer : Black_Move_Spacer;
-    //cout << "n_moves: " << n_moves << endl;
     Move move;
-    for (i = 0; i < n_moves; i++)
+    Search::Current_Turn ? move.Black_Temp_Move_Spacer = 0 : move.Black_Temp_Move_Spacer = 0;
+    for (int i = 0; i < n_moves; i++)
     {
         Search::Current_Turn ? move.From = White_Move_From_Stack[i] : move.From = Black_Move_From_Stack[i];
         Search::Current_Turn ? move.To = White_Move_To_Stack[i] : move.To = Black_Move_To_Stack[i];
@@ -59,5 +57,4 @@ int Perft(int depth)
         move.Undo_Move();
     }
     return nodes;
-
 }
