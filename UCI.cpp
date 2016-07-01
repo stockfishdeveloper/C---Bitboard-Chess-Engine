@@ -1,9 +1,5 @@
 #include "Bitboard.h"
 #include "UCI.h"
-#include <string>
-#include <iomanip>
-#include <sstream>
-#include <ctime>
 #include "windows.h"
 #include <thread> //For multithreading--must be using C++11 compiler
 #include "Thread.h"//Threading header file
@@ -35,7 +31,7 @@ int CheckUci()
         if(UciCommand == "uci")
         {
             cout << "id name ";
-            cout << setfill('0') << Engine_Info() << "\n";
+            cout << setfill('0') << Engine_Info() << " new\n";
             cout << "id author David Cimbalista\n";
             cout << "option name TimePerMove type spin default 3 min 1 max 5\n";
             cout << "option name NalimovPath type string default NULL\n";
@@ -270,13 +266,11 @@ int CheckUci()
             Timer timer;
             Search::Searching = true;
             Search::Time_Allocation = 10000;
-            //std::thread t(Runthread, &timer);//Spawn new thread to constantly output infos the the GUI while the search function is running
             timer.Start_Clock();
             int h = 0, j = 0;
             Move blank;
             blank = Search::Think(wtime, btime, h, j);
             Search::Searching = false;
-            //t.join();
             for( int h = 0; h < 64; h++)
             {
                 if(GeneralBoard[h] & blank.From)
@@ -311,11 +305,8 @@ int CheckUci()
         }
         else if (UciCommand == "moves")
         {
-//Log << UciCommand << endl;
             Moves_Command();
         }
-
-
     }
 
     return 0;
@@ -346,7 +337,7 @@ int Parse_Fen(string Fen)
     Black_Knights = 0;
     Black_Pawns = 0;
     char Current_Square;
-    for(int h = 0; h < (Fen.length()); h++)
+    for(unsigned int h = 0; h < (Fen.length()); h++)
     {
         Current_Square = Fen[h];
         Read_Fen(Current_Square);
@@ -576,8 +567,8 @@ int Moves_Command()
         string f2 = "f2";
         string g2 = "g2";
         string h2 = "h2";
-        Bitboard Fr;
-        Bitboard T_o;
+        Bitboard Fr = 0;;
+        Bitboard T_o = 0;;
         for(int i = 0; i < 64; i++)
         {
             if(First_Part == PlayerMoves[i])
