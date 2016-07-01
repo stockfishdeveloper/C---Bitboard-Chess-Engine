@@ -1,5 +1,4 @@
 using namespace std;
-#include <cassert>
 #include "Bitboard.h"
 #include "Search.h"
 #include "Eval.h"
@@ -72,8 +71,10 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
     int matemoves = 1000;
     for(int q = 1; q < MAXDEPTH; q++)
     {
-    	//Search::Clear();
-    	/*if(q > 1)
+    	output.lock();
+		cout << "info depth " << q << endl;
+        output.unlock();
+    	/*if(q > 5)
     	{
     		rootAlpha = std::max(rootstack[q].Score - 18, -100000);
     		rootBeta = std::min(rootstack[q].Score + 18, 100000);
@@ -81,15 +82,14 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
         if(Current_Turn == true)
         {
             Time_Allocation = wtime;
-            //assert(Time_Allocation > 0);
             Depth = q;
             if(q == 1) Generate_White_Moves(false);
             Move wh;
             move = wh;
+            wh.White_Temp_Move_Spacer = White_Move_Spacer;
             for(int h = 0; h < White_Move_Spacer; h++)
             {
-            	//cout << PlayerMoves[move.Convert_Bitboard(White_Move_From_Stack[h])] << PlayerMoves[move.Convert_Bitboard(White_Move_To_Stack[h])] << endl;
-                if(q == 1)
+            	if(q == 1)
                 {
                     move.From = White_Move_From_Stack[h];
                     move.To = White_Move_To_Stack[h];
@@ -118,21 +118,18 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
                     Log << " currmovenumber " << (i + 1) << endl;
                     output.unlock();
                 }
-
                 Make_White_Search_Move(move.From, move.To, move.Move_Type);
-                int Temp_Move = SearchMin(rootAlpha, rootBeta, (q), &line, true);
-                move.Undo_Move();
+                int Temp_Move = SearchMin(rootAlpha, rootBeta, (q - 1), &line, true);
                 (rootstack[i]).Score = Temp_Move;
-                if (Temp_Move < rootAlpha)
+                move.Undo_Move();
+                if(Temp_Move < rootAlpha)
                 {
-                    rootAlpha = -100000;
-                    rootBeta = 100000;
+                    rootAlpha -= 18;
                     continue;
                 }
                 if(Temp_Move > rootBeta)
                 {
-                    rootBeta = 100000;
-                    rootAlpha = -100000;
+                    rootBeta += 18;
                     continue;
                 }
                 if(Temp_Move > rootAlpha)
@@ -143,51 +140,10 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
                     delete f;
                     ::PVline.argmove[0] = move;
                     ::PVline.score = Temp_Move;
-                    ::PVline.cmove = 1;
+                    ::PVline.cmove = line.cmove + 1;
                     memcpy(::PVline.argmove + 1, line.argmove, line.cmove * sizeof(Move));
                     Best = move;
                     Best.Score = Temp_Move;
-                    output.lock();
-                    cout << "info multipv 1 depth " << q + 1 << " seldepth " << Search::Seldepth << " score ";
-                    Log << "<< info multipv 1 depth " << q + 1 << " seldepth " << Search::Seldepth << " score ";
-                    if(Temp_Move == 10000)
-                    {
-                    	if(q + 1 < matemoves)
-                    	{
-                        cout << "mate " << ((q + 1) / 2);
-                        Log << "mate " << ((q + 1) / 2);
-                        matemoves = q + 1;
-                    	}
-                    	else
-                    	{
-                    		cout << "mate " << matemoves / 2;
-                        	Log << "mate " << matemoves / 2;
-						}
-                    }
-                    else if(Temp_Move == -10000)
-                    {
-                        if(q + 1 < matemoves)
-                    	{
-                        cout << "mate " << ((q + 1) / 2);
-                        Log << "mate " << ((q + 1) / 2);
-                        matemoves = q + 1;
-                    	}
-                    	else
-                    	{
-                    		cout << "mate " << matemoves / 2;
-                        	Log << "mate " << matemoves / 2;
-						}
-                    }
-                    else
-                    {
-                        cout << "cp " << Temp_Move;
-                        Log << "cp " << Temp_Move;
-                    }
-                    cout << " pv " << ::PVline.Output() << line.Output();
-                    Log << " pv " << ::PVline.Output() << line.Output();
-                    cout << "time " << timer.Get_Time() << " nodes " << Search::Nodes << " nps " << (1000 *(Search::Nodes / (timer.Get_Time() + 1))) << endl;
-                    Log << "time " << timer.Get_Time() << " nodes " << Search::Nodes << " nps " << (1000 *(Search::Nodes / (timer.Get_Time() + 1))) << endl;
-                    output.unlock();
                     rootAlpha = Temp_Move;
                 }
                 if(timer.Get_Time() >= (Search::Time_Allocation / 30))
@@ -202,7 +158,6 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
         else
         {
         	Time_Allocation = btime;
-            //assert(Time_Allocation > 0);
             Depth = q;
             if(q == 1)
 			{
@@ -239,24 +194,21 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
                     Log << " currmovenumber " << (i + 1) << endl;
                     output.unlock();
                 }
-
                 Make_Black_Search_Move(move.From, move.To, move.Move_Type);
-                int Temp_Move = SearchMax(rootAlpha, rootBeta, (q), &line, true);
-                move.Undo_Move();
+                int Temp_Move = SearchMax(rootAlpha, rootBeta, (q - 1), &line, true);
                 (rootstack[i]).Score = Temp_Move;
+                move.Undo_Move();
                 if (Temp_Move < rootAlpha)
                 {
-                    rootAlpha = -100000;
-                    rootBeta = 100000;
+                    rootAlpha -= 18;
                     continue;
                 }
                 if(Temp_Move > rootBeta)
                 {
-                    rootBeta = 100000;
-                    rootAlpha = -100000;
+                    rootBeta += 18;
                     continue;
                 }
-                else if(Temp_Move < rootBeta)
+                if(Temp_Move < rootBeta)
                 {
                     LINE* f = new LINE;
                     f->cmove = 0;
@@ -264,51 +216,10 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
                     delete f;
                     ::PVline.argmove[0] = move;
                     ::PVline.score = Temp_Move;
-                    ::PVline.cmove = 1;
+                    ::PVline.cmove = line.cmove + 1;
                     memcpy(::PVline.argmove + 1, line.argmove, line.cmove * sizeof(Move));
                     Best = move;
                     Best.Score = Temp_Move;
-                    output.lock();
-                    cout << "info multipv 1 depth " << q + 1 << " seldepth " << Search::Seldepth << " score ";
-                    Log << "<< info multipv 1 depth " << q + 1 << " seldepth " << Search::Seldepth << " score ";
-                    if(Temp_Move == -10000)
-                    {
-                        if(q + 1 < matemoves)
-                    	{
-                        cout << "mate " << ((q + 1) / 2);
-                        Log << "mate " << ((q + 1) / 2);
-                        matemoves = q + 1;
-                    	}
-                    	else
-                    	{
-                    		cout << "mate " << matemoves / 2;
-                        	Log << "mate " << matemoves / 2;
-						}
-                    }
-                    else if(Temp_Move == 10000)
-                    {
-                        if(q + 1 < matemoves)
-                    	{
-                        cout << "mate " << ((q + 1) / 2);
-                        Log << "mate " << ((q + 1) / 2);
-                        matemoves = q + 1;
-                    	}
-                    	else
-                    	{
-                    		cout << "mate " << matemoves / 2;
-                        	Log << "mate " << matemoves / 2;
-						}
-                    }
-                    else
-                    {
-                        cout << "cp " << -Temp_Move;
-                        Log << "cp " << -Temp_Move;
-                    }
-                    cout << " pv " << ::PVline.Output() << line.Output();
-                    Log << " pv " << ::PVline.Output() << line.Output();
-                    cout << "time " << timer.Get_Time() << " nodes " << Search::Nodes << " nps " << (1000 *(Search::Nodes / (timer.Get_Time() + 1))) << endl;
-                    Log << "time " << timer.Get_Time() << " nodes " << Search::Nodes << " nps " << (1000 *(Search::Nodes / (timer.Get_Time() + 1))) << endl;
-                    output.unlock();
                     rootBeta = Temp_Move;
                 }
                 if(timer.Get_Time() >= (Search::Time_Allocation / 30))
@@ -322,8 +233,10 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
         }
 
 
-		for(int i = 2; i < count; i++)
+		for(int i = 0; i < count; i++)
 		{
+			if((rootstack[i].From == Best.From) && (rootstack[i].To == Best.To))
+				rootstack[i].Score += (Current_Turn ? 1000 : -1000);
 			if((rootstack[i].Move_Type % 2) > 0)
 				rootstack[i].Score += (Current_Turn ? 20 : -20);
 			if((rootstack[i].Move_Type == 13) || (rootstack[i].Move_Type == 14))
@@ -336,6 +249,8 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
         Search::Order_Moves(rootstack, Current_Turn, count);
         for(int i = 0; i < count; i++)
         {
+        	//cout << PlayerMoves[rootstack[i].Convert_Bitboard(rootstack[i].From)] << PlayerMoves[rootstack[i].Convert_Bitboard(rootstack[i].To)] << " " << rootstack[i].Score << endl;
+        	rootstack[i].Score = 0;
             if(Current_Turn)
             {
                 White_Move_From_Stack[i] = rootstack[i].From;
@@ -351,63 +266,61 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
                 Black_Move_Spacer = count;
             }
         }
-
-        //count = 0;
-
-		/*output.lock();
-        cout << "info multipv 1 depth " << q + 1 << " seldepth " << Search::Seldepth << " score ";
-        Log << "<< info multipv 1 depth " << q + 1 << " seldepth " << Search::Seldepth << " score ";
+		
+		output.lock();
+		cout << "info multipv 1 depth " << q << " seldepth " << Search::Seldepth << " score ";
+        Log << "<< info multipv 1 depth " << q << " seldepth " << Search::Seldepth << " score ";
         if(Best.Score == 10000)
         {
-            if(q + 1 < matemoves)
-            {
-            cout << "mate " << ((q + 1) / 2);
-            Log << "mate " << ((q + 1) / 2);
-            }
+        	if(q + 1 < matemoves)
+                {
+                	cout << "mate " << (Current_Turn == true ? ((q + 1) / 2) : -((q + 1) / 2));
+                    Log << "mate " << (Current_Turn == true ? ((q + 1) / 2) : -((q + 1) / 2));
+                    matemoves = q + 1;
+                }
             else
-            {
-                cout << "mate " << matemoves / 2;
-                Log << "mate " << matemoves / 2;
-			}
+                {
+                    cout << "mate " << (Current_Turn == true ? matemoves / 2 : -matemoves / 2);
+                    Log << "mate " << (Current_Turn == true ? matemoves / 2 : -matemoves / 2);
+                }
         }
         else if(Best.Score == -10000)
         {
-            if(q + 1 < matemoves)
-            {
-            cout << "mate " << ((q + 1) / 2);
-            Log << "mate " << ((q + 1) / 2);
-            }
-            else
-            {
-                cout << "mate " << matemoves / 2;
-            	Log << "mate " << matemoves / 2;
-			}
-        }
+        	if(q + 1 < matemoves)
+                {
+        			cout << "mate " << (Current_Turn == true ? -((q + 1) / 2) : ((q + 1) / 2));
+        			Log << "mate " << (Current_Turn == true ? -((q + 1) / 2) : ((q + 1) / 2));
+        			matemoves = q + 1;
+        		}
+        	else
+                {
+                    cout << "mate " << (Current_Turn == true ? -matemoves / 2 : matemoves / 2);
+                    Log << "mate " << (Current_Turn == true ? -matemoves / 2 : matemoves / 2);
+                }
+    	}
         else
         {
-            cout << "cp " << Best.Score;
-            Log << "cp " << Best.Score;
-        }
+        cout << "cp " << Current_Turn ? Best.Score : -Best.Score;
+        Log << "cp " << Current_Turn ? Best.Score : -Best.Score;
+    	}
         cout << " pv " << ::PVline.Output() << line.Output();
         Log << " pv " << ::PVline.Output() << line.Output();
         cout << "time " << timer.Get_Time() << " nodes " << Search::Nodes << " nps " << (1000 *(Search::Nodes / (timer.Get_Time() + 1))) << endl;
         Log << "time " << timer.Get_Time() << " nodes " << Search::Nodes << " nps " << (1000 *(Search::Nodes / (timer.Get_Time() + 1))) << endl;
-        output.unlock();*/
+		output.unlock();
         LINE* f = new LINE;
         f->cmove = 0;
-        ::PVline = *f;
+        //::PVline = *f;
         line = *f;
         delete f;
-
-        //Search::Clear();//Clear search stacks, variables, etc.
 
         if(STOP_SEARCHING_NOW)
         {
             Time_Allocation = 0;
             return Best;
         }
-        rootAlpha = rootAlpha - 50;
-        rootBeta = rootBeta + 50;
+        //rootAlpha = rootAlpha - 50;
+        //rootBeta = rootBeta + 50;
         //rootAlpha = -100000;
     	//rootBeta = 100000;
     }
@@ -417,22 +330,18 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
 
 int Search::SearchMax(int alpha, int beta, int depth, LINE * pline, bool donullmove)
 {
-    /*if(STOP_SEARCHING_NOW)
-    return alpha;*/
-
     if(depth <= 1)
     {
         ++Nodes;
         pline->cmove = 0;
-        return QuiesceMax(alpha, beta);
+        return QuiesceMax(alpha, beta, pline, depth + 1);
     }
     LINE line;
-
 
     /*NULLMOVE PRUNING*******************************************************
     *************************************************************************
     *************************************************************************/
-    if((Search::Is_Mate() != -10000) && (donullmove) && (depth > 3))
+    /*if((Search::Is_Mate() != -10000) && (donullmove) && (depth > 3))
     {
         Search::Current_Turn = false;
         int Temp_Move = SearchMin(beta, beta - 1, depth - 3, &line, false);
@@ -444,7 +353,7 @@ int Search::SearchMax(int alpha, int beta, int depth, LINE * pline, bool donullm
             }
 
     }
-        Search::Current_Turn = true;
+        Search::Current_Turn = true;*/
     /************************************************************************
     *************************************************************************
     *************************************************************************/
@@ -454,15 +363,12 @@ int Search::SearchMax(int alpha, int beta, int depth, LINE * pline, bool donullm
     {
         alpha = Is_Mate();
         pline->score = alpha;
-        pline->cmove = depth;
+        pline->cmove = 0;
         return alpha;
-    }
-
+	}
     for(int i = 0; i < White_Move_Spacer; i++)
     {
         Nodes++;
-        /*if(STOP_SEARCHING_NOW)
-        return alpha;*/
         move.From = White_Move_From_Stack[i];
         move.To = White_Move_To_Stack[i];
         move.Move_Type = White_Move_Types[i];
@@ -473,7 +379,6 @@ int Search::SearchMax(int alpha, int beta, int depth, LINE * pline, bool donullm
         {
             return beta;
         }
-
         else if(Temp_Move > alpha)
         {
             pline->argmove[0] = move;
@@ -491,20 +396,17 @@ int Search::SearchMax(int alpha, int beta, int depth, LINE * pline, bool donullm
 
 int Search::SearchMin(int alpha, int beta, int depth, LINE * pline, bool donullmove)
 {
-    /*if(STOP_SEARCHING_NOW)
-    return beta;*/
     if(depth <= 1)
     {
-        //int Best;
         ++Nodes;
         pline->cmove = 0;
-        return QuiesceMin(alpha, beta);
+        return QuiesceMin(alpha, beta, pline, depth + 1);
     }
     LINE line;
     /*NULLMOVE PRUNING*******************************************************
     *************************************************************************
     *************************************************************************/
-    if((Search::Is_Mate() != 10000) && (donullmove) && (depth > 3))
+    /*if((Search::Is_Mate() != 10000) && (donullmove) && (depth > 3))
     {
         Search::Current_Turn = true;
         int Temp_Move = SearchMax(alpha, alpha + 1, depth - 3, &line, false);
@@ -515,7 +417,7 @@ int Search::SearchMin(int alpha, int beta, int depth, LINE * pline, bool donullm
                 return alpha;
             }
     }
-        Search::Current_Turn = false;
+        Search::Current_Turn = false;*/
     /************************************************************************
     *************************************************************************
     *************************************************************************/
@@ -526,7 +428,7 @@ int Search::SearchMin(int alpha, int beta, int depth, LINE * pline, bool donullm
     {
         beta = Is_Mate();
         pline->score = beta;
-        pline->cmove = depth;
+        pline->cmove = 0;
         return beta;
     }
 
@@ -535,7 +437,6 @@ int Search::SearchMin(int alpha, int beta, int depth, LINE * pline, bool donullm
     	move.From = Black_Move_From_Stack[i];
         move.To = Black_Move_To_Stack[i];
         move.Move_Type = Black_Move_Types[i];
-
         Nodes++;
         Make_Black_Search_Move(Black_Move_From_Stack[i], Black_Move_To_Stack[i], Black_Move_Types[i]);
         int Temp_Move = SearchMax(alpha, beta, depth - 1, &line, (donullmove ? false : true));
@@ -544,7 +445,6 @@ int Search::SearchMin(int alpha, int beta, int depth, LINE * pline, bool donullm
         {
             return alpha;
         }
-
         else if(Temp_Move < beta)
         {
             pline->argmove[0] = move;
@@ -1162,39 +1062,48 @@ void Search::Clear()
 
 }
 
-int Search::QuiesceMax(int alpha, int beta)
+int Search::QuiesceMax(int alpha, int beta, LINE * pline, int depth)
 {
 	int stand_pat = Eval::Evaluate_Position();
+	Search::Seldepth = Search::Depth + (depth > Search::Seldepth ? depth : Search::Seldepth);
 	Nodes++;
     if(stand_pat >= beta)
         return beta;
     if(alpha < stand_pat)
         alpha = stand_pat;
 	Generate_White_Moves(true);
-    Move move;
-    /*if(White_Move_Spacer == 0)
+	if(White_Move_Spacer == 0)
     {
-        alpha = Search::Is_Mate();
-    	return alpha;
-    }*/
-    bool table[White_Move_Spacer];
+    	pline->cmove = 0;
+    	Generate_White_Moves(false);
+		if(White_Move_Spacer == 0)
+		{
+			if(Search::Is_Mate() != 0)
+			return Search::Is_Mate();
+			return 0;
+		}
+        return stand_pat;
+    }
+    Move move;
+    LINE line;
+    /*bool table[White_Move_Spacer];
     for(int i = 0; i < White_Move_Spacer; i++)
     {
     	if(MVV_LVA(White_Move_Types[i], White_Move_To_Stack[i], true))
     	table[i] = true;
     	else
     	table[i] = false;
-	}
+	}*/
     for(int i = 0; i < White_Move_Spacer; i++)
     {
-    	if(table[i])
+    	if(MVV_LVA(White_Move_Types[i], White_Move_To_Stack[i], true))
     	{
         Nodes++;
         move.From = White_Move_From_Stack[i];
         move.To = White_Move_To_Stack[i];
         move.Move_Type = White_Move_Types[i];
         Make_White_Search_Move(White_Move_From_Stack[i], White_Move_To_Stack[i], White_Move_Types[i]);
-        int Temp_Move = QuiesceMin(alpha, beta);
+        int Temp_Move = QuiesceMin(alpha, beta, &line, depth + 1);
         move.Undo_Move();
         if(Temp_Move >= beta)
         {
@@ -1203,48 +1112,61 @@ int Search::QuiesceMax(int alpha, int beta)
 
         else if(Temp_Move > alpha)
         {
+        	pline->argmove[0] = move;
+            pline->score = Temp_Move;
+            memcpy(pline->argmove + 1, line.argmove, line.cmove * sizeof(Move));
+            pline->cmove = line.cmove + 1;
             alpha = Temp_Move;
         }
     	}
 
     }
-
+            
     return alpha;
 }
 
-int Search::QuiesceMin(int alpha, int beta)
+int Search::QuiesceMin(int alpha, int beta, LINE * pline, int depth)
 {
 	int stand_pat = Eval::Evaluate_Position();
+	Search::Seldepth = Search::Depth + (depth > Search::Seldepth ? depth : Search::Seldepth);
 	Nodes++;
     if( stand_pat <= alpha)
         return alpha;
     if(stand_pat < beta)
         beta = stand_pat;
 	Generate_Black_Moves(true);
-    Move move;
-    /*if(White_Move_Spacer == 0)
+	if(Black_Move_Spacer == 0)
     {
-        alpha = Search::Is_Mate();
-    	return alpha;
-    }*/
-    bool table[Black_Move_Spacer];
+    	pline->cmove = 0;
+    	Generate_Black_Moves(false);
+    	if(Black_Move_Spacer == 0)
+		{
+			if(Search::Is_Mate() != 0)
+			return Search::Is_Mate();
+			return 0;
+		}
+        return stand_pat;
+    }
+    Move move;
+    LINE line;
+    /*bool table[Black_Move_Spacer];
     for(int i = 0; i < Black_Move_Spacer; i++)
     {
     	if(MVV_LVA(Black_Move_Types[i], Black_Move_To_Stack[i], false))
     	table[i] = true;
     	else
     	table[i] = false;
-	}
+	}*/
     for(int i = 0; i < Black_Move_Spacer; i++)
     {
-    	if(table[i])
+    	if(MVV_LVA(Black_Move_Types[i], Black_Move_To_Stack[i], false))
     	{
         Nodes++;
         move.From = Black_Move_From_Stack[i];
         move.To = Black_Move_To_Stack[i];
         move.Move_Type = Black_Move_Types[i];
         Make_Black_Search_Move(Black_Move_From_Stack[i], Black_Move_To_Stack[i], Black_Move_Types[i]);
-        int Temp_Move = QuiesceMax(alpha, beta);
+        int Temp_Move = QuiesceMax(alpha, beta, &line, depth + 1);
         move.Undo_Move();
         if(Temp_Move <= alpha)
         {
@@ -1253,7 +1175,11 @@ int Search::QuiesceMin(int alpha, int beta)
 
         else if(Temp_Move < beta)
         {
-            beta = Temp_Move;
+        	pline->argmove[0] = move;
+            pline->score = Temp_Move;
+            memcpy(pline->argmove + 1, line.argmove, line.cmove * sizeof(Move));
+            pline->cmove = line.cmove + 1;
+			beta = Temp_Move;
         }
     	}    
 
