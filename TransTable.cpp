@@ -1,41 +1,32 @@
 #include "Bitboard.h"
 #include "Search.h"
 #include "TransTable.h"
-#include <cstdlib>
-#include <ctime>
-enum NodeType { Alpha, Exact, Beta };
-class TTEntry
-{
-	Bitboard key;
-	int depth;
-	int score;
-	Move best;
-};
-class TranspositionTable
-{
-	TTEntry table[100000];
-	TTEntry * probe(const Bitboard key);
-};
 
-Bitboard zobrist[64][6][2];
-//TODO: Castling added to Zobrist hashing
-void Init_Zobrist()
+TranspositionTable TT;
+TTEntry * TranspositionTable::probe(const Bitboard key1)
 {
-	srand(time(0));
-	for(int i = 0; i < 64; i++)
+	int index = key1 % 100000;
+	if(TT.table[index].key == key1)
+	return &table[index];
+	else
+	return NULL;
+}
+void TranspositionTable::save(int depth1, int score1, Move best1, NodeType n, Bitboard hashkey)
+{
+	int index = hashkey % 100000;
+	if(TT.table[index].depth < depth1)
 	{
-		zobrist[i][0][0] = rand();
-	
-	for(int j = 0; j < 6; j++)
-	{
-		zobrist[0][j][0] = rand();
-	for(int h = 0; h < 2; h++)
-	{
-		zobrist[0][0][h] = rand();
-	}
-	}
+		TTEntry tt;
+		tt.depth = depth1;
+		tt.score = score1;
+		tt.best = best1;
+		tt.key = hashkey;
+		tt.nodetype = n;
+		TT.table[index] = tt;
+		TT.count++;
 	}
 }
-
-//TranspositionTable TT;
-
+void TranspositionTable::clear()
+{
+	//std::memset(TT.table, 0, 1000 * sizeof(TTEntry));
+}
