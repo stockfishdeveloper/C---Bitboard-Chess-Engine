@@ -5,10 +5,11 @@
 #include "Thread.h"//Threading header file
 #include "Search.h"
 #include "Perft.h"
-
+#include "Zobrist.h"
 #include "Nalimov\TBINDEX.h"
 #include "MoveGen.h"
 #include "Util.h"
+#include "TransTable.h"
 using namespace std;
 int CheckUci();
 string UciCommand;
@@ -76,8 +77,9 @@ int CheckUci()
             btime = 0;
             Search::STOP_SEARCHING_NOW = false;
             Search::Nodes = 0;
-
             Search::Clear();
+            TT.clear();
+            //cout << Get_Current_Hash_Key() << endl;
 
         }
 		else if(UciCommand == "bench")
@@ -103,24 +105,6 @@ int CheckUci()
 			}
 			cout << time.Get_Time() << endl;
 			Search::Clear();
-			/*Generate_Black_Moves(true);
-			for(int i = 0; i < Black_Move_Spacer; i++)
-			{
-            for( int h = 0; h < 64; h++)
-        {
-            if(GeneralBoard[h] & Black_Move_From_Stack[i])
-            {
-                cout << PlayerMoves[h];
-            }
-        }
-        for( int h = 0; h < 64; h++)
-        {
-            if(GeneralBoard[h] & Black_Move_To_Stack[i])
-            {
-                cout  << PlayerMoves[h] << endl;
-            }
-        }
-    		}*/
 		}
         else if(UciCommand == "perft")
         {
