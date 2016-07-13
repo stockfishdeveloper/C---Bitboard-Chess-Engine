@@ -2,6 +2,11 @@
 #define UCI_H_INCLUDED
 using namespace std;
 #include <fstream>
+#include <string>
+#include <iomanip>
+#include <sstream>
+#include <ctime>
+#include <iostream>
 #include "Search.h"
 #include <chrono>
 extern LINE PVline;
