@@ -85,7 +85,7 @@ const int Eval::BKpsqt[64] =
 
 const int Eval::WBpsqt[64] =
 {
-	-20,-10,-40,-10,-10,-40,-10,-20,
+	-20,-10,  0,-10,-10,  0,-10,-20,
 	-10,  5,  0,  0,  0,  0,  5,-10,
 	-10, 10, 10, 10, 10, 10, 10,-10,
 	-10,  0, 10, 10, 10, 10,  0,-10,
@@ -103,7 +103,7 @@ const int Eval::BBpsqt[64] =
     -10,  0, 10, 10, 10, 10,  0,-10,
     -10, 10, 10, 10, 10, 10, 10,-10,
     -10,  5,  0,  0,  0,  0,  5,-10,
-    -20,-10,-40,-10,-10,-40,-10,-20
+    -20,-10,  0,-10,-10,  0,-10,-20
 };
 int White_Score = 0; //White's Score
 int Black_Score = 0; //Black's Score
@@ -278,5 +278,5 @@ const int Eval::Evaluate_Position()
     Black_Score += BKpsqt[bk];
 	}
         
-    return (White_Score - Black_Score); //Return the score from WHITE'S perspective
+    return (!Search::Current_Turn ? (White_Score - Black_Score) : (Black_Score - White_Score)); //Return the score from WHITE'S perspective
 }
