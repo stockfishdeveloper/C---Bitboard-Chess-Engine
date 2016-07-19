@@ -166,13 +166,14 @@ public:
 namespace Search
 {
 Move Think(int wtime, int btime, int winc, int binc);
-int SearchMax(int alpha, int beta, int depth, LINE * pline, bool donullmove);
-int SearchMin(int alpha, int beta, int depth, LINE * pline, bool donullmove);
-int QuiesceMax(int alpha, int beta, int depth);
-int QuiesceMin(int alpha, int beta, int depth);
+int AlphaBeta(int alpha, int beta, int depth, LINE * pline, bool donullmove);
+int QuiescenceSearch(int alpha, int beta, int depth);
+//int SearchMax(int alpha, int beta, int depth, LINE * pline, bool donullmove);
+//int SearchMin(int alpha, int beta, int depth, LINE * pline, bool donullmove);
+//int QuiesceMax(int alpha, int beta, int depth);
+//int QuiesceMin(int alpha, int beta, int depth);
 int Make_White_Search_Move(const Bitboard& From, const Bitboard& To, const int Move_Type);
 int Make_Black_Search_Move(const Bitboard& From, const Bitboard& To, const int Move_Type);
-bool MVV_LVA(int& Move_Type, Bitboard& To, bool WhiteToMove);
 int Get_Move_Score(Move& m, bool turn);
 extern Bitboard Nodes;
 extern bool Searching;
