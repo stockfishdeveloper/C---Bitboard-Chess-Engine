@@ -3,19 +3,27 @@
 #include "Bitboard.h"
 #include "Search.h"
 enum NodeType { Alpha, Exact, Beta };
+class TTMove
+{
+	public:
+		Bitboard From;
+		Bitboard To;
+};
 class TTEntry
 {
 	public:
+	//TTEntry() : key(0), depth(0), score(0), nodetype(Exact), visited(0) {}
 	Bitboard key;
 	int depth;
 	int score;
-	Move best;
+	TTMove best;
 	NodeType nodetype;
+	int visited;
 };
 class TranspositionTable
 {
 	public:
-	TTEntry table[100000];
+	TTEntry table[8388608];
 	int count = 0;
 	TTEntry * probe(const Bitboard key);
 	void save(int depth, int score, Move best, NodeType n, Bitboard haskkey);
