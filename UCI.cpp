@@ -18,6 +18,7 @@ ofstream Log("Log.txt");//For writing to a text file
 int wtime = 0;
 int btime = 0;
 int Time_Usage = 0;
+int searchtodepth = 100;
 LINE PVline;
 
 
@@ -32,7 +33,7 @@ int CheckUci()
         if(UciCommand == "uci")
         {
             cout << "id name ";
-            cout << setfill('0') << Engine_Info() << " new\n";
+            cout << setfill('0') << Engine_Info() << "\n";
             cout << "id author David Cimbalista\n";
             cout << "option name TimePerMove type spin default 3 min 1 max 5\n";
             cout << "option name NalimovPath type string default NULL\n";
@@ -235,7 +236,6 @@ int CheckUci()
 
         else if(UciCommand == "go")
         {
-
             string time_left_white = "";
             string time_left_black = "";
             cin >> time_left_white >> wtime >> time_left_black >> btime;
@@ -289,7 +289,7 @@ int CheckUci()
         }
         else if (UciCommand == "moves")
         {
-            Moves_Command();
+        	Moves_Command();
         }
     }
 
@@ -489,6 +489,8 @@ int Moves_Command()
     string Promotion_Type;
     while(true)
     {
+    	Move m(0);
+    	TT.save(0, 0, m, Exact, Get_Current_Hash_Key());
         cin.get();
         cin.get(First_Part, 3);
         Log << ">> " << First_Part;
@@ -559,7 +561,6 @@ int Moves_Command()
             {
             	Fr = GeneralBoard[i];
             }
-
         }
         for(int i = 0; i < 64; i++)
         {
@@ -567,7 +568,6 @@ int Moves_Command()
             {
             	T_o = GeneralBoard[i];
             }
-
         }
         if(((T_o & Eigth_Rank_White) && (Fr & Seventh_Rank_White) && (Fr & White_Pawns)) || ((T_o & Eigth_Rank_Black) && (Fr & Seventh_Rank_Black) && (Fr & Black_Pawns)))
         {
@@ -575,18 +575,9 @@ int Moves_Command()
             Log << Promotion_Type << endl;
             Parse_Moves(First_Part, Second_Part, Promotion_Type);
         }
-
         else
-        {
-
             Parse_Moves(First_Part, Second_Part);
-
-
-        }
         Search::Current_Turn ^= 1;
-//cout << "Black_Pieces: " << Black_Pieces << endl;
-//cout << "White_Pieces: " << White_Pieces << endl;
-	//Print_Board();
     }
 	return 0;
 }
@@ -910,7 +901,6 @@ int Parse_Moves(string First, string Second)
         }
 
     }
-    //Print_Board();
     return 0;
 }
 
