@@ -99,9 +99,14 @@ public:
 class LINE
 {
 public:
-    int cmove = 0;// Number of moves in the line.
+    int cmove;// Number of moves in the line.
     Move argmove[20];  // The line.
-    int score = 0;
+    int score;
+    LINE()
+    {
+    	cmove = 0;
+    	score = 0;
+	}
     string Output()
     {
         string f = "";
@@ -132,9 +137,7 @@ public:
 };
 class Timer
 {
-    /* return std::chrono::duration_cast<std::chrono::milliseconds>
-    (std::chrono::steady_clock::now().time_since_epoch()).count();*/
-public:
+	public:
     TimePoint begin_time;
     TimePoint end_time;
     Timer()
