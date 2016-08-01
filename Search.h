@@ -39,7 +39,6 @@ public:
     Bitboard Black_Knights2;
     Bitboard Black_Pawns2;
 
-	Bitboard Zobrist;
 	const int Convert_Bitboard(const Bitboard& board) const
     {
         if(board == 0)
@@ -171,6 +170,7 @@ namespace Search
 Move Think(int wtime, int btime, int winc, int binc);
 int AlphaBeta(int alpha, int beta, int depth, LINE * pline, bool donullmove);
 int QuiescenceSearch(int alpha, int beta, int depth);
+int MateSearch(int alpha, int beta, int depth);
 //int SearchMax(int alpha, int beta, int depth, LINE * pline, bool donullmove);
 //int SearchMin(int alpha, int beta, int depth, LINE * pline, bool donullmove);
 //int QuiesceMax(int alpha, int beta, int depth);
