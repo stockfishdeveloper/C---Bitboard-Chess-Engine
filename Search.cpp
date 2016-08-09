@@ -10,6 +10,7 @@ using namespace std;
 #include "Zobrist.h"
 #include "TransTable.h"
 #include "Thread.h"
+#include "Util.h"
 
 int Search::Time_Allocation = 0;
 bool Search::Searching = false;
@@ -17,41 +18,6 @@ Bitboard Search::Nodes = 0;
 int Search::Depth = 0;
 int Search::Seldepth = 0;
 bool Search::STOP_SEARCHING_NOW = false;
-bool Search::Current_Turn = false;
-Move m;
-
-void Move::Undo_Move()
-{
-    White_Pieces = White_Pieces2;
-    Black_Pieces = Black_Pieces2;
-    White_King = White_King2;
-    Black_King = Black_King2;
-    White_Queens = White_Queens2;
-    White_Rooks = White_Rooks2;
-    White_Bishops = White_Bishops2;
-    White_Knights = White_Knights2;
-    White_Pawns = White_Pawns2;
-    Black_Queens = Black_Queens2;
-    Black_Rooks = Black_Rooks2;
-    Black_Bishops = Black_Bishops2;
-    Black_Knights = Black_Knights2;
-    Black_Pawns = Black_Pawns2;
-    White_Move_Spacer = White_Temp_Move_Spacer;
-    for(int h = 0; h < White_Temp_Move_Spacer; h++)
-    {
-        White_Move_From_Stack[h] = Unconvert_Int(White_Temp_Move_From_Stack[h]);
-        White_Move_To_Stack[h] = Unconvert_Int(White_Temp_Move_To_Stack[h]);
-        White_Move_Types[h] = White_Temp_Move_Types[h];
-    }
-	Black_Move_Spacer = Black_Temp_Move_Spacer;
-    for(int h = 0; h < Black_Temp_Move_Spacer; h++)
-    {
-        Black_Move_From_Stack[h] = Unconvert_Int(Black_Temp_Move_From_Stack[h]);
-        Black_Move_To_Stack[h] = Unconvert_Int(Black_Temp_Move_To_Stack[h]);
-        Black_Move_Types[h] = Black_Temp_Move_Types[h];
-    }
-	Search::Current_Turn ^= 1;
-}
 
 Move Search::Think(int wtime, int btime, int winc, int binc)
 {
@@ -59,7 +25,7 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
     Best.Score = -100000;
     Timer timer;
     timer.Start_Clock();
-    Time_Allocation = (Current_Turn ? wtime : btime);
+    Time_Allocation = (pos.Current_Turn ? wtime : btime);
     Move move;
     int rootAlpha = -100000;
     int rootBeta = 100000;
@@ -77,27 +43,18 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
 		output.unlock();
 		if(q == 1)
 		{
-			Current_Turn ? Generate_White_Moves(false) : Generate_Black_Moves(false);
-			if((Current_Turn ? White_Move_Spacer : Black_Move_Spacer) == 1)
+			pos.Current_Turn ? Generate_White_Moves(false, &pos) : Generate_Black_Moves(false, &pos);
+			if(pos.numlegalmoves == 1)
             {
-            	move.From = Current_Turn ? White_Move_From_Stack[0] : Black_Move_From_Stack[0];
-            	move.To = Current_Turn ? White_Move_To_Stack[0] : Black_Move_To_Stack[0];
-                Best = move;
-                return Best;
+            	return pos.LegalMoves[0];
             }
 		}
-		Move wh;
-        move = wh;
-        Current_Turn ? (wh.White_Temp_Move_Spacer = White_Move_Spacer) : (wh.Black_Temp_Move_Spacer = Black_Move_Spacer);
-        if(q == 1)
+		if(q == 1)
             {
-            	for(int h = 0; h < (Current_Turn ? White_Move_Spacer : Black_Move_Spacer); h++)
+            	for(int h = 0; h < pos.numlegalmoves; h++)
                 	{
-                    	move.From = Current_Turn ? White_Move_From_Stack[h] : Black_Move_From_Stack[h];
-                    	move.To = Current_Turn ? White_Move_To_Stack[h] : Black_Move_To_Stack[h];
-                    	move.Move_Type = Current_Turn ? White_Move_Types[h] : Black_Move_Types[h];
-                    	move.Score = Get_Move_Score(move, Current_Turn);
-                    	rootstack.push_back(move);
+                    	pos.LegalMoves[h].Score = Get_Move_Score(pos.LegalMoves[h]);
+                    	rootstack.push_back(pos.LegalMoves[h]);
                     	count++;
                 	}
             }
@@ -105,53 +62,50 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
 			{
 				if((rootstack[i].From == Best.From) && (rootstack[i].To == Best.To))
 					rootstack[i].Score += 1000;
-				if((rootstack[i].Move_Type % 2) > 0)
+				if(rootstack[i].C != NONE)
 					rootstack[i].Score += 20;
-				if((rootstack[i].Move_Type == 13) || (rootstack[i].Move_Type == 14))
-					rootstack[i].Score += 40;
-				if(Get_Move_Score(rootstack[i], Current_Turn) > 0)
+				if(rootstack[i].Promotion == true)
+					rootstack[i].Score += 100;
+				/*if(Get_Move_Score(rootstack[i], pos.Current_Turn) > 0)
 				{
 					rootstack[i].Score += 50;
-				}
+				}*/
 			}
         std::sort(rootstack.begin(), rootstack.end(), [](const Move& lhs, const Move& rhs){ return (lhs.Score > rhs.Score);});
-        for(int i = 0; i < (Current_Turn ? White_Move_Spacer : Black_Move_Spacer); i++)
+        for(int i = 0; i < pos.numlegalmoves; i++)
             {
             	Nodes++;
-                move.From = rootstack[i].From;
-                move.To = rootstack[i].To;
-                move.Move_Type = rootstack[i].Move_Type;
                 if(q >= 2 && timer.Get_Time() > 1000)
                 {
                     output.lock();
-                    cout << "info currmove " << PlayerMoves[(move.Convert_Bitboard(move.From))] << PlayerMoves[(move.Convert_Bitboard(move.To))];
-                    Log << "<< info currmove " << PlayerMoves[(move.Convert_Bitboard(move.From))] << PlayerMoves[(move.Convert_Bitboard(move.To))];
+                    cout << "info currmove " << PlayerMoves[(Convert_Bitboard(rootstack[i].From))] << PlayerMoves[(Convert_Bitboard(rootstack[i].To))];
+                    Log << "<< info currmove " << PlayerMoves[(Convert_Bitboard(rootstack[i].From))] << PlayerMoves[(Convert_Bitboard(rootstack[i].To))];
                     cout << " currmovenumber " << (i + 1) << endl;
                     Log << " currmovenumber " << (i + 1) << endl;
                     output.unlock();
                 }
-                Current_Turn ? Make_White_Search_Move(move.From, move.To, move.Move_Type) : Make_Black_Search_Move(move.From, move.To, move.Move_Type);
-                int score = -AlphaBeta(-rootBeta, -rootAlpha, (q - 1), &line, true);
+                pos.Make_Move(rootstack[i]);
+                int score = -AlphaBeta(&pos, -rootBeta, -rootAlpha, (q - 1), &line, true);
                 (rootstack[i]).Score = score;
                 //cout << " " << score << endl;
                 if((score > rootBeta) || (score < rootAlpha))
                 {
                 	rootAlpha = -100000;
                 	rootBeta = 100000;
-                	score = -AlphaBeta(-rootBeta, -rootAlpha, (q - 1), &line, true);
+                	score = -AlphaBeta(&pos, -rootBeta, -rootAlpha, (q - 1), &line, true);
                 }
-                move.Undo_Move();
+                pos.Undo_Move(rootstack[i]);
                 if(score > rootAlpha)
                 {
                 	LINE* f = new LINE;
                     f->cmove = 0;
                     ::PVline = *f;
                     delete f;
-                    ::PVline.argmove[0] = move;
+                    ::PVline.argmove[0] = rootstack[i];
                     ::PVline.score = score;
                     ::PVline.cmove = line.cmove + 1;
                     memcpy(::PVline.argmove + 1, line.argmove, line.cmove * sizeof(Move));
-                    Best = move;
+                    Best = rootstack[i];
                     Best.Score = score;
                     Uci_Pv(q, Seldepth, Best, &matemoves, timer.Get_Time(), Nodes);
                     rootAlpha = score;
@@ -183,41 +137,43 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
     return Best;
 }
 
-int Search::AlphaBeta(int alpha, int beta, int depth, LINE * pline, bool donullmove)
+int Search::AlphaBeta(Position* posit, int alpha, int beta, int depth, LINE * pline, bool donullmove)
 {
-    if(depth <= 1)
+	if(depth <= 1)
     {
         ++Nodes;
         pline->cmove = 0;
-        return QuiescenceSearch(alpha, beta, depth + 1);
+        return QuiescenceSearch(posit, alpha, beta, depth + 1);
     }
+    Position position(posit);
     LINE line;
+    bool inCheck = (position.Current_Turn ? (Search::Is_Mate(&position) == -10000) : (Search::Is_Mate(&position) == 10000));
 	/*NULLMOVE PRUNING*******************************************************
     *************************************************************************
     *************************************************************************/
-    if(((Search::Is_Mate() != -10000) && (Search::Is_Mate() != 10000)) && (donullmove) && (depth > 3))
+    if((!inCheck) && (donullmove) && (depth > 3))
     {
-        Search::Current_Turn ^= 1;
-        int score = -AlphaBeta(-beta, -beta + 1, depth - 3, &line, false);
+        position.Current_Turn ^= 1;
+        int score = -AlphaBeta(&position, -beta, -beta + 1, depth - 3, &line, false);
         if(score >= beta)
             {
-                Search::Current_Turn ^= 1;
+                position.Current_Turn ^= 1;
                 return beta;
             }
-		Search::Current_Turn ^= 1;
+		position.Current_Turn ^= 1;
     }
     /************************************************************************
     *************************************************************************
     *************************************************************************/
-    Current_Turn ? Generate_White_Moves(false) : Generate_Black_Moves(false);
-    if((Current_Turn ? White_Move_Spacer : Black_Move_Spacer) == 0)
+    position.Current_Turn ? Generate_White_Moves(false, &position) : Generate_Black_Moves(false, &position);
+    if(position.numlegalmoves == 0)
     {
-        alpha = Is_Mate();
+        alpha = Is_Mate(&position);
         pline->score = alpha;
         pline->cmove = 0;
         return alpha;
 	}
-	TTEntry* tt = TT.probe(Get_Current_Hash_Key());
+	TTEntry* tt = TT.probe(Get_Current_Hash_Key(&position));
 	if(tt!= NULL)
 	{
 		if(tt->depth >= depth)
@@ -230,60 +186,59 @@ int Search::AlphaBeta(int alpha, int beta, int depth, LINE * pline, bool donullm
 				}
 		}
 	}
-	Move move;
-    NodeType node = Alpha;
+	NodeType node = Alpha;
     vector<Move> moves;
-    for(int i = 0; i < (Current_Turn ? White_Move_Spacer : Black_Move_Spacer); i++)
+    //moves.reserve(Current_Turn ? White_Move_Spacer : Black_Move_Spacer);
+    for(int i = 0; i < position.numlegalmoves; i++)
     	{
-    		Move m(0);
-    		m.From = Current_Turn ? White_Move_From_Stack[i] : Black_Move_From_Stack[i];
-    		m.To = Current_Turn ? White_Move_To_Stack[i] : Black_Move_To_Stack[i]; 
-    		m.Move_Type = Current_Turn ? White_Move_Types[i] : Black_Move_Types[i]; 
-    		if(tt != NULL) if(tt->best.From == m.From && tt->best.To == m.To) m.Score += 100;
-    		if(m.Move_Type % 2 == 0)
-    			m.Score += 1;
-    		if((m.Move_Type == 13) || (m.Move_Type == 14))
-				m.Score += 8;
-    		m.Score += Get_Move_Score(m, Current_Turn);
-    		moves.push_back(m);
+    		if(tt != NULL) if(tt->best.From == position.LegalMoves[i].From && tt->best.To == position.LegalMoves[i].To) position.LegalMoves[i].Score += 1000;
+    		if(position.LegalMoves[i].C != NONE)
+    			position.LegalMoves[i].Score += Get_Move_Score(position.LegalMoves[i]);
+    		if(position.LegalMoves[i].Promotion)
+				position.LegalMoves[i].Score += 64 * 8;
+    		moves.push_back(position.LegalMoves[i]);
 		}
 	std::sort(moves.begin(), moves.end(), [](const Move& lhs, const Move& rhs){ return lhs.Score > rhs.Score; });
 	bool pvfound = false;
-	for(int i = 0; i < (Current_Turn ? White_Move_Spacer : Black_Move_Spacer); i++)
+	for(int i = 0; i < position.numlegalmoves; i++)
     {
         Nodes++;
-        move.From = moves[i].From;
-        move.To = moves[i].To;
-        move.Move_Type = moves[i].Move_Type;
-        Current_Turn ? Make_White_Search_Move(moves[i].From, moves[i].To, moves[i].Move_Type) : Make_Black_Search_Move(moves[i].From, moves[i].To, moves[i].Move_Type);
+        position.Make_Move(moves[i]);
         int score;
-        bool dofullsearch = true;
-        if(depth > 2
-		   && i > 3
-		   && (moves[i].Move_Type % 2 != 0))
-		   {
-		   		score = -AlphaBeta(-(alpha + 1), -alpha, depth - 2, &line, true);
-		   		dofullsearch = score > alpha;
-		   }
-		if(dofullsearch)
-		{
-			score = -AlphaBeta(-beta, -alpha, depth - 1, &line, true);
-		}
-        /*else if((pvfound == true) && (dofullsearch == 0))
+        if(i < 3)
+        	score = -AlphaBeta(&position, -beta, -alpha, depth - 1, &line, true);
+        else
+        	{
+        		if(depth > 2
+		   		&& i > 2
+		   		//&& (!(mt == Capture))
+		   		//&& (!(mt == Promotion))
+				&& !inCheck)
+		   		{
+		   			score = -AlphaBeta(&position, -(alpha + 1), -alpha, depth - 2, &line, true);
+		   			if(score > alpha)
+				   		score = -AlphaBeta(&position, -(alpha + 1), -alpha, depth - 1, &line, true);
+				   	if(score > alpha && score < beta)
+          				score = -AlphaBeta(&position, -beta, -alpha, depth - 1, &line, true);
+          		}
+		   		else
+		   			score = -AlphaBeta(&position, -beta, -alpha, depth - 1, &line, true);
+		   	}
+		/*else if((pvfound == true) && (dofullsearch == 0))
         {
 			score = -AlphaBeta(-(alpha-1), -alpha, depth - 1, &line, true);
 			if(score > alpha)
             	score = -AlphaBeta(-beta, -alpha, depth - 1, &line, true);
         }*/
-        move.Undo_Move();
+        position.Undo_Move(moves[i]);
         if(score >= beta)
         {
-        	TT.save(depth, beta, pline->argmove[0], Beta, Get_Current_Hash_Key());
+        	TT.save(depth, beta, pline->argmove[0], Beta, Get_Current_Hash_Key(&position));
         	return beta;
         }
         if(score > alpha)
         {
-        	pline->argmove[0] = move;
+        	pline->argmove[0] = moves[i];
             pline->score = score;
             memcpy(pline->argmove + 1, line.argmove, line.cmove * sizeof(Move));
             pline->cmove = line.cmove + 1;
@@ -292,490 +247,65 @@ int Search::AlphaBeta(int alpha, int beta, int depth, LINE * pline, bool donullm
             pvfound = true;
 		}
     }
-    TT.save(depth, alpha, pline->argmove[0], node, Get_Current_Hash_Key());
+    TT.save(depth, alpha, pline->argmove[0], node, Get_Current_Hash_Key(&position));
     return alpha;
 }
 
-Search::Make_White_Search_Move(const Bitboard& From, const Bitboard& To, const int Move_Type)
-{
-	switch(Move_Type)//This switch evaluates the type of move that accompanies the index of the move stack that q refers to
-    {
-
-    case 1://A (white) pawn capture
-    {
-        White_Pieces |= To;//Move white's pieces to the to square and from the from square
-        White_Pieces ^= From;
-        White_Pawns |= To;
-        White_Pawns ^= From;
-        Black_Pieces |= To;//Do the same for the black pieces because it is a capture: we have to remove a black piece
-        Black_Pieces ^= To;
-        Black_Queens |= To;
-        Black_Queens ^= To;
-        Black_Rooks |= To;
-        Black_Rooks ^= To;
-        Black_Bishops |= To;
-        Black_Bishops ^= To;
-        Black_Knights |= To;
-        Black_Knights ^= To;
-        Black_Pawns |= To;
-        Black_Pawns ^= To;
-        break;
-	}
-
-    case 2://"Plain" pawn push: one square
-        White_Pieces |= To;
-        White_Pieces ^= From;
-        White_Pawns |= To;
-        White_Pawns ^= From;
-		break;
-
-
-    case 3://Knight Capture
-        White_Pieces |= To;
-        White_Pieces ^= From;
-        White_Knights |= To;
-        White_Knights ^= From;
-        Black_Pieces |= To;
-        Black_Pieces ^= To;
-        Black_Queens |= To;
-        Black_Queens ^= To;
-        Black_Rooks |= To;
-        Black_Rooks ^= To;
-        Black_Bishops |= To;
-        Black_Bishops ^= To;
-        Black_Knights |= To;
-        Black_Knights ^= To;
-        Black_Pawns |= To;
-        Black_Pawns  ^= To;
-        break;
-
-    case 4://Plain knight move
-        White_Pieces |= To;
-        White_Pieces ^= From;
-        White_Knights |= To;
-        White_Knights ^= From;
-        break;
-
-    case 5://Bishop capture
-        White_Pieces |= To;
-        White_Pieces ^= From;
-        White_Bishops |= To;
-        White_Bishops ^= From;
-        Black_Pieces |= To;
-        Black_Pieces ^= To;
-        Black_Queens |= To;
-        Black_Queens ^= To;
-        Black_Rooks |= To;
-        Black_Rooks ^= To;
-        Black_Bishops |= To;
-        Black_Bishops ^= To;
-        Black_Knights |= To;
-        Black_Knights ^= To;
-        Black_Pawns |= To;
-        Black_Pawns  ^= To;
-        break;
-
-    case 6://"Plain" bishop move
-        White_Pieces |= To;
-        White_Pieces ^= From;
-        White_Bishops |= To;
-        White_Bishops ^= From;
-        break;
-
-    case 7://Rook capture
-        White_Pieces |= To;
-        White_Pieces ^= From;
-        White_Rooks |= To;
-        White_Rooks ^= From;
-        Black_Pieces |= To;
-        Black_Pieces ^= To;
-        Black_Queens |= To;
-        Black_Queens ^= To;
-        Black_Rooks |= To;
-        Black_Rooks ^= To;
-        Black_Bishops |= To;
-        Black_Bishops ^= To;
-        Black_Knights |= To;
-        Black_Knights ^= To;
-        Black_Pawns |= To;
-        Black_Pawns  ^= To;
-        break;
-
-    case 8://"Plain" rook move
-        White_Pieces |= To;
-        White_Pieces ^= From;
-        White_Rooks |= To;
-        White_Rooks ^= From;
-        break;
-
-    case 9://Queen capture
-        White_Pieces |= To;
-        White_Pieces ^= From;
-        White_Queens |= To;
-        White_Queens ^= From;
-        Black_Pieces |= To;
-        Black_Pieces ^= To;
-        Black_Queens |= To;
-        Black_Queens ^= To;
-        Black_Rooks |= To;
-        Black_Rooks ^= To;
-        Black_Bishops |= To;
-        Black_Bishops ^= To;
-        Black_Knights |= To;
-        Black_Knights ^= To;
-        Black_Pawns |= To;
-        Black_Pawns  ^= To;
-        break;
-
-    case 10://"Plain" queen move
-        White_Pieces |= To;
-        White_Pieces ^= From;
-        White_Queens |= To;
-        White_Queens ^= From;
-        break;
-
-    case 11://King capture
-        White_Pieces |= To;
-        White_Pieces ^= From;
-        White_King |= To;
-        White_King ^= From;
-        Black_Pieces |= To;
-        Black_Pieces ^= To;
-        Black_Queens |= To;
-        Black_Queens ^= To;
-        Black_Rooks |= To;
-        Black_Rooks ^= To;
-        Black_Bishops |= To;
-        Black_Bishops ^= To;
-        Black_Knights |= To;
-        Black_Knights ^= To;
-        Black_Pawns |= To;
-        Black_Pawns  ^= To;
-        break;
-
-    case 12://"Plain" king move
-        White_Pieces |= To;
-        White_Pieces ^= From;
-        White_King |= To;
-        White_King ^= From;
-        break;
-
-    case 13://Pawn promotion with capture; automatically promotes to queen
-        White_Pawns ^= From;
-        White_Pieces |= To;
-        White_Pieces ^= From;
-        White_Queens |= To;
-        Black_Pieces |= To;
-        Black_Pieces ^= To;
-        Black_Queens |= To;
-        Black_Queens ^= To;
-        Black_Rooks |= To;
-        Black_Rooks ^= To;
-        Black_Bishops |= To;
-        Black_Bishops ^= To;
-        Black_Knights |= To;
-        Black_Knights ^= To;
-        break;
-
-    case 14://"Plain" pawn promotion
-        White_Pawns ^= From;
-        White_Pieces |= To;
-        White_Pieces ^= From;
-        White_Queens |= To;
-        break;
-
-    case 15://Kigside castling
-        White_Pieces |= To;
-        White_Pieces ^= From;
-        White_Rooks |= 32;
-        White_Rooks ^= 128;
-        White_King |= 64;
-        White_King ^= 16;
-        break;
-
-
-    }
-
-    //Tidy up for the next call of the move generation functions
-    for(int t = 0; t < White_Move_Spacer; t++)
-    {
-        White_Move_From_Stack[t] = 0;//Clear the move from stack
-        White_Move_To_Stack[t] = 0;//Clear the move to stack
-        White_Move_Types[t] = 0;//Clear the move types associated with the moves
-    }
-    White_Move_Spacer = 0;
-	Search::Current_Turn = false;
-	return 0;
-
-}
-
-
-Search::Make_Black_Search_Move(const Bitboard& From, const Bitboard& To, const int Move_Type)
-{
-    switch(Move_Type)//This switch evaluates the type of move that accompanies the index of the move stack that Move_Type refers to
-    {
-
-    case 1://A (white) pawn capture
-        Black_Pieces |= To;//Move white's pieces to the to square and from the from square
-        Black_Pieces ^= From;
-        Black_Pawns |= To;
-        Black_Pawns ^= From;
-        White_Pieces |= To;//Do the same for the black pieces because it is a capture: we have to remove a black piece
-        White_Pieces ^= To;
-        White_Queens |= To;
-        White_Queens ^= To;
-        White_Rooks |= To;
-        White_Rooks ^= To;
-        White_Bishops |= To;
-        White_Bishops ^= To;
-        White_Knights |= To;
-        White_Knights ^= To;
-        White_Pawns |= To;
-        White_Pawns  ^= To;
-        break;
-
-
-    case 2://"Plain" pawn push: one square
-        Black_Pieces |= To;
-        Black_Pieces ^= From;
-        Black_Pawns |= To;
-        Black_Pawns ^= From;
-        break;
-
-
-    case 3://Knight Capture
-        Black_Pieces |= To;
-        Black_Pieces ^= From;
-        Black_Knights |= To;
-        Black_Knights ^= From;
-        White_Pieces |= To;
-        White_Pieces ^= To;
-        White_Queens |= To;
-        White_Queens ^= To;
-        White_Rooks |= To;
-        White_Rooks ^= To;
-        White_Bishops |= To;
-        White_Bishops ^= To;
-        White_Knights |= To;
-        White_Knights ^= To;
-        White_Pawns |= To;
-        White_Pawns  ^= To;
-        break;
-
-    case 4://"Plain" knight move
-        Black_Pieces |= To;
-        Black_Pieces ^= From;
-        Black_Knights |= To;
-        Black_Knights ^= From;
-        break;
-
-    case 5://Bishop capture
-        Black_Pieces |= To;
-        Black_Pieces ^= From;
-        Black_Bishops |= To;
-        Black_Bishops ^= From;
-        White_Pieces |= To;
-        White_Pieces ^= To;
-        White_Queens |= To;
-        White_Queens ^= To;
-        White_Rooks |= To;
-        White_Rooks ^= To;
-        White_Bishops |= To;
-        White_Bishops ^= To;
-        White_Knights |= To;
-        White_Knights ^= To;
-        White_Pawns |= To;
-        White_Pawns  ^= To;
-        break;
-
-    case 6://"Plain" bishop move
-        Black_Pieces |= To;
-        Black_Pieces ^= From;
-        Black_Bishops |= To;
-        Black_Bishops ^= From;
-        break;
-
-    case 7://Rook capture
-        Black_Pieces |= To;
-        Black_Pieces ^= From;
-        Black_Rooks |= To;
-        Black_Rooks ^= From;
-        White_Pieces |= To;
-        White_Pieces ^= To;
-        White_Queens |= To;
-        White_Queens ^= To;
-        White_Rooks |= To;
-        White_Rooks ^= To;
-        White_Bishops |= To;
-        White_Bishops ^= To;
-        White_Knights |= To;
-        White_Knights ^= To;
-        White_Pawns |= To;
-        White_Pawns  ^= To;
-        break;
-
-    case 8://"Plain" rook move
-        Black_Pieces |= To;
-        Black_Pieces ^= From;
-        Black_Rooks |= To;
-        Black_Rooks ^= From;
-        break;
-
-    case 9://Queen capture
-        Black_Pieces |= To;
-        Black_Pieces ^= From;
-        Black_Queens |= To;
-        Black_Queens ^= From;
-        White_Pieces |= To;
-        White_Pieces ^= To;
-        White_Queens |= To;
-        White_Queens ^= To;
-        White_Rooks |= To;
-        White_Rooks ^= To;
-        White_Bishops |= To;
-        White_Bishops ^= To;
-        White_Knights |= To;
-        White_Knights ^= To;
-        White_Pawns |= To;
-        White_Pawns  ^= To;
-        break;
-
-    case 10://"Plain" queen move
-        Black_Pieces |= To;
-        Black_Pieces ^= From;
-        Black_Queens |= To;
-        Black_Queens ^= From;
-        break;
-
-    case 11://King capture
-        Black_Pieces |= To;
-        Black_Pieces ^= From;
-        Black_King |= To;
-        Black_King ^= From;
-        White_Pieces |= To;
-        White_Pieces ^= To;
-        White_Queens |= To;
-        White_Queens ^= To;
-        White_Rooks |= To;
-        White_Rooks ^= To;
-        White_Bishops |= To;
-        White_Bishops ^= To;
-        White_Knights |= To;
-        White_Knights ^= To;
-        White_Pawns |= To;
-        White_Pawns  ^= To;
-        break;
-
-    case 12://"Plain" king move
-        Black_Pieces |= To;
-        Black_Pieces ^= From;
-        Black_King |= To;
-        Black_King ^= From;
-        break;
-
-    case 13://Pawn promotion with capture; automatically promotes to queen
-        Black_Pawns ^= From;
-        Black_Pieces |= To;
-        Black_Pieces ^= From;
-        Black_Queens |= To;
-        White_Pieces |= To;
-        White_Pieces ^= To;
-        White_Queens |= To;
-        White_Queens ^= To;
-        White_Rooks |= To;
-        White_Rooks ^= To;
-        White_Bishops |= To;
-        White_Bishops ^= To;
-        White_Knights |= To;
-        White_Knights ^= To;
-        break;
-
-    case 14://"Plain" pawn promotion
-        Black_Pawns ^= From;
-        Black_Pieces |= To;
-        Black_Pieces ^= From;
-        Black_Queens |= To;
-        break;
-
-    case 15://Kigside castling
-        Black_Pieces |= To;
-        Black_Pieces ^= From;
-        Black_Rooks |= 2305843009213693952;
-        Black_Rooks ^= 9223372036854775808ULL;
-        Black_King |= 4611686018427387904;
-        Black_King ^= 1152921504606846976;
-        break;
-    }
-
-    //Tidy up for the next call of the move generation functions
-    for(int t = 0; t < Black_Move_Spacer; t++)
-    {
-        Black_Move_From_Stack[t] = 0;//Clear the move from stack
-        Black_Move_To_Stack[t] = 0;//Clear the move to stack
-        Black_Move_Types[t] = 0;//Clear the move types associated with the moves
-    }
-    Black_Move_Spacer = 0;
-
-    Search::Current_Turn  = true;
-    return 0;
-
-}
-
-Search::Is_Mate()
+Search::Is_Mate(Position* position)
 {
 	int score = 0;
     int h;
         for(int j = 0; j < 64; j++)
         {
-            if(White_King & GeneralBoard[j])//Get the index (0-63) of White's king
+            if(position->White_King & GeneralBoard[j])//Get the index (0-63) of White's king
             {
                 h = j;
                 break;
             }
         }
-        Bitboard BAttacks = Bmagic(h, (White_Pieces | Black_Pieces));
-        Bitboard RAttacks = Rmagic(h, (White_Pieces | Black_Pieces));
-        Bitboard QAttacks = Qmagic(h, (White_Pieces | Black_Pieces));
+        Bitboard BAttacks = Bmagic(h, (position->White_Pieces | position->Black_Pieces));
+        Bitboard RAttacks = Rmagic(h, (position->White_Pieces | position->Black_Pieces));
+        Bitboard QAttacks = Qmagic(h, (position->White_Pieces | position->Black_Pieces));
 
-        if(BAttacks & (Black_Bishops))
+        if(BAttacks & (position->Black_Bishops))
             score = -1;
-        if(RAttacks & (Black_Rooks))
+        if(RAttacks & (position->Black_Rooks))
             score = -1;
-        if(QAttacks & (Black_Queens))
+        if(QAttacks & (position->Black_Queens))
             score = -1;
-        if(Knight_Lookup_Table[h] & Black_Knights)
+        if(Knight_Lookup_Table[h] & position->Black_Knights)
             score = -1;
-        if(King_Lookup_Table[h] & Black_King)
+        if(King_Lookup_Table[h] & position->Black_King)
             score = -1;
-        Bitboard Spare = Black_Pawns;
+        Bitboard Spare = position->Black_Pawns;
         Spare |= A_Pawn_Mask;
         Spare ^= A_Pawn_Mask;
-        if((Spare >> 7) & White_King)
+        if((Spare >> 7) & position->White_King)
             score = -1;
-        Bitboard Spare2 = Black_Pawns;
+        Bitboard Spare2 = position->Black_Pawns;
         Spare2 |= H_Pawn_Mask;
         Spare2 ^= H_Pawn_Mask;
-        if((Spare2 >> 9) & White_King)
+        if((Spare2 >> 9) & position->White_King)
             score = -1;
-        Bitboard Black_Pawns5 = Black_Pawns;
+        Bitboard Black_Pawns5 = position->Black_Pawns;
         Black_Pawns5 |= A_Pawn_Mask;
         Black_Pawns5 ^= A_Pawn_Mask;
         Black_Pawns5 |= H_Pawn_Mask;
         Black_Pawns5 ^= H_Pawn_Mask;
-        if(((Black_Pawns5 >> 7) | (Black_Pawns5 >> 9)) & White_King)
+        if(((Black_Pawns5 >> 7) | (Black_Pawns5 >> 9)) & position->White_King)
             score = -1;
         if(score != 0)
     	{
     		if(score < 0)
     		{
-    			if(Current_Turn)
+    			if(position->Current_Turn)
     				return -10000;
     			else
     				return 10000;
 			}
 			if(score > 0)
     		{
-    			if(Current_Turn)
+    			if(position->Current_Turn)
     				return 10000;
     			else
     				return -10000;
@@ -783,54 +313,54 @@ Search::Is_Mate()
 		}
         for(int j = 0; j < 64; j++)
         {
-            if(Black_King & GeneralBoard[j])//Get the index(0-63) of the black king
+            if(position->Black_King & GeneralBoard[j])//Get the index(0-63) of the black king
             {
                 h = j;
                 break;
             }
         }
-        BAttacks = Bmagic(h, (White_Pieces | Black_Pieces));
-        RAttacks = Rmagic(h, (White_Pieces | Black_Pieces));
-        QAttacks = Qmagic(h, (White_Pieces | Black_Pieces));
-        if(BAttacks & (White_Bishops))
+        BAttacks = Bmagic(h, (position->White_Pieces | position->Black_Pieces));
+        RAttacks = Rmagic(h, (position->White_Pieces | position->Black_Pieces));
+        QAttacks = Qmagic(h, (position->White_Pieces | position->Black_Pieces));
+        if(BAttacks & (position->White_Bishops))
             score = 1;
-        if(RAttacks & (White_Rooks))
+        if(RAttacks & (position->White_Rooks))
             score = 1;
-        if(QAttacks & (White_Queens))
+        if(QAttacks & (position->White_Queens))
             score = 1;
-        if(Knight_Lookup_Table[h] & White_Knights)
+        if(Knight_Lookup_Table[h] & position->White_Knights)
             score = 1;
-        if(King_Lookup_Table[h] & White_King)
+        if(King_Lookup_Table[h] & position->White_King)
             score = 1;
-        Spare = White_Pawns;
+        Spare = position->White_Pawns;
         Spare |= A_Pawn_Mask;
         Spare ^= A_Pawn_Mask;
-        if((Spare << 9) & Black_King)
+        if((Spare << 9) & position->Black_King)
             score = 1;
-        Bitboard Spare7 = White_Pawns;
+        Bitboard Spare7 = position->White_Pawns;
         Spare7 |= H_Pawn_Mask;
         Spare7 ^= H_Pawn_Mask;
-        if((Spare7 << 7) & Black_King)
+        if((Spare7 << 7) & position->Black_King)
             score = 1;
-        Bitboard White_Pawns2 = 0;
+        Bitboard White_Pawns2 = position->White_Pawns;
         White_Pawns2 |= A_Pawn_Mask;
         White_Pawns2 ^= A_Pawn_Mask;
         White_Pawns2 |= H_Pawn_Mask;
         White_Pawns2 ^= H_Pawn_Mask;
-        if(((White_Pawns << 7) | (White_Pawns << 9)) & GeneralBoard[h])
+        if(((White_Pawns2 << 7) | (White_Pawns2 << 9)) & GeneralBoard[h])
             score = 1;
         if(score != 0)
     	{
     		if(score < 0)
     		{
-    			if(Current_Turn)
+    			if(position->Current_Turn)
     				return -10000;
     			else
     				return 10000;
 			}
 			if(score > 0)
     		{
-    			if(Current_Turn)
+    			if(position->Current_Turn)
     				return 10000;
     			else
     				return -10000;
@@ -841,45 +371,30 @@ Search::Is_Mate()
 
 void Search::Clear()
 {
-    for(int t = 0; t < 100; t++)
-    {
-        White_Move_From_Stack[t] = 0;//Clear the move from stack
-        White_Move_To_Stack[t] = 0;//Clear the move to stack
-        White_Move_Types[t] = 0;//Clear the move types associated with the moves
-    }
-	Search::Depth = 0;
-    for(int t = 0; t < 100; t++)
-    {
-        Black_Move_From_Stack[t] = 0;//Clear the move from stack
-        Black_Move_To_Stack[t] = 0;//Clear the move to stack
-        Black_Move_Types[t] = 0;//Clear the move types associated with the moves
-    }
-
-    White_Move_Spacer = 0;
-    Black_Move_Spacer = 0;
-
+    Search::Depth = 0;
 }
 
-int Search::QuiescenceSearch(int alpha, int beta, int depth)
+int Search::QuiescenceSearch(Position* posit, int alpha, int beta, int depth)
 {
-	int stand_pat = Current_Turn ? Eval::Evaluate_Position() : -Eval::Evaluate_Position();
-	Search::Seldepth = std::max(depth, Seldepth);
+	int stand_pat = posit->Current_Turn ? Eval::Evaluate_Position(posit) : -Eval::Evaluate_Position(posit);
+	Search::Seldepth = std::max(depth, Search::Seldepth);
 	Nodes++;
     if(stand_pat >= beta)
         return beta;
     if(stand_pat > alpha)
         alpha = stand_pat;
-    Current_Turn ? Generate_White_Moves(true) : Generate_Black_Moves(true);
-	if((Current_Turn ? White_Move_Spacer : Black_Move_Spacer) == 0)
+    Position position(posit);
+    position.Current_Turn ? Generate_White_Moves(true, &position) : Generate_Black_Moves(true, &position);
+	if(position.numlegalmoves == 0)
     {
-    	Current_Turn ? Generate_White_Moves(false) : Generate_Black_Moves(false);
-		if((Current_Turn ? White_Move_Spacer : Black_Move_Spacer) == 0)
+    	position.Current_Turn ? Generate_White_Moves(false, &position) : Generate_Black_Moves(false, &position);
+		if(position.numlegalmoves == 0)
 		{
-			return Search::Is_Mate();
+			return Search::Is_Mate(&position);
 		}
         return stand_pat;
     }
-    TTEntry* tt = TT.probe(Get_Current_Hash_Key());
+    TTEntry* tt = TT.probe(Get_Current_Hash_Key(&position));
 	if(tt!= NULL)
 	{
 		if(tt->depth >= depth)
@@ -893,35 +408,28 @@ int Search::QuiescenceSearch(int alpha, int beta, int depth)
 		}
 	}
     Move move;
-    Move Best(0);
+    Move Best;
     vector<Move>stack;
+    //stack.reserve(Current_Turn ? White_Move_Spacer: Black_Move_Spacer);
     int count = 0;
-    for(int i = 0; i < (Current_Turn ? White_Move_Spacer : Black_Move_Spacer); i++)
+    for(int i = 0; i < position.numlegalmoves; i++)
     	{
-    		Move m(0);
-    		m.From = Current_Turn ? White_Move_From_Stack[i] : Black_Move_From_Stack[i];
-    		m.To = Current_Turn ? White_Move_To_Stack[i] : Black_Move_To_Stack[i]; 
-    		m.Move_Type = Current_Turn ? White_Move_Types[i] : Black_Move_Types[i]; 
-    		m.Score = Get_Move_Score(m, Current_Turn);
-    		if(tt != NULL) if(tt->best.From == m.From && tt ->best.To == m.To) m.Score += 100;
-    		stack.push_back(m);
-		}
+    		Move m = position.LegalMoves[i];
+    		m.Score = Get_Move_Score(m);
+    		if(tt != NULL) if(tt->best.From == m.From && tt->best.To == m.To) m.Score += 100;
+    		if(m.Score > 0) stack.push_back(m);
+    	}
 	std::sort(stack.begin(), stack.end(), [](const Move& lhs, const Move& rhs){ return lhs.Score > rhs.Score; });
 	NodeType n = Alpha;
-	for(int i = 0; i < (Current_Turn ? White_Move_Spacer : Black_Move_Spacer); i++)
+	for(int i = 0; i < (stack.size()); i++)
     {
-    	if(stack[i].Score > 0)
-    	{
-        Nodes++;
-        move.From = stack[i].From;
-        move.To = stack[i].To;
-        move.Move_Type = stack[i].Move_Type;
-        Current_Turn ? Make_White_Search_Move(stack[i].From, stack[i].To, stack[i].Move_Type) : Make_Black_Search_Move(stack[i].From, stack[i].To, stack[i].Move_Type);
-        int score = -QuiescenceSearch(-beta, -alpha, depth + 1);
-        move.Undo_Move();
+    	Nodes++;
+        position.Make_Move(stack[i]);
+        int score = -QuiescenceSearch(&position, -beta, -alpha, depth + 1);
+        position.Undo_Move(stack[i]);
         if(score >= beta)
         {
-        	TT.save(depth, beta, move, Beta, Get_Current_Hash_Key());
+        	TT.save(depth, beta, move, Beta, Get_Current_Hash_Key(&position));
             return beta;
         }
         if(score > alpha)
@@ -931,9 +439,8 @@ int Search::QuiescenceSearch(int alpha, int beta, int depth)
         	Best.Score = score;
         	alpha = score;
         }
-    	}
-	}
-    TT.save(depth, Best.Score, Best, n, Get_Current_Hash_Key());
+    }
+    TT.save(depth, Best.Score, Best, n, Get_Current_Hash_Key(&position));
     return alpha;
 }
 int Search::MateSearch(int alpha, int beta, int depth)
@@ -942,21 +449,18 @@ int Search::MateSearch(int alpha, int beta, int depth)
     {
         return 0;
     }
-    Current_Turn ? Generate_White_Moves(false) : Generate_Black_Moves(false);
-    if((Current_Turn ? White_Move_Spacer : Black_Move_Spacer) == 0)
+    pos.Current_Turn ? Generate_White_Moves(false, &pos) : Generate_Black_Moves(false, &pos);
+    if(pos.numlegalmoves == 0)
     {
-        return (Is_Mate() / 10000);
+        return (Is_Mate(&pos) / 10000);
     }
 	Move move;
-    for(int i = 0; i < (Current_Turn ? White_Move_Spacer : Black_Move_Spacer); i++)
+    for(int i = 0; i < pos.numlegalmoves; i++)
     {
         Nodes++;
-        move.From = Current_Turn ? White_Move_From_Stack[i] : Black_Move_From_Stack[i];
-        move.To = Current_Turn ? White_Move_To_Stack[i] : Black_Move_To_Stack[i];
-        move.Move_Type = Current_Turn ? White_Move_Types[i] : Black_Move_Types[i];
-        Current_Turn ? Make_White_Search_Move(move.From, move.To, move.Move_Type) : Make_Black_Search_Move(move.From, move.To, move.Move_Type);
+        pos.Make_Move(move);
         int score = -MateSearch(-beta, -alpha, depth - 1);
-        move.Undo_Move();
+        pos.Undo_Move(move);
         if(score >= beta)
         {
         	return beta;
@@ -969,21 +473,11 @@ int Search::MateSearch(int alpha, int beta, int depth)
     return alpha;
 }
 
-int Search::Get_Move_Score(Move& m, bool turn)
+int Search::Get_Move_Score(Move& m)
 {
-	int capturedtype = 0;
-	int movedtype = m.Move_Type;
-	if(m.To & (turn ? Black_Pawns : White_Pawns))
-		capturedtype = 1;
-	if(m.To & (turn ? Black_Knights : White_Knights))
-		capturedtype = 3;
-	if(m.To & (turn ? Black_Bishops : White_Bishops))
-		capturedtype = 5;
-	if(m.To & (turn ? Black_Rooks : White_Rooks))
-		capturedtype = 7;
-	if(m.To & (turn ? Black_Queens : White_Queens))
-		capturedtype = 9;
-	return capturedtype - movedtype; 
+	int capturedtype = m.C;
+	int movedtype = m.P;
+	return ((64 * capturedtype) - movedtype);
 }
 
 
