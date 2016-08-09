@@ -14,7 +14,7 @@ TTEntry * TranspositionTable::probe(const Bitboard key1)
 void TranspositionTable::save(int depth1, int score1, Move best1, NodeType n, Bitboard hashkey)
 {
 	int index = hashkey % 8388608;
-	if(TT.table[index].depth < depth1)
+	if(TT.table[index].depth <= depth1)
 	{
 		TTEntry tt;
 		tt.depth = depth1;
@@ -26,7 +26,6 @@ void TranspositionTable::save(int depth1, int score1, Move best1, NodeType n, Bi
 		TT.table[index] = tt;
 		TT.count++;
 	}
-	TT.table[index].visited++;
 }
 void TranspositionTable::clear()
 {
