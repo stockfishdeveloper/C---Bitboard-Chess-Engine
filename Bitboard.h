@@ -11,21 +11,6 @@ extern Bitboard Eigth_Rank_White;//For masking out pawn pushes to the eagth rank
 extern Bitboard Eigth_Rank_Black;//See last comment
 extern Bitboard Seventh_Rank_White;//For masking out pawn pushes to the eagth rank for each side--white and black
 extern Bitboard Seventh_Rank_Black;//See last comment
-extern Bitboard White_Pieces;
-extern Bitboard Black_Pieces;
-extern Bitboard White_King;
-extern Bitboard Black_King;
-extern Bitboard White_Queens;
-extern Bitboard White_Rooks;
-extern Bitboard White_Bishops;
-extern Bitboard White_Knights;
-extern Bitboard White_Pawns;
-extern Bitboard Black_Queens;
-extern Bitboard Black_Rooks;
-extern Bitboard Black_Bishops;
-extern Bitboard Black_Knights;
-extern Bitboard Black_Pawns;
-
 extern Bitboard CurrZobkey;
 //Contains the squares that a knight on a given index can move to. For example, the 0th element has the bits of b3 and c2 set
 extern Bitboard Knight_Lookup_Table[64];
