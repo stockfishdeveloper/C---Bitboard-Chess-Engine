@@ -1,11 +1,6 @@
 #include "Search.h"
 #include "Thread.h"
 #include "UCI.h"
-#include <chrono>
-#include <iostream>
-#include <windows.h>
-
-using namespace std;
 
 int nodes = 0;
 int movenum = 0;
