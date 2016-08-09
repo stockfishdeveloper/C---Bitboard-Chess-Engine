@@ -1,8 +1,9 @@
 #ifndef _Eval_H_Included_
 #define _Eval_H_Included_
+#include "Position.h"
 namespace Eval
 {
-const int Evaluate_Position();
+const int Evaluate_Position(Position* position);
 extern const int WNpsqt[64];
 extern const int BNpsqt[64];
 extern const int WPpsqt[64];
