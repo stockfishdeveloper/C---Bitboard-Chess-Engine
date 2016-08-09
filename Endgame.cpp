@@ -1,5 +1,6 @@
 #include "Bitboard.h"
 #include "Endgame.h"
+#include "Position.h"
 
 const int Center_Distance[64] =
 {
@@ -19,7 +20,7 @@ const int Drive_To_Corner(bool Losing_King)
 	{
 		for(int i = 0; i < 64; i++)
 		{
-			if(White_King & GeneralBoard[i])
+			if(pos.White_King & GeneralBoard[i])
 			{
 				return Center_Distance[i];
 			}		
@@ -29,7 +30,7 @@ const int Drive_To_Corner(bool Losing_King)
 	{
 		for(int i = 0; i < 64; i++)
 		{
-			if(Black_King & GeneralBoard[i])
+			if(pos.Black_King & GeneralBoard[i])
 			{
 				return Center_Distance[i];
 			}		
