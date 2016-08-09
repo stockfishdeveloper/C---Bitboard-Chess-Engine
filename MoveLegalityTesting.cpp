@@ -1,518 +1,159 @@
 #include "MoveLegalityTesting.h"
+#include "Position.h"
 #include "magicmoves.h"
 
 /* This function takes a bitboard called To_Square that has only the bit set that the move moves to; it takes a From_Square that is the same,
 and it has the bit set that the piece in the move moves to. It also takes a Move_Type, which tells it which way to update its bitboards
 */
-bool White_Is_Legal(const Bitboard& From_Square, const Bitboard& To_Square, const int Move_Type)
+bool White_Is_Legal(Position* position, Move move)
 {
-
-    Bitboard White_Pieces2 = White_Pieces; //Make a copy of all normal bitboards to use in this function
-    Bitboard Black_Pieces2 = Black_Pieces;
-    Bitboard White_King2 = White_King;
-    Bitboard Black_King2 = Black_King;
-    Bitboard White_Queens2 = White_Queens;
-    Bitboard White_Rooks2 = White_Rooks;
-    Bitboard White_Bishops2 = White_Bishops;
-    Bitboard White_Knights2 = White_Knights;
-    Bitboard White_Pawns2 = White_Pawns;
-    Bitboard Black_Queens2 = Black_Queens;
-    Bitboard Black_Rooks2 = Black_Rooks;
-    Bitboard Black_Bishops2 = Black_Bishops;
-    Bitboard Black_Knights2 = Black_Knights;
-    Bitboard Black_Pawns2 = Black_Pawns;
-    switch(Move_Type)
-    {
-    case 1://Pawn capture
-        White_Pieces2 |= To_Square;
-        White_Pieces2 ^= From_Square;
-        White_Pawns2 |= To_Square;
-        White_Pawns2 ^= From_Square;
-        Black_Pieces2 |= To_Square;
-        Black_Pieces2 ^= To_Square;
-        Black_Queens2 |= To_Square;
-        Black_Queens2 ^= To_Square;
-        Black_Rooks2 |= To_Square;
-        Black_Rooks2 ^= To_Square;
-        Black_Bishops2 |= To_Square;
-        Black_Bishops2 ^= To_Square;
-        Black_Knights2 |= To_Square;
-        Black_Knights2 ^= To_Square;
-        Black_Pawns2 |= To_Square;
-        Black_Pawns2  ^= To_Square;
-        break;
-
-
-    case 2://Pawn single push
-        White_Pieces2 |= To_Square;
-        White_Pieces2 ^= From_Square;
-        White_Pawns2 |= To_Square;
-        White_Pawns2 ^= From_Square;
-        break;
-
-
-    case 3://Knight capture
-        White_Pieces2 |= To_Square;
-        White_Pieces2 ^= From_Square;
-        White_Knights2 |= To_Square;
-        White_Knights2 ^= From_Square;
-        Black_Pieces2 |= To_Square;
-        Black_Pieces2 ^= To_Square;
-        Black_Queens2 |= To_Square;
-        Black_Queens2 ^= To_Square;
-        Black_Rooks2 |= To_Square;
-        Black_Rooks2 ^= To_Square;
-        Black_Bishops2 |= To_Square;
-        Black_Bishops2 ^= To_Square;
-        Black_Knights2 |= To_Square;
-        Black_Knights2 ^= To_Square;
-        Black_Pawns2 |= To_Square;
-        Black_Pawns2  ^= To_Square;
-        break;
-
-    case 4://Knight plain move
-        White_Pieces2 |= To_Square;
-        White_Pieces2 ^= From_Square;
-        White_Knights2 |= To_Square;
-        White_Knights2 ^= From_Square;
-        break;
-
-    case 5://Bishop capture
-        White_Pieces2 |= To_Square;
-        White_Pieces2 ^= From_Square;
-        White_Bishops2 |= To_Square;
-        White_Bishops2 ^= From_Square;
-        Black_Pieces2 |= To_Square;
-        Black_Pieces2 ^= To_Square;
-        Black_Queens2 |= To_Square;
-        Black_Queens2 ^= To_Square;
-        Black_Rooks2 |= To_Square;
-        Black_Rooks2 ^= To_Square;
-        Black_Bishops2 |= To_Square;
-        Black_Bishops2 ^= To_Square;
-        Black_Knights2 |= To_Square;
-        Black_Knights2 ^= To_Square;
-        Black_Pawns2 |= To_Square;
-        Black_Pawns2  ^= To_Square;
-        break;
-
-    case 6://Bishop normal move
-        White_Pieces2 |= To_Square;
-        White_Pieces2 ^= From_Square;
-        White_Bishops2 |= To_Square;
-        White_Bishops2 ^= From_Square;
-        break;
-
-    case 7://Rook capture
-        White_Pieces2 |= To_Square;
-        White_Pieces2 ^= From_Square;
-        White_Rooks2 |= To_Square;
-        White_Rooks2 ^= From_Square;
-        Black_Pieces2 |= To_Square;
-        Black_Pieces2 ^= To_Square;
-        Black_Queens2 |= To_Square;
-        Black_Queens2 ^= To_Square;
-        Black_Rooks2 |= To_Square;
-        Black_Rooks2 ^= To_Square;
-        Black_Bishops2 |= To_Square;
-        Black_Bishops2 ^= To_Square;
-        Black_Knights2 |= To_Square;
-        Black_Knights2 ^= To_Square;
-        Black_Pawns2 |= To_Square;
-        Black_Pawns2  ^= To_Square;
-        break;
-
-    case 8://Rook normal move
-        White_Pieces2 |= To_Square;
-        White_Pieces2 ^= From_Square;
-        White_Rooks2 |= To_Square;
-        White_Rooks2 ^= From_Square;
-        break;
-
-    case 9://Queen capture
-        White_Pieces2 |= To_Square;
-        White_Pieces2 ^= From_Square;
-        White_Queens2 |= To_Square;
-        White_Queens2 ^= From_Square;
-        Black_Pieces2 |= To_Square;
-        Black_Pieces2 ^= To_Square;
-        Black_Queens2 |= To_Square;
-        Black_Queens2 ^= To_Square;
-        Black_Rooks2 |= To_Square;
-        Black_Rooks2 ^= To_Square;
-        Black_Bishops2 |= To_Square;
-        Black_Bishops2 ^= To_Square;
-        Black_Knights2 |= To_Square;
-        Black_Knights2 ^= To_Square;
-        Black_Pawns2 |= To_Square;
-        Black_Pawns2  ^= To_Square;
-        break;
-
-    case 10://Queen normal move
-        White_Pieces2 |= To_Square;
-        White_Pieces2 ^= From_Square;
-        White_Queens2 |= To_Square;
-        White_Queens2 ^= From_Square;
-        break;
-
-    case 11://King capture
-        White_Pieces2 |= To_Square;
-        White_Pieces2 ^= From_Square;
-        White_King2 |= To_Square;
-        White_King2 ^= From_Square;
-        Black_Pieces2 |= To_Square;
-        Black_Pieces2 ^= To_Square;
-        Black_Queens2 |= To_Square;
-        Black_Queens2 ^= To_Square;
-        Black_Rooks2 |= To_Square;
-        Black_Rooks2 ^= To_Square;
-        Black_Bishops2 |= To_Square;
-        Black_Bishops2 ^= To_Square;
-        Black_Knights2 |= To_Square;
-        Black_Knights2 ^= To_Square;
-        Black_Pawns2 |= To_Square;
-        Black_Pawns2  ^= To_Square;
-        break;
-
-    case 12://King normal move
-        White_Pieces2 |= To_Square;
-        White_Pieces2 ^= From_Square;
-        White_King2 |= To_Square;
-        White_King2 ^= From_Square;
-        break;
-
-    case 13://Pawn promotion with a capture
-        White_Pawns2 ^= From_Square;
-        White_Pieces2 |= To_Square;
-        White_Pieces2 ^= From_Square;
-        White_Queens2 |= To_Square;
-        Black_Pieces2 |= To_Square;
-        Black_Pieces2 ^= To_Square;
-        Black_Queens2 |= To_Square;
-        Black_Queens2 ^= To_Square;
-        Black_Rooks2 |= To_Square;
-        Black_Rooks2 ^= To_Square;
-        Black_Bishops2 |= To_Square;
-        Black_Bishops2 ^= To_Square;
-        Black_Knights2 |= To_Square;
-        Black_Knights2 ^= To_Square;
-        break;
-
-    case 14://Plain pawn promotion
-        White_Pawns2 ^= From_Square;
-        White_Pieces2 |= To_Square;
-        White_Pieces2 ^= From_Square;
-        White_Queens2 |= To_Square;
-        break;
-
-    case 15://Kigside castling
-        White_Pieces2 |= To_Square;
-        White_Pieces2 ^= From_Square;
-        White_Pieces2 |= 32;
-        White_Pieces2 ^= 128;
-        White_Rooks2 |= 32;
-        White_Rooks2 ^= 128;
-        White_King2 |= 64;
-        White_King2 ^= 16;
-        break;
-    }
-
+	position->Make_Move(move);
     int h;
     for(int j = 0; j < 64; j++)
     {
-        if(White_King2 & GeneralBoard[j])//Get the index (0-63) of White's king
+        if(position->White_King & GeneralBoard[j])//Get the index (0-63) of White's king
         {
             h = j;
             break;
         }
     }
-    Bitboard BAttacks = Bmagic(h, (White_Pieces2 | Black_Pieces2));
-    Bitboard RAttacks = Rmagic(h, (White_Pieces2 | Black_Pieces2));
-    Bitboard QAttacks = Qmagic(h, (White_Pieces2 | Black_Pieces2));
-
-
-    if(BAttacks & (Black_Bishops2))
+    Bitboard BAttacks = Bmagic(h, (position->White_Pieces | position->Black_Pieces));
+    Bitboard RAttacks = Rmagic(h, (position->White_Pieces | position->Black_Pieces));
+    Bitboard QAttacks = Qmagic(h, (position->White_Pieces | position->Black_Pieces));
+    if(BAttacks & (position->Black_Bishops))
+    {
+    	position->Undo_Move(move);
         return false;
-    if(RAttacks & (Black_Rooks2))
+    }
+    if(RAttacks & (position->Black_Rooks))
+    	{
+    	position->Undo_Move(move);
         return false;
-    if(QAttacks & (Black_Queens2))
+    	}
+    if(QAttacks & (position->Black_Queens))
+        {
+    	position->Undo_Move(move);
         return false;
-    if(Knight_Lookup_Table[h] & Black_Knights2)
+    	}
+    if(Knight_Lookup_Table[h] & position->Black_Knights)
+        {
+    	position->Undo_Move(move);
         return false;
-    if(King_Lookup_Table[h] & Black_King2)
+    	}
+    if(King_Lookup_Table[h] & position->Black_King)
+        {
+    	position->Undo_Move(move);
         return false;
-
-    Bitboard Spare = Black_Pawns2;
+    	}
+    Bitboard Spare = position->Black_Pawns;
     Spare |= H_Pawn_Mask;
     Spare ^= H_Pawn_Mask;
-    if((Spare >> 7) & White_King2)
+    if((Spare >> 7) & position->White_King)
+    	{
+    	position->Undo_Move(move);
         return false;
+    	}
 
-    Bitboard Spare2 = Black_Pawns2;
+    Bitboard Spare2 = position->Black_Pawns;
     Spare2 |= A_Pawn_Mask;
     Spare2 ^= A_Pawn_Mask;
-    if((Spare2 >> 9) & White_King2)
+    if((Spare2 >> 9) & position->White_King)
+        {
+    	position->Undo_Move(move);
         return false;
-
-    Black_Pawns2 |= A_Pawn_Mask;
-    Black_Pawns2 ^= A_Pawn_Mask;
-    Black_Pawns2 |= H_Pawn_Mask;
-    Black_Pawns2 ^= H_Pawn_Mask;
-    if(((Black_Pawns2 >> 7) | (Black_Pawns2 >> 9)) & White_King2)
+    	}
+	Bitboard b = position->Black_Pawns;
+    b |= A_Pawn_Mask;
+    b ^= A_Pawn_Mask;
+    b |= H_Pawn_Mask;
+    b ^= H_Pawn_Mask;
+    if(((b >> 7) | (b >> 9)) & position->White_King)
+        {
+    	position->Undo_Move(move);
         return false;
+    	}
 
     else
-        return true;
+        {
+    	position->Undo_Move(move);
+    	return true;
+    	}
 }
 
 
-bool Black_Is_Legal(const Bitboard& From_Square, const Bitboard& To_Square, const int Move_Type)
+bool Black_Is_Legal(Position* position, Move move)
 {
-
-    Bitboard White_Pieces2 = White_Pieces;
-    Bitboard Black_Pieces2 = Black_Pieces;
-    Bitboard White_King2 = White_King;
-    Bitboard Black_King2 = Black_King;
-    Bitboard White_Queens2 = White_Queens;
-    Bitboard White_Rooks2 = White_Rooks;
-    Bitboard White_Bishops2 = White_Bishops;
-    Bitboard White_Knights2 = White_Knights;
-    Bitboard White_Pawns2 = White_Pawns;
-    Bitboard Black_Queens2 = Black_Queens;
-    Bitboard Black_Rooks2 = Black_Rooks;
-    Bitboard Black_Bishops2 = Black_Bishops;
-    Bitboard Black_Knights2 = Black_Knights;
-    Bitboard Black_Pawns2 = Black_Pawns;
-
-
-    switch(Move_Type)
-    {
-
-    case 1:
-        Black_Pieces2 |= To_Square;
-        Black_Pieces2 ^= From_Square;
-        Black_Pawns2 |= To_Square;
-        Black_Pawns2 ^= From_Square;
-        White_Pieces2 |= To_Square;
-        White_Pieces2 ^= To_Square;
-        White_Queens2 |= To_Square;
-        White_Queens2 ^= To_Square;
-        White_Rooks2 |= To_Square;
-        White_Rooks2 ^= To_Square;
-        White_Bishops2 |= To_Square;
-        White_Bishops2 ^= To_Square;
-        White_Knights2 |= To_Square;
-        White_Knights2 ^= To_Square;
-        White_Pawns2 |= To_Square;
-        White_Pawns2  ^= To_Square;
-        break;
-
-    case 2:
-        Black_Pieces2 |= To_Square;
-        Black_Pieces2 ^= From_Square;
-        Black_Pawns2 |= To_Square;
-        Black_Pawns2 ^= From_Square;
-        break;
-
-    case 3:
-        Black_Pieces2 |= To_Square;
-        Black_Pieces2 ^= From_Square;
-        Black_Knights2 |= To_Square;
-        Black_Knights2 ^= From_Square;
-        White_Pieces2 |= To_Square;
-        White_Pieces2 ^= To_Square;
-        White_Queens2 |= To_Square;
-        White_Queens2 ^= To_Square;
-        White_Rooks2 |= To_Square;
-        White_Rooks2 ^= To_Square;
-        White_Bishops2 |= To_Square;
-        White_Bishops2 ^= To_Square;
-        White_Knights2 |= To_Square;
-        White_Knights2 ^= To_Square;
-        White_Pawns2 |= To_Square;
-        White_Pawns2  ^= To_Square;
-        break;
-
-    case 4:
-        Black_Pieces2 |= To_Square;
-        Black_Pieces2 ^= From_Square;
-        Black_Knights2 |= To_Square;
-        Black_Knights2 ^= From_Square;
-        break;
-
-    case 5:
-        Black_Pieces2 |= To_Square;
-        Black_Pieces2 ^= From_Square;
-        Black_Bishops2 |= To_Square;
-        Black_Bishops2 ^= From_Square;
-        White_Pieces2 |= To_Square;
-        White_Pieces2 ^= To_Square;
-        White_Queens2 |= To_Square;
-        White_Queens2 ^= To_Square;
-        White_Rooks2 |= To_Square;
-        White_Rooks2 ^= To_Square;
-        White_Bishops2 |= To_Square;
-        White_Bishops2 ^= To_Square;
-        White_Knights2 |= To_Square;
-        White_Knights2 ^= To_Square;
-        White_Pawns2 |= To_Square;
-        White_Pawns2  ^= To_Square;
-        break;
-
-    case 6:
-        Black_Pieces2 |= To_Square;
-        Black_Pieces2 ^= From_Square;
-        Black_Bishops2 |= To_Square;
-        Black_Bishops2 ^= From_Square;
-        break;
-
-    case 7:
-        Black_Pieces2 |= To_Square;
-        Black_Pieces2 ^= From_Square;
-        Black_Rooks2 |= To_Square;
-        Black_Rooks2 ^= From_Square;
-        White_Pieces2 |= To_Square;
-        White_Pieces2 ^= To_Square;
-        White_Queens2 |= To_Square;
-        White_Queens2 ^= To_Square;
-        White_Rooks2 |= To_Square;
-        White_Rooks2 ^= To_Square;
-        White_Bishops2 |= To_Square;
-        White_Bishops2 ^= To_Square;
-        White_Knights2 |= To_Square;
-        White_Knights2 ^= To_Square;
-        White_Pawns2 |= To_Square;
-        White_Pawns2  ^= To_Square;
-        break;
-
-    case 8:
-        Black_Pieces2 |= To_Square;
-        Black_Pieces2 ^= From_Square;
-        Black_Rooks2 |= To_Square;
-        Black_Rooks2 ^= From_Square;
-        break;
-
-    case 9:
-        Black_Pieces2 |= To_Square;
-        Black_Pieces2 ^= From_Square;
-        Black_Queens2 |= To_Square;
-        Black_Queens2 ^= From_Square;
-        White_Pieces2 |= To_Square;
-        White_Pieces2 ^= To_Square;
-        White_Queens2 |= To_Square;
-        White_Queens2 ^= To_Square;
-        White_Rooks2 |= To_Square;
-        White_Rooks2 ^= To_Square;
-        White_Bishops2 |= To_Square;
-        White_Bishops2 ^= To_Square;
-        White_Knights2 |= To_Square;
-        White_Knights2 ^= To_Square;
-        White_Pawns2 |= To_Square;
-        White_Pawns2  ^= To_Square;
-        break;
-
-    case 10:
-        Black_Pieces2 |= To_Square;
-        Black_Pieces2 ^= From_Square;
-        Black_Queens2 |= To_Square;
-        Black_Queens2 ^= From_Square;
-        break;
-
-    case 11:
-        Black_Pieces2 |= To_Square;
-        Black_Pieces2 ^= From_Square;
-        Black_King2 |= To_Square;
-        Black_King2 ^= From_Square;
-        White_Pieces2 |= To_Square;
-        White_Pieces2 ^= To_Square;
-        White_Queens2 |= To_Square;
-        White_Queens2 ^= To_Square;
-        White_Rooks2 |= To_Square;
-        White_Rooks2 ^= To_Square;
-        White_Bishops2 |= To_Square;
-        White_Bishops2 ^= To_Square;
-        White_Knights2 |= To_Square;
-        White_Knights2 ^= To_Square;
-        White_Pawns2 |= To_Square;
-        White_Pawns2  ^= To_Square;
-        break;
-
-    case 12:
-        Black_Pieces2 |= To_Square;
-        Black_Pieces2 ^= From_Square;
-        Black_King2 |= To_Square;
-        Black_King2 ^= From_Square;
-        break;
-
-    case 13: // Promotion and a capture
-        Black_Pawns2 ^= From_Square;
-        Black_Queens2 |= To_Square;
-        Black_Pieces2 |= To_Square;
-        Black_Pieces2 ^= From_Square;
-        White_Pieces2 |= To_Square;
-        White_Pieces2 ^= To_Square;
-        White_Queens2 |= To_Square;
-        White_Queens2 ^= To_Square;
-        White_Rooks2 |= To_Square;
-        White_Rooks2 ^= To_Square;
-        White_Bishops2 |= To_Square;
-        White_Bishops2 ^= To_Square;
-        White_Knights2 |= To_Square;
-        White_Knights2 ^= To_Square;
-        break;
-
-    case 14: // Plain promotion
-        Black_Pawns2 ^= From_Square;
-        Black_Queens2 |= To_Square;
-        Black_Pieces2 |= To_Square;
-        Black_Pieces2 ^= From_Square;
-        break;
-
-    }
-
+	position->Make_Move(move);
     int h;
     for(int j = 0; j < 64; j++)
     {
-        if(Black_King2 & GeneralBoard[j])//Get the index(0-63) of the black king
+        if(position->Black_King & GeneralBoard[j])//Get the index(0-63) of the black king
         {
             h = j;
             break;
         }
     }
-    Bitboard BAttacks = Bmagic(h, (White_Pieces2 | Black_Pieces2));
-    Bitboard RAttacks = Rmagic(h, (White_Pieces2 | Black_Pieces2));
-    Bitboard QAttacks = Qmagic(h, (White_Pieces2 | Black_Pieces2));
+    Bitboard BAttacks = Bmagic(h, (position->White_Pieces | position->Black_Pieces));
+    Bitboard RAttacks = Rmagic(h, (position->White_Pieces | position->Black_Pieces));
+    Bitboard QAttacks = Qmagic(h, (position->White_Pieces | position->Black_Pieces));
 
-    if(BAttacks & (White_Bishops2))
+    if(BAttacks & (position->White_Bishops))
+        {
+    	position->Undo_Move(move);
         return false;
-    if(RAttacks & (White_Rooks2))
+    	}
+    if(RAttacks & (position->White_Rooks))
+        {
+    	position->Undo_Move(move);
         return false;
-    if(QAttacks & (White_Queens2))
+    	}
+    if(QAttacks & (position->White_Queens))
+        {
+    	position->Undo_Move(move);
         return false;
-    if(Knight_Lookup_Table[h] & White_Knights2)
+    	}
+    if(Knight_Lookup_Table[h] & position->White_Knights)
+        {
+    	position->Undo_Move(move);
         return false;
-    if(King_Lookup_Table[h] & White_King2)
+    	}
+    if(King_Lookup_Table[h] & position->White_King)
+        {
+    	position->Undo_Move(move);
         return false;
+    	}
 
-    Bitboard Spare = White_Pawns2;
+    Bitboard Spare = position->White_Pawns;
     Spare |= H_Pawn_Mask;
     Spare ^= H_Pawn_Mask;
-    if((Spare << 9) & Black_King2)
+    if((Spare << 9) & position->Black_King)
+        {
+    	position->Undo_Move(move);
         return false;
+    	}
 
-    Bitboard Spare2 = White_Pawns2;
+    Bitboard Spare2 = position->White_Pawns;
     Spare2 |= A_Pawn_Mask;
     Spare2 ^= A_Pawn_Mask;
-    if((Spare2 << 7) & Black_King2)
+    if((Spare2 << 7) & position->Black_King)
+        {
+    	position->Undo_Move(move);
         return false;
-
-    White_Pawns2 |= A_Pawn_Mask;
-    White_Pawns2 ^= A_Pawn_Mask;
-    White_Pawns2 |= H_Pawn_Mask;
-    White_Pawns2 ^= H_Pawn_Mask;
-    if(((White_Pawns2 << 7) | (White_Pawns2 << 9)) & GeneralBoard[h])
+    	}
+	Bitboard w = position->White_Pawns;
+    w |= A_Pawn_Mask;
+    w ^= A_Pawn_Mask;
+    w |= H_Pawn_Mask;
+    w ^= H_Pawn_Mask;
+    if(((w << 7) | (w << 9)) & position->Black_King)
+        {
+    	position->Undo_Move(move);
         return false;
-
+    	}
     else
+        {
+    	position->Undo_Move(move);
         return true;
+    	}
 }
+
