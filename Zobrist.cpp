@@ -23,36 +23,36 @@ void Init_Zobrist()
 			}
 	}
 }
-Bitboard Get_Current_Hash_Key()
+Bitboard Get_Current_Hash_Key(Position* position)
 {
 	Bitboard key = 0;
 	for(int i = 0; i < 64; i++)
 	{
-		if(White_Pawns & GeneralBoard[i])
+		if(position->White_Pawns & GeneralBoard[i])
 		key ^= GeneralBoard[i];
-		if(White_Knights & GeneralBoard[i])
+		if(position->White_Knights & GeneralBoard[i])
 		key ^= GeneralBoard[i];
-		if(White_Bishops & GeneralBoard[i])
+		if(position->White_Bishops & GeneralBoard[i])
 		key ^= GeneralBoard[i];
-		if(White_Rooks & GeneralBoard[i])
+		if(position->White_Rooks & GeneralBoard[i])
 		key ^= GeneralBoard[i];
-		if(White_Queens & GeneralBoard[i])
+		if(position->White_Queens & GeneralBoard[i])
 		key ^= GeneralBoard[i];
-		if(White_King & GeneralBoard[i])
+		if(position->White_King & GeneralBoard[i])
 		key ^= GeneralBoard[i];
-		if(Black_Pawns & GeneralBoard[i])
+		if(position->Black_Pawns & GeneralBoard[i])
 		key ^= GeneralBoard[i];
-		if(Black_Knights & GeneralBoard[i])
+		if(position->Black_Knights & GeneralBoard[i])
 		key ^= GeneralBoard[i];
-		if(Black_Bishops & GeneralBoard[i])
+		if(position->Black_Bishops & GeneralBoard[i])
 		key ^= GeneralBoard[i];
-		if(Black_Rooks & GeneralBoard[i])
+		if(position->Black_Rooks & GeneralBoard[i])
 		key ^= GeneralBoard[i];
-		if(Black_Queens & GeneralBoard[i])
+		if(position->Black_Queens & GeneralBoard[i])
 		key ^= GeneralBoard[i];
-		if(Black_King & GeneralBoard[i])
+		if(position->Black_King & GeneralBoard[i])
 		key ^= GeneralBoard[i];
 	}
-	key ^= Search::Current_Turn;
+	key ^= position->Current_Turn;
 	return key;
 }
