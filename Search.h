@@ -2,98 +2,13 @@
 #define SEARCH_H_INCLUDED
 #include "Bitboard.h"
 #include "MoveGen.h"
+#include "Position.h"
 #include <cassert>
 #include <iostream>
 #include <chrono>
 #include <string>
 
 typedef std::chrono::milliseconds::rep TimePoint; // A value in milliseconds
-class Move
-{
-public:
-    Bitboard From;
-    Bitboard To;
-    int Move_Type;
-    int Score;
-    int White_Temp_Move_From_Stack[100];
-    int White_Temp_Move_To_Stack[100];
-    int Black_Temp_Move_From_Stack[100];
-    int Black_Temp_Move_To_Stack[100];
-    int White_Temp_Move_Types[100];
-    int Black_Temp_Move_Types[100];
-    int White_Temp_Move_Spacer;
-    int Black_Temp_Move_Spacer;
-
-    Bitboard White_Pieces2;
-    Bitboard Black_Pieces2;
-    Bitboard White_King2;
-    Bitboard Black_King2;
-    Bitboard White_Queens2;
-    Bitboard White_Rooks2;
-    Bitboard White_Bishops2;
-    Bitboard White_Knights2;
-    Bitboard White_Pawns2;
-    Bitboard Black_Queens2;
-    Bitboard Black_Rooks2;
-    Bitboard Black_Bishops2;
-    Bitboard Black_Knights2;
-    Bitboard Black_Pawns2;
-
-	const int Convert_Bitboard(const Bitboard& board) const
-    {
-        if(board == 0)
-            return 0;
-        for(int i = 0; i < 64; i++)
-        {
-            if(board & GeneralBoard[i])
-                return i;
-        }
-        return 0;
-    }
-	const Bitboard Unconvert_Int(const int& number) const
-	{
-        return GeneralBoard[number];
-    }
-	void Undo_Move();
-	Move(int){};
-    Move()
-    {
-        White_Pieces2 = White_Pieces;
-        Black_Pieces2 = Black_Pieces;
-        White_King2 = White_King;
-        Black_King2 = Black_King;
-        White_Queens2 = White_Queens;
-        White_Rooks2 = White_Rooks;
-        White_Bishops2 = White_Bishops;
-        White_Knights2 = White_Knights;
-        White_Pawns2 = White_Pawns;
-        Black_Queens2 = Black_Queens;
-        Black_Rooks2 = Black_Rooks;
-        Black_Bishops2 = Black_Bishops;
-        Black_Knights2 = Black_Knights;
-        Black_Pawns2 = Black_Pawns;
-        From = 0;
-        To = 0;
-        Move_Type = 0;
-        Score = 0;
-        White_Temp_Move_Spacer = White_Move_Spacer;
-			for(int h = 0; h < White_Move_Spacer; h++)
-    		{
-        		White_Temp_Move_From_Stack[h] = Convert_Bitboard(White_Move_From_Stack[h]);
-        		White_Temp_Move_To_Stack[h] = Convert_Bitboard(White_Move_To_Stack[h]);
-        		White_Temp_Move_Types[h] = White_Move_Types[h];
-    		}
-    	Black_Temp_Move_Spacer = Black_Move_Spacer;
-    	for(int h = 0; h < Black_Move_Spacer; h++)
-    		{
-        		Black_Temp_Move_From_Stack[h] = Convert_Bitboard(Black_Move_From_Stack[h]);
-        		Black_Temp_Move_To_Stack[h] = Convert_Bitboard(Black_Move_To_Stack[h]);
-        		Black_Temp_Move_Types[h] = Black_Move_Types[h];
-    		}
-    	
-		
-    }
-};
 
 class LINE
 {
@@ -105,7 +20,7 @@ public:
     {
     	cmove = 0;
     	score = 0;
-	}
+    }
     string Output()
     {
         string f = "";
@@ -116,8 +31,6 @@ public:
                 if(GeneralBoard[h] & argmove[i].From)
                 {
                     f += PlayerMoves[h];
-                    //cout << PlayerMoves[h];
-                    //Log << PlayerMoves[h];
                 }
             }
             for( int h = 0; h < 64; h++)
@@ -125,9 +38,37 @@ public:
                 if(GeneralBoard[h] & argmove[i].To)
                 {
                     f += PlayerMoves[h];
+                    if(argmove[i].PromotionType != NONE)
+                    {
+                    	switch(argmove[i].PromotionType)
+                    	{
+                    		case WN:
+                    			f += "n";
+                    			break;
+                    		case WB:
+                    			f += "b";
+                    			break;
+                    		case WR:
+                    			f += "r";
+                    			break;
+                    		case WQ:
+                    			f += "q";
+                    			break;
+                    		case BN:
+                    			f += "n";
+                    			break;
+							case BB:
+                    			f += "b";
+                    			break;
+                    		case BR:
+                    			f += "r";
+                    			break;
+                    		case BQ:
+                    			f += "q";
+                    			break;
+						}
+					}
                     f += " ";
-                    //cout << PlayerMoves[h] << " ";
-                    //Log << PlayerMoves[h] << " ";
                 }
             }
         }
@@ -168,27 +109,24 @@ class Timer
 namespace Search
 {
 Move Think(int wtime, int btime, int winc, int binc);
-int AlphaBeta(int alpha, int beta, int depth, LINE * pline, bool donullmove);
-int QuiescenceSearch(int alpha, int beta, int depth);
+int AlphaBeta(Position* position, int alpha, int beta, int depth, LINE * pline, bool donullmove);
+int QuiescenceSearch(Position* posit, int alpha, int beta, int depth);
 int MateSearch(int alpha, int beta, int depth);
 //int SearchMax(int alpha, int beta, int depth, LINE * pline, bool donullmove);
 //int SearchMin(int alpha, int beta, int depth, LINE * pline, bool donullmove);
 //int QuiesceMax(int alpha, int beta, int depth);
 //int QuiesceMin(int alpha, int beta, int depth);
-int Make_White_Search_Move(const Bitboard& From, const Bitboard& To, const int Move_Type);
-int Make_Black_Search_Move(const Bitboard& From, const Bitboard& To, const int Move_Type);
-int Get_Move_Score(Move& m, bool turn);
+int Get_Move_Score(Move& m);
 extern Bitboard Nodes;
 extern bool Searching;
 extern LINE line;
 extern int Depth;
 extern int Seldepth;
-int Is_Mate();
+int Is_Mate(Position* position);
 void Clear();
 extern bool Output_Pv;
 extern int Time_Allocation;
 extern bool STOP_SEARCHING_NOW;
-extern bool Current_Turn;
 }
 
 #endif
