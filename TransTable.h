@@ -18,7 +18,6 @@ class TTEntry
 	int score;
 	TTMove best;
 	NodeType nodetype;
-	int visited;
 };
 class TranspositionTable
 {
