@@ -2,59 +2,76 @@
 #include "Search.h"
 int Root_Perft(int depth)
 {
-    int n_moves;
+    if(depth == 0) return 1;
     Bitboard nodes = 0;
-
-    if (depth == 0) return 1;
-    Search::Current_Turn ? Generate_White_Moves(false) : Generate_Black_Moves(false);
-    n_moves = Search::Current_Turn ? White_Move_Spacer : Black_Move_Spacer;
-    Move move;
-    for(int i = 0; i < n_moves; i++)
+    pos.Current_Turn ? Generate_White_Moves(false, &pos) : Generate_Black_Moves(false, &pos);
+    for(int i = 0; i < pos.numlegalmoves; i++)
     {
-
-        Search::Current_Turn ? move.From = White_Move_From_Stack[i] : move.From = Black_Move_From_Stack[i];
-        Search::Current_Turn ? move.To = White_Move_To_Stack[i] : move.To = Black_Move_To_Stack[i];
-        Search::Current_Turn ? move.Move_Type = White_Move_Types[i] : move.Move_Type = Black_Move_Types[i];
-        Search::Current_Turn ? Search::Make_White_Search_Move(White_Move_From_Stack[i], White_Move_To_Stack[i], White_Move_Types[i]) : Search::Make_Black_Search_Move(Black_Move_From_Stack[i], Black_Move_To_Stack[i], Black_Move_Types[i]);
+        pos.Make_Move(pos.LegalMoves[i]);
         for( int h = 0; h < 64; h++)
         {
-            if(GeneralBoard[h] & move.From)
+            if(GeneralBoard[h] & pos.LegalMoves[i].From)
             {
                 cout << PlayerMoves[h];
             }
         }
         for( int h = 0; h < 64; h++)
         {
-            if(GeneralBoard[h] & move.To)
+            if(GeneralBoard[h] & pos.LegalMoves[i].To)
             {
-                cout  << PlayerMoves[h] << ": ";
+            	cout  << PlayerMoves[h];
+            	if(pos.LegalMoves[i].Promotion)
+            	{
+            		switch(pos.LegalMoves[i].PromotionType)
+                    	{
+                    		case WN:
+                    			cout << "n";
+                    			break;
+                    		case WB:
+                    			cout << "b";
+                    			break;
+                    		case WR:
+                    			cout << "r";
+                    			break;
+                    		case WQ:
+                    			cout << "q";
+                    			break;
+                    		case BN:
+                    			cout << "n";
+                    			break;
+							case BB:
+                    			cout << "b";
+                    			break;
+                    		case BR:
+                    			cout << "r";
+                    			break;
+                    		case BQ:
+                    			cout << "q";
+                    			break;
+						}
+				}
+				cout << ": ";
             }
         }
         int f = nodes;
-        nodes += Perft(depth - 1);
+        nodes += Perft(&pos, depth - 1);
         cout << nodes - f << endl;
-        move.Undo_Move();
+        pos.Undo_Move(pos.LegalMoves[i]);
     }
     return nodes;
 
 }
-int Perft(int depth)
+int Perft(Position* posit, int depth)
 {
-    if (depth == 0) return 1;
-    int n_moves;
+	if (depth == 0) return 1;
+    Position position(posit);
     Bitboard nodes = 0;
-    Search::Current_Turn ? Generate_White_Moves(false) : Generate_Black_Moves(false);
-    n_moves = Search::Current_Turn ? White_Move_Spacer : Black_Move_Spacer;
-    Move move;
-    Search::Current_Turn ? move.Black_Temp_Move_Spacer = 0 : move.Black_Temp_Move_Spacer = 0;
-    for (int i = 0; i < n_moves; i++)
+    position.Current_Turn ? Generate_White_Moves(false, &position) : Generate_Black_Moves(false, &position);
+    for(int i = 0; i < position.numlegalmoves; i++)
     {
-        Search::Current_Turn ? move.From = White_Move_From_Stack[i] : move.From = Black_Move_From_Stack[i];
-        Search::Current_Turn ? move.To = White_Move_To_Stack[i] : move.To = Black_Move_To_Stack[i];
-        Search::Current_Turn ? move.Move_Type = White_Move_Types[i] : move.Move_Type = Black_Move_Types[i];
-        Search::Current_Turn ? Search::Make_White_Search_Move(White_Move_From_Stack[i], White_Move_To_Stack[i], White_Move_Types[i]) : Search::Make_Black_Search_Move(Black_Move_From_Stack[i], Black_Move_To_Stack[i], Black_Move_Types[i]);
-        nodes += Perft(depth - 1);
-        move.Undo_Move();
+        position.Make_Move(position.LegalMoves[i]);
+        nodes += Perft(&position, depth - 1);
+        position.Undo_Move(position.LegalMoves[i]);
     }
     return nodes;
 }
