@@ -3,252 +3,258 @@ using namespace std;
 #include "MoveGen.h"
 #include "Search.h"
 #include "magicmoves.h"
-
 #include "Util.h"
-Bitboard White_Move_From_Stack[100];//Move stack is just an array of Bitboards(64-bit integers) containing only one bit set in each--the from square or the to square
-Bitboard White_Move_To_Stack[100];
-Bitboard Black_Move_From_Stack[100];
-Bitboard Black_Move_To_Stack[100];
-int White_Move_Types[100];//Array of normal integers that keeps track of the type of each move
-int Black_Move_Types[100];
-int White_Move_Spacer = 0; // Keeps a "record" of the last move put on the stack so that it knows which index of the array to put the next move in
-int Black_Move_Spacer = 0;
-bool Is_Legal;
-bool WhiteCanCastleK = true;
-bool WhiteCanCastleQ = true;
-bool BlackCanCastleK = true;
-bool BlackCanCastleQ = true;
 
-void Generate_White_Moves(const bool caps)
+bool Is_Legal;
+
+void Generate_White_Moves(const bool caps, Position* position)
 {
-	Search::Clear();
+	int spacer = 0;
     for(int i = 0; i < 64; i++)
 	{
-		if(White_Pawns & GeneralBoard[i])
+		if(position->White_Pawns & GeneralBoard[i])
 		{
 			if(!caps)
 			{
 				if(GeneralBoard[i] & 65280)
 				{
-					if(!((GeneralBoard[i] << 8) & (White_Pieces | Black_Pieces)))
+					if(!((GeneralBoard[i] << 8) & (position->White_Pieces | position->Black_Pieces)))
 					{
-						if(White_Is_Legal(GeneralBoard[i], GeneralBoard[i] << 8, 2))
+						Move m(WP, NONE, GeneralBoard[i], GeneralBoard[i] << 8, false, false);
+						if(White_Is_Legal(position, m))
 							{
-								White_Move_From_Stack[White_Move_Spacer] = GeneralBoard[i];
-								White_Move_To_Stack[White_Move_Spacer] = GeneralBoard[i] << 8;
-								White_Move_Types[White_Move_Spacer++] = (GeneralBoard[i] & 71776119061217280 ? 14 : 2);
+								position->LegalMoves[position->numlegalmoves++] = m;
 							}
-						if(!((GeneralBoard[i] << 16) & (White_Pieces | Black_Pieces)))
+						if(!((GeneralBoard[i] << 16) & (position->White_Pieces | position->Black_Pieces)))
 						{
-							if(White_Is_Legal(GeneralBoard[i], GeneralBoard[i] << 16, 2))
+							Move m(WP, NONE, GeneralBoard[i], GeneralBoard[i] << 16, false, false);
+							if(White_Is_Legal(position, m))
 							{
-								White_Move_From_Stack[White_Move_Spacer] = GeneralBoard[i];
-								White_Move_To_Stack[White_Move_Spacer] = GeneralBoard[i] << 16;
-								White_Move_Types[White_Move_Spacer++] = 2;
+								position->LegalMoves[position->numlegalmoves++] = m;
 							}
 						}					
 					}
 				}
 				else
 				{
-					if(!((GeneralBoard[i] << 8) & (White_Pieces | Black_Pieces)))
+					if((!((GeneralBoard[i] << 8) & (position->White_Pieces | position->Black_Pieces))) && (!(GeneralBoard[i] & 71776119061217280)))
 					{
-						if(White_Is_Legal(GeneralBoard[i], GeneralBoard[i] << 8, 2))
+						Move m(WP, NONE, GeneralBoard[i], GeneralBoard[i] << 8, false, false);
+						if(White_Is_Legal(position, m))
 						{
-							White_Move_From_Stack[White_Move_Spacer] = GeneralBoard[i];
-							White_Move_To_Stack[White_Move_Spacer] = GeneralBoard[i] << 8;
-							White_Move_Types[White_Move_Spacer++] = (GeneralBoard[i] & 71776119061217280 ? 14 : 2);
+							position->LegalMoves[position->numlegalmoves++] = m;
 						}
 					}
 				}
 			}
+			if((GeneralBoard[i] & 71776119061217280) && (!(GeneralBoard[i] << 8 & (position->White_Pieces | position->Black_Pieces))))
+			{
+				Move m(WP, NONE, GeneralBoard[i], GeneralBoard[i] << 8, false, true);
+				for(int p = 1; p < 5; p++)
+					{
+						m.PromotionType = WP + p;
+						if(White_Is_Legal(position, m))
+						position->LegalMoves[position->numlegalmoves++] = m;
+					}
+			}
 			if(!(GeneralBoard[i] & A_Pawn_Mask))
 			{
-				if((GeneralBoard[i] << 7) & Black_Pieces)
+				if((GeneralBoard[i] << 7) & position->Black_Pieces && (GeneralBoard[i]  & 71776119061217280))
 				{
-					if(White_Is_Legal(GeneralBoard[i], GeneralBoard[i] << 7, 1))
+					Move m(WP, position->Get_Piece_From_Bitboard(GeneralBoard[i] << 7), GeneralBoard[i], GeneralBoard[i] << 7, false, true);
+					{
+						for(int p = 1; p < 5; p++)
 						{
-							White_Move_From_Stack[White_Move_Spacer] = GeneralBoard[i];
-							White_Move_To_Stack[White_Move_Spacer] = GeneralBoard[i] << 7;
-							White_Move_Types[White_Move_Spacer++] = (GeneralBoard[i] & 71776119061217280 ? 13 : 1);
+							m.PromotionType = WP + p;
+							if(White_Is_Legal(position, m))
+							position->LegalMoves[position->numlegalmoves++] = m;
+						}
+					}
+				}
+				else if((GeneralBoard[i] << 7) & position->Black_Pieces)
+				{
+					Move m(WP, position->Get_Piece_From_Bitboard(GeneralBoard[i] << 7), GeneralBoard[i], GeneralBoard[i] << 7, false, false);
+					if(White_Is_Legal(position, m))
+						{
+							position->LegalMoves[position->numlegalmoves++] = m;
 						}
 				}
 			}
 			if(!(GeneralBoard[i] & H_Pawn_Mask))
 			{
-				if((GeneralBoard[i] << 9) & Black_Pieces)
+				if((GeneralBoard[i] << 9) & position->Black_Pieces && (GeneralBoard[i]  & 71776119061217280))
 				{
-					if(White_Is_Legal(GeneralBoard[i], GeneralBoard[i] << 9, 1))
+					Move m(WP, position->Get_Piece_From_Bitboard(GeneralBoard[i] << 9), GeneralBoard[i], GeneralBoard[i] << 9, false, true);
+					for(int p = 1; p < 5; p++)
 						{
-							White_Move_From_Stack[White_Move_Spacer] = GeneralBoard[i];
-							White_Move_To_Stack[White_Move_Spacer] = GeneralBoard[i] << 9;
-							White_Move_Types[White_Move_Spacer++] = (GeneralBoard[i] & 71776119061217280 ? 13 : 1);
+							m.PromotionType = WP + p;
+							if(White_Is_Legal(position, m))
+							position->LegalMoves[position->numlegalmoves++] = m;
+						}
+				}
+				else if((GeneralBoard[i] << 9) & position->Black_Pieces)
+				{
+					Move m(WP, position->Get_Piece_From_Bitboard(GeneralBoard[i] << 9), GeneralBoard[i], GeneralBoard[i] << 9, false, false);
+					if(White_Is_Legal(position, m))
+						{
+							position->LegalMoves[position->numlegalmoves++] = m;
 						}
 				}
 			}
 		}
-		if(GeneralBoard[i] & White_Knights)
+		if(GeneralBoard[i] & position->White_Knights)
 		{
 			Bitboard k = Knight_Lookup_Table[i];
-			k |= White_Pieces;
-			Bitboard b = k ^ White_Pieces;
+			k |= position->White_Pieces;
+			Bitboard b = k ^ position->White_Pieces;
 			int p = __builtin_popcountll(b);
 			for(int m = 0; m < p; m++)
 			{
 				int j = lsb(b);
 				b ^= GeneralBoard[j];
-				if(GeneralBoard[j] & Black_Pieces)
+				if(GeneralBoard[j] & position->Black_Pieces)
 					{
-						if(White_Is_Legal(GeneralBoard[i], GeneralBoard[j], 3))
+						Move m(WN, position->Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
+						if(White_Is_Legal(position, m))
 						{
-							White_Move_From_Stack[White_Move_Spacer] = GeneralBoard[i];
-							White_Move_To_Stack[White_Move_Spacer] = GeneralBoard[j];
-							White_Move_Types[White_Move_Spacer++] = 3;
+							position->LegalMoves[position->numlegalmoves++] = m;
 						}
 					}
 				else
 				{
 					if(!caps)
 					{
-						if(White_Is_Legal(GeneralBoard[i], GeneralBoard[j], 4))
+						Move m(WN, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
+						if(White_Is_Legal(position, m))
 							{
-								White_Move_From_Stack[White_Move_Spacer] = GeneralBoard[i];
-								White_Move_To_Stack[White_Move_Spacer] = GeneralBoard[j];
-								White_Move_Types[White_Move_Spacer++] = 4;
+								position->LegalMoves[position->numlegalmoves++] = m;
 							}
 					}
 				}	
 									
 			}
 		}
-		if(GeneralBoard[i] & White_Bishops)
+		if(GeneralBoard[i] & position->White_Bishops)
 		{
-			Bitboard bi = Bmagic(i, White_Pieces | Black_Pieces);
-			bi |= White_Pieces;
-			Bitboard b = bi ^ White_Pieces;
+			Bitboard bi = Bmagic(i, position->White_Pieces | position->Black_Pieces);
+			bi |= position->White_Pieces;
+			Bitboard b = bi ^ position->White_Pieces;
 			int p = __builtin_popcountll(b);
 			for(int m = 0; m < p; m++)
 			{
 				int j = lsb(b);
 				b ^= GeneralBoard[j];
-				if(GeneralBoard[j] & Black_Pieces)
+				if(GeneralBoard[j] & position->Black_Pieces)
 					{
-						if(White_Is_Legal(GeneralBoard[i], GeneralBoard[j], 5))
+						Move m(WB, position->Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
+						if(White_Is_Legal(position, m))
 						{
-							White_Move_From_Stack[White_Move_Spacer] = GeneralBoard[i];
-							White_Move_To_Stack[White_Move_Spacer] = GeneralBoard[j];
-							White_Move_Types[White_Move_Spacer++] = 5;
+							position->LegalMoves[position->numlegalmoves++] = m;
 						}
 					}
 				else
 				{
 					if(!caps)
 					{
-						if(White_Is_Legal(GeneralBoard[i], GeneralBoard[j], 6))
+						Move m(WB, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
+						if(White_Is_Legal(position, m))
 							{
-								White_Move_From_Stack[White_Move_Spacer] = GeneralBoard[i];
-								White_Move_To_Stack[White_Move_Spacer] = GeneralBoard[j];
-								White_Move_Types[White_Move_Spacer++] = 6;
+								position->LegalMoves[position->numlegalmoves++] = m;
 							}
 					}
 				}	
 			}
 		}
-		if(GeneralBoard[i] & White_Rooks)
+		if(GeneralBoard[i] & position->White_Rooks)
 		{
-			Bitboard r = Rmagic(i, White_Pieces | Black_Pieces);
-			r |= White_Pieces;
-			Bitboard b = r ^ White_Pieces;
+			Bitboard r = Rmagic(i, position->White_Pieces | position->Black_Pieces);
+			r |= position->White_Pieces;
+			r ^= position->White_Pieces;
+			Bitboard b = r;
 			int p = __builtin_popcountll(b);
 			for(int m = 0; m < p; m++)
 			{
 				int j = lsb(b);
 				b ^= GeneralBoard[j];
-				if(GeneralBoard[j] & Black_Pieces)
+				if(GeneralBoard[j] & position->Black_Pieces)
 					{
-						if(White_Is_Legal(GeneralBoard[i], GeneralBoard[j], 7))
+						Move m(WR, position->Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
+						if(White_Is_Legal(position, m))
 						{
-							White_Move_From_Stack[White_Move_Spacer] = GeneralBoard[i];
-							White_Move_To_Stack[White_Move_Spacer] = GeneralBoard[j];
-							White_Move_Types[White_Move_Spacer++] = 7;
+							position->LegalMoves[position->numlegalmoves++] = m;
 						}
 					}
 				else
 				{
 					if(!caps)
 					{
-						if(White_Is_Legal(GeneralBoard[i], GeneralBoard[j], 8))
+						Move m(WR, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
+						if(White_Is_Legal(position, m))
 							{
-								White_Move_From_Stack[White_Move_Spacer] = GeneralBoard[i];
-								White_Move_To_Stack[White_Move_Spacer] = GeneralBoard[j];
-								White_Move_Types[White_Move_Spacer++] = 8;
+								position->LegalMoves[position->numlegalmoves++] = m;
 							}
 					}
 				}	
 			}
 		}
-		if(GeneralBoard[i] & White_Queens)
+		if(GeneralBoard[i] & position->White_Queens)
 		{
-			Bitboard q = Rmagic(i, White_Pieces | Black_Pieces);
-			Bitboard qu = (Bmagic(i, White_Pieces | Black_Pieces) | q);
-			qu |= White_Pieces;
-			Bitboard b = qu ^ White_Pieces;
+			Bitboard q = Rmagic(i, position->White_Pieces | position->Black_Pieces);
+			Bitboard qu = (Bmagic(i, position->White_Pieces | position->Black_Pieces) | q);
+			qu |= position->White_Pieces;
+			Bitboard b = qu ^ position->White_Pieces;
 			int p = __builtin_popcountll(b);
 			for(int m = 0; m < p; m++)
 			{
 				int j = lsb(b);
 				b ^= GeneralBoard[j];
-				if(GeneralBoard[j] & Black_Pieces)
+				if(GeneralBoard[j] & position->Black_Pieces)
 					{
-						if(White_Is_Legal(GeneralBoard[i], GeneralBoard[j], 9))
+						Move m(WQ, position->Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
+						if(White_Is_Legal(position, m))
 						{
-							White_Move_From_Stack[White_Move_Spacer] = GeneralBoard[i];
-							White_Move_To_Stack[White_Move_Spacer] = GeneralBoard[j];
-							White_Move_Types[White_Move_Spacer++] = 9;
+							position->LegalMoves[position->numlegalmoves++] = m;
 						}
 					}
 				else
 				{
 					if(!caps)
 					{
-						if(White_Is_Legal(GeneralBoard[i], GeneralBoard[j], 10))
+						Move m(WQ, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
+						if(White_Is_Legal(position, m))
 							{
-								White_Move_From_Stack[White_Move_Spacer] = GeneralBoard[i];
-								White_Move_To_Stack[White_Move_Spacer] = GeneralBoard[j];
-								White_Move_Types[White_Move_Spacer++] = 10;
+								position->LegalMoves[position->numlegalmoves++] = m;
 							}
 					}
 				}	
 			}
 		}
-		if(GeneralBoard[i] & White_King)
+		if(GeneralBoard[i] & position->White_King)
 		{
 			Bitboard k = King_Lookup_Table[i];
-			k |= White_Pieces;
-			Bitboard b = k ^ White_Pieces;
+			k |= position->White_Pieces;
+			Bitboard b = k ^ position->White_Pieces;
 			int p = __builtin_popcountll(b);
 			for(int m = 0; m < p; m++)
 			{
 				int j = lsb(b);
 				b ^= GeneralBoard[j];
-				if(GeneralBoard[j] & Black_Pieces)
+				if(GeneralBoard[j] & position->Black_Pieces)
 					{
-						if(White_Is_Legal(GeneralBoard[i], GeneralBoard[j], 11))
+						Move m(WK, position->Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
+						if(White_Is_Legal(position, m))
 						{
-							White_Move_From_Stack[White_Move_Spacer] = GeneralBoard[i];
-							White_Move_To_Stack[White_Move_Spacer] = GeneralBoard[j];
-							White_Move_Types[White_Move_Spacer++] = 11;
+							position->LegalMoves[position->numlegalmoves++] = m;
 						}
 					}
 				else
 				{
 					if(!caps)
 					{
-						if(White_Is_Legal(GeneralBoard[i], GeneralBoard[j], 12))
+						Move m(WK, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
+						if(White_Is_Legal(position, m))
 							{
-								White_Move_From_Stack[White_Move_Spacer] = GeneralBoard[i];
-								White_Move_To_Stack[White_Move_Spacer] = GeneralBoard[j];
-								White_Move_Types[White_Move_Spacer++] = 12;
+								position->LegalMoves[position->numlegalmoves++] = m;
 							}
 					}
 				}	
@@ -257,256 +263,279 @@ void Generate_White_Moves(const bool caps)
 			if(!caps)
 			{
 				Bitboard first = (GeneralBoard[i] & 16);
-        		Bitboard second = ((White_Pieces | Black_Pieces) & 96);
+        		Bitboard second = ((position->White_Pieces | position->Black_Pieces) & 96);
         		Bitboard e1 = 16, f1 = 32, g1 = 64, a0 = 0;
-        		bool canmovetof1 = White_Is_Legal(e1, f1, 12);
-        		bool canmovetog1 = White_Is_Legal(e1, g1, 12);
-        		bool canmovetoe1 = White_Is_Legal(a0, e1, 12);
-        		bool Rookonh1 = (White_Rooks & 128);
-        		int notincheck = Search::Is_Mate();
-        		if(first && (!second) && canmovetof1 && canmovetog1 && canmovetoe1 && (WhiteCanCastleK) && Rookonh1 && (notincheck != -10000))
+        		bool canmovetof1 = !(f1 & (position->White_Pieces | position->Black_Pieces));
+        		bool canmovetog1 = !(g1 & (position->White_Pieces | position->Black_Pieces));
+        		if(canmovetof1 && canmovetog1)
         		{
-		            White_Move_From_Stack[White_Move_Spacer] = GeneralBoard[i];
-		            Bitboard too = 64;
-		            White_Move_To_Stack[White_Move_Spacer++] = too;
-		            White_Move_Types[White_Move_Spacer - 1] = 15;
-		        }
+        			Move m(WK, NONE, GeneralBoard[i], 32, false, false);
+        			bool safetomovetof1 = White_Is_Legal(position, m);
+        			Move m1(WK, NONE, GeneralBoard[i], 64, false, false);
+        			bool safetomovetog1 = White_Is_Legal(position, m1);
+        			Move m2(WK, NONE, GeneralBoard[i], 16, false, false);
+        			bool safetomovetoe1 = Search::Is_Mate(position) >= 0 ? true : false;
+        			bool Rookonh1 = (position->White_Rooks & 128);
+        			int notincheck = Search::Is_Mate(position);
+        			if(first && (!second) && safetomovetof1 && safetomovetog1 && safetomovetoe1 && (position->WhiteCanCastleK) && Rookonh1 && (notincheck != -10000))
+        			{
+        				m1.Castling = true;
+        				position->LegalMoves[position->numlegalmoves++] = m1;
+		        	}
+		    	}
 	    	}
 		}
 	}
 return;	
 }
 
-void Generate_Black_Moves(const bool caps)
+void Generate_Black_Moves(const bool caps, Position* position)
 {
-	Search::Clear();
+	int spacer = 0;
     for(int i = 0; i < 64; i++)
 	{
-		if(Black_Pawns & GeneralBoard[i])
+		if(position->Black_Pawns & GeneralBoard[i])
 		{
 			if(!caps)
 			{
 				if(GeneralBoard[i] & 71776119061217280)
 				{
-					if(!((GeneralBoard[i] >> 8) & (White_Pieces | Black_Pieces)))
+					if(!((GeneralBoard[i] >> 8) & (position->White_Pieces | position->Black_Pieces)))
 					{
-						if(Black_Is_Legal(GeneralBoard[i], GeneralBoard[i] >> 8, 2))
+						Move m(BP, NONE, GeneralBoard[i], GeneralBoard[i] >> 8, false, false);
+						if(Black_Is_Legal(position, m))
 							{
-								Black_Move_From_Stack[Black_Move_Spacer] = GeneralBoard[i];
-								Black_Move_To_Stack[Black_Move_Spacer] = GeneralBoard[i] >> 8;
-								Black_Move_Types[Black_Move_Spacer++] = (GeneralBoard[i] & 65280 ? 14 : 2);
+								position->LegalMoves[position->numlegalmoves++] = m;
 							}
-						if(!((GeneralBoard[i] >> 16) & (White_Pieces | Black_Pieces)))
+						if(!((GeneralBoard[i] >> 16) & (position->White_Pieces | position->Black_Pieces)))
 						{
-							if(Black_Is_Legal(GeneralBoard[i], GeneralBoard[i] >> 16, 2))
+							Move m(BP, NONE, GeneralBoard[i], GeneralBoard[i] >> 16, false, false);
+							if(Black_Is_Legal(position, m))
 							{
-								Black_Move_From_Stack[Black_Move_Spacer] = GeneralBoard[i];
-								Black_Move_To_Stack[Black_Move_Spacer] = GeneralBoard[i] >> 16;
-								Black_Move_Types[Black_Move_Spacer++] = 2;
+								position->LegalMoves[position->numlegalmoves++] = m;
 							}
 						}	
 					}
 				}
 				else
 				{
-					if(!((GeneralBoard[i] >> 8) & (White_Pieces | Black_Pieces)))
+					if((!((GeneralBoard[i] >> 8) & (position->White_Pieces | position->Black_Pieces))) && (!(GeneralBoard[i] & 65280)))
 					{
-						if(Black_Is_Legal(GeneralBoard[i], GeneralBoard[i] >> 8, 2))
+						Move m(BP, NONE, GeneralBoard[i], GeneralBoard[i] >> 8, false, false);
+						if(Black_Is_Legal(position, m))
 						{
-							Black_Move_From_Stack[Black_Move_Spacer] = GeneralBoard[i];
-							Black_Move_To_Stack[Black_Move_Spacer] = GeneralBoard[i] >> 8;
-							Black_Move_Types[Black_Move_Spacer++] = (GeneralBoard[i] & 65280 ? 14 : 2);
+							position->LegalMoves[position->numlegalmoves++] = m;
 						}
 					}
 				}
 			}
+			if(GeneralBoard[i] & 65280 && (!(GeneralBoard[i] >> 8 & (position->White_Pieces | position->Black_Pieces))))
+			{
+				Move m(BP, NONE, GeneralBoard[i], GeneralBoard[i] >> 8, false, true);
+				for(int p = 1; p < 5; p++)
+					{
+						m.PromotionType = WB + p;
+						if(Black_Is_Legal(position, m))
+						position->LegalMoves[position->numlegalmoves++] = m;
+					}
+			}
 			if(!(GeneralBoard[i] & H_Pawn_Mask))
 			{
-				if((GeneralBoard[i] >> 7) & White_Pieces)
+				if(((GeneralBoard[i] >> 7) & position->White_Pieces) && (GeneralBoard[i]  & 65280))
 				{
-					if(Black_Is_Legal(GeneralBoard[i], GeneralBoard[i] >> 7, 1))
+					Move m(BP, position->Get_Piece_From_Bitboard(GeneralBoard[i] >> 7), GeneralBoard[i], GeneralBoard[i] >> 7, false, true);
+					for(int p = 1; p < 5; p++)
+							{
+								m.PromotionType = BP + p;
+								if(Black_Is_Legal(position, m))
+								position->LegalMoves[position->numlegalmoves++] = m;
+							}
+				}
+				else if((GeneralBoard[i] >> 7) & position->White_Pieces)
+				{
+					Move m(BP, position->Get_Piece_From_Bitboard(GeneralBoard[i] >> 7), GeneralBoard[i], GeneralBoard[i] >> 7, false, false);
+					if(Black_Is_Legal(position, m))
 						{
-							Black_Move_From_Stack[Black_Move_Spacer] = GeneralBoard[i];
-							Black_Move_To_Stack[Black_Move_Spacer] = GeneralBoard[i] >> 7;
-							Black_Move_Types[Black_Move_Spacer++] = (GeneralBoard[i] & 65280 ? 13 : 1);
+							position->LegalMoves[position->numlegalmoves++] = m;
 						}
 				}
 			}
 			if(!(GeneralBoard[i] & A_Pawn_Mask))
 			{
-				if((GeneralBoard[i] >> 9) & White_Pieces)
+				if(((GeneralBoard[i] >> 9) & position->White_Pieces) && (GeneralBoard[i]  & 65280))
 				{
-					if(Black_Is_Legal(GeneralBoard[i], GeneralBoard[i] >> 9, 1))
+					Move m(BP, position->Get_Piece_From_Bitboard(GeneralBoard[i] >> 9), GeneralBoard[i], GeneralBoard[i] >> 9, false, true);
+					if(Black_Is_Legal(position, m))
 						{
-							Black_Move_From_Stack[Black_Move_Spacer] = GeneralBoard[i];
-							Black_Move_To_Stack[Black_Move_Spacer] = GeneralBoard[i] >> 9;
-							Black_Move_Types[Black_Move_Spacer++] = (GeneralBoard[i] & 65280 ? 13 : 1);
+							for(int p = 1; p < 5; p++)
+							{
+								m.PromotionType = BP + p;
+								position->LegalMoves[position->numlegalmoves++] = m;
+							}
+						}
+				}
+				else if((GeneralBoard[i] >> 9) & position->White_Pieces)
+				{
+					Move m(BP, position->Get_Piece_From_Bitboard(GeneralBoard[i] >> 9), GeneralBoard[i], GeneralBoard[i] >> 9, false, false);
+					if(Black_Is_Legal(position, m))
+						{
+							position->LegalMoves[position->numlegalmoves++] = m;
 						}
 				}
 			}
 		}
-		if(GeneralBoard[i] & Black_Knights)
+		if(GeneralBoard[i] & position->Black_Knights)
 		{
 			Bitboard k = Knight_Lookup_Table[i];
-			k |= Black_Pieces;
-			Bitboard b = k ^ Black_Pieces;
+			k |= position->Black_Pieces;
+			Bitboard b = k ^ position->Black_Pieces;
 			int p = __builtin_popcountll(b);
 			for(int m = 0; m < p; m++)
 			{
 				int j = lsb(b);
 				b ^= GeneralBoard[j];
-				if(GeneralBoard[j] & White_Pieces)
+				if(GeneralBoard[j] & position->White_Pieces)
 					{
-						if(Black_Is_Legal(GeneralBoard[i], GeneralBoard[j], 3))
+						Move m(BN, position->Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
+						if(Black_Is_Legal(position, m))
 						{
-							Black_Move_From_Stack[Black_Move_Spacer] = GeneralBoard[i];
-							Black_Move_To_Stack[Black_Move_Spacer] = GeneralBoard[j];
-							Black_Move_Types[Black_Move_Spacer++] = 3;
+							position->LegalMoves[position->numlegalmoves++] = m;
 						}
 					}
 				else
 				{
 					if(!caps)
 					{
-						if(Black_Is_Legal(GeneralBoard[i], GeneralBoard[j], 4))
+						Move m(BN, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
+						if(Black_Is_Legal(position, m))
 							{
-								Black_Move_From_Stack[Black_Move_Spacer] = GeneralBoard[i];
-								Black_Move_To_Stack[Black_Move_Spacer] = GeneralBoard[j];
-								Black_Move_Types[Black_Move_Spacer++] = 4;
+								position->LegalMoves[position->numlegalmoves++] = m;
 							}
 					}
 				}	
 									
 			}
 		}
-		if(GeneralBoard[i] & Black_Bishops)
+		if(GeneralBoard[i] & position->Black_Bishops)
 		{
-			Bitboard bi = Bmagic(i, White_Pieces | Black_Pieces);
-			bi |= Black_Pieces;
-			Bitboard b = bi ^ Black_Pieces;
+			Bitboard bi = Bmagic(i, position->White_Pieces | position->Black_Pieces);
+			bi |= position->Black_Pieces;
+			Bitboard b = bi ^ position->Black_Pieces;
 			int p = __builtin_popcountll(b);
 			for(int m = 0; m < p; m++)
 			{
 				int j = lsb(b);
 				b ^= GeneralBoard[j];
-				if(GeneralBoard[j] & White_Pieces)
+				if(GeneralBoard[j] & position->White_Pieces)
 					{
-						if(Black_Is_Legal(GeneralBoard[i], GeneralBoard[j], 5))
+						Move m(BB, position->Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
+						if(Black_Is_Legal(position, m))
 						{
-							Black_Move_From_Stack[Black_Move_Spacer] = GeneralBoard[i];
-							Black_Move_To_Stack[Black_Move_Spacer] = GeneralBoard[j];
-							Black_Move_Types[Black_Move_Spacer++] = 5;
+							position->LegalMoves[position->numlegalmoves++] = m;
 						}
 					}
 				else
 				{
 					if(!caps)
 					{
-						if(Black_Is_Legal(GeneralBoard[i], GeneralBoard[j], 6))
+						Move m(BB, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
+						if(Black_Is_Legal(position, m))
 							{
-								Black_Move_From_Stack[Black_Move_Spacer] = GeneralBoard[i];
-								Black_Move_To_Stack[Black_Move_Spacer] = GeneralBoard[j];
-								Black_Move_Types[Black_Move_Spacer++] = 6;
+								position->LegalMoves[position->numlegalmoves++] = m;
 							}
 					}
 				}	
 			}
 		}
-		if(GeneralBoard[i] & Black_Rooks)
+		if(GeneralBoard[i] & position->Black_Rooks)
 		{
-			Bitboard r = Rmagic(i, White_Pieces | Black_Pieces);
-			r |= Black_Pieces;
-			Bitboard b = r ^ Black_Pieces;
+			Bitboard r = Rmagic(i, position->White_Pieces | position->Black_Pieces);
+			r |= position->Black_Pieces;
+			Bitboard b = r ^ position->Black_Pieces;
 			int p = __builtin_popcountll(b);
 			for(int m = 0; m < p; m++)
 			{
 				int j = lsb(b);
 				b ^= GeneralBoard[j];
-				if(GeneralBoard[j] & White_Pieces)
+				if(GeneralBoard[j] & position->White_Pieces)
 					{
-						if(Black_Is_Legal(GeneralBoard[i], GeneralBoard[j], 7))
+						Move m(BR, position->Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
+						if(Black_Is_Legal(position, m))
 						{
-							Black_Move_From_Stack[Black_Move_Spacer] = GeneralBoard[i];
-							Black_Move_To_Stack[Black_Move_Spacer] = GeneralBoard[j];
-							Black_Move_Types[Black_Move_Spacer++] = 7;
+							position->LegalMoves[position->numlegalmoves++] = m;
 						}
 					}
 				else
 				{
 					if(!caps)
 					{
-						if(Black_Is_Legal(GeneralBoard[i], GeneralBoard[j], 8))
+						Move m(BR, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
+						if(Black_Is_Legal(position, m))
 							{
-								Black_Move_From_Stack[Black_Move_Spacer] = GeneralBoard[i];
-								Black_Move_To_Stack[Black_Move_Spacer] = GeneralBoard[j];
-								Black_Move_Types[Black_Move_Spacer++] = 8;
+								position->LegalMoves[position->numlegalmoves++] = m;
 							}
 					}
 				}	
 			}
 		}
-		if(GeneralBoard[i] & Black_Queens)
+		if(GeneralBoard[i] & position->Black_Queens)
 		{
-			Bitboard q = Rmagic(i, White_Pieces | Black_Pieces);
-			Bitboard qu = (Bmagic(i, White_Pieces | Black_Pieces) | q);
-			qu |= Black_Pieces;
-			Bitboard b = qu ^ Black_Pieces;
+			Bitboard q = Rmagic(i, position->White_Pieces | position->Black_Pieces);
+			Bitboard qu = (Bmagic(i, position->White_Pieces | position->Black_Pieces) | q);
+			qu |= position->Black_Pieces;
+			Bitboard b = qu ^ position->Black_Pieces;
 			int p = __builtin_popcountll(b);
 			for(int m = 0; m < p; m++)
 			{
 				int j = lsb(b);
 				b ^= GeneralBoard[j];
-				if(GeneralBoard[j] & White_Pieces)
+				if(GeneralBoard[j] & position->White_Pieces)
 					{
-						if(Black_Is_Legal(GeneralBoard[i], GeneralBoard[j], 9))
+						Move m(BQ, position->Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
+						if(Black_Is_Legal(position, m))
 						{
-							Black_Move_From_Stack[Black_Move_Spacer] = GeneralBoard[i];
-							Black_Move_To_Stack[Black_Move_Spacer] = GeneralBoard[j];
-							Black_Move_Types[Black_Move_Spacer++] = 9;
+							position->LegalMoves[position->numlegalmoves++] = m;
 						}
 					}
 				else
 				{
 					if(!caps)
 					{
-						if(Black_Is_Legal(GeneralBoard[i], GeneralBoard[j], 10))
+						Move m(BQ, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
+						if(Black_Is_Legal(position, m))
 							{
-								Black_Move_From_Stack[Black_Move_Spacer] = GeneralBoard[i];
-								Black_Move_To_Stack[Black_Move_Spacer] = GeneralBoard[j];
-								Black_Move_Types[Black_Move_Spacer++] = 10;
+								position->LegalMoves[position->numlegalmoves++] = m;
 							}
 					}
 				}	
 			}
 		}
-		if(GeneralBoard[i] & Black_King)
+		if(GeneralBoard[i] & position->Black_King)
 		{
 			Bitboard k = King_Lookup_Table[i];
-			k |= Black_Pieces;
-			Bitboard b = k ^ Black_Pieces;
+			k |= position->Black_Pieces;
+			Bitboard b = k ^ position->Black_Pieces;
 			int p = __builtin_popcountll(b);
 			for(int m = 0; m < p; m++)
 			{
 				int j = lsb(b);
 				b ^= GeneralBoard[j];
-				if(GeneralBoard[j] & White_Pieces)
+				if(GeneralBoard[j] & position->White_Pieces)
 					{
-						if(Black_Is_Legal(GeneralBoard[i], GeneralBoard[j], 11))
+						Move m(BK, position->Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
+						if(Black_Is_Legal(position, m))
 						{
-							Black_Move_From_Stack[Black_Move_Spacer] = GeneralBoard[i];
-							Black_Move_To_Stack[Black_Move_Spacer] = GeneralBoard[j];
-							Black_Move_Types[Black_Move_Spacer++] = 11;
+							position->LegalMoves[position->numlegalmoves++] = m;
 						}
 					}
 				else
 				{
 					if(!caps)
 					{
-						if(Black_Is_Legal(GeneralBoard[i], GeneralBoard[j], 12))
+						Move m(BK, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
+						if(Black_Is_Legal(position, m))
 							{
-								Black_Move_From_Stack[Black_Move_Spacer] = GeneralBoard[i];
-								Black_Move_To_Stack[Black_Move_Spacer] = GeneralBoard[j];
-								Black_Move_Types[Black_Move_Spacer++] = 12;
+								position->LegalMoves[position->numlegalmoves++] = m;
 							}
 					}
 				}	
@@ -515,22 +544,28 @@ void Generate_Black_Moves(const bool caps)
 			if(!caps)
 			{
 				Bitboard first = (GeneralBoard[i] & 1152921504606846976);
-        		Bitboard second = ((White_Pieces | Black_Pieces) & 6917529027641081856);
+        		Bitboard second = ((position->White_Pieces | position->Black_Pieces) & 6917529027641081856);
         		Bitboard e8 = 1152921504606846976, f8 = 2305843009213693952, g8 = 4611686018427387904, a0 = 0;
-        		bool canmovetof1 = Black_Is_Legal(e8, f8, 12);
-        		bool canmovetog1 = Black_Is_Legal(e8, g8, 12);
-        		bool canmovetoe1 = Black_Is_Legal(a0, e8, 12);
-        		bool Rookonh1 = (Black_Rooks & 9223372036854775808ULL);
-        		int notincheck = Search::Is_Mate();
-        		if(first && (!second) && canmovetof1 && canmovetog1 && canmovetoe1 && (BlackCanCastleK) && Rookonh1 && (notincheck != 10000))
+        		bool canmovetof8 = !(f8 & (position->White_Pieces | position->Black_Pieces));
+        		bool canmovetog8 = !(g8 & (position->White_Pieces | position->Black_Pieces));
+        		if(canmovetof8 && canmovetog8)
         		{
-		            Black_Move_From_Stack[Black_Move_Spacer] = GeneralBoard[i];
-		            Bitboard too = 4611686018427387904;
-		            Black_Move_To_Stack[Black_Move_Spacer++] = too;
-		            Black_Move_Types[Black_Move_Spacer - 1] = 15;
-		        }
+        			Move m(BK, NONE, GeneralBoard[i], 2305843009213693952, false, false);
+        			bool safetomovetof1 = Black_Is_Legal(position, m);
+        			Move m1(BK, NONE, GeneralBoard[i], 4611686018427387904, false, false);
+        			bool safetomovetog1 = Black_Is_Legal(position, m1);
+        			Move m2(BK, NONE, GeneralBoard[i], 1152921504606846976, false, false);
+        			bool safetomovetoe1 = Search::Is_Mate(position) <= 0 ? true : false;
+        			bool Rookonh1 = (position->Black_Rooks & 9223372036854775808);
+        			int notincheck = Search::Is_Mate(position);
+        			if(first && (!second) && safetomovetof1 && safetomovetog1 && safetomovetoe1 && (position->BlackCanCastleK) && Rookonh1 && (notincheck != 10000))
+        			{
+        				m1.Castling = true;
+        				position->LegalMoves[position->numlegalmoves++] = m1;
+		        	}
+		    	}
 	    	}
-		}
+	    }
 	}
 return;	
 }
