@@ -1,4 +1,3 @@
-#include <string>
 #include "Bitboard.h"
 #include "Search.h"
 typedef unsigned long long int Bitboard;
@@ -19,21 +18,6 @@ Bitboard Eigth_Rank_White = 18374686479671623680ULL;//For masking out pawn pushe
 Bitboard Eigth_Rank_Black = 255;//See last comment
 Bitboard Seventh_Rank_White = 71776119061217280;//For masking out pawn pushes to the eagth rank for each side--white and black
 Bitboard Seventh_Rank_Black = 65280;//See last comment
-Bitboard White_Pieces = 0;
-Bitboard Black_Pieces = 0;
-Bitboard White_King = 0;
-Bitboard Black_King = 0;
-Bitboard White_Queens = 0;
-Bitboard White_Rooks = 0;
-Bitboard White_Bishops = 0;
-Bitboard White_Knights = 0;
-Bitboard White_Pawns = 0;
-Bitboard Black_Queens = 0;
-Bitboard Black_Rooks = 0;
-Bitboard Black_Bishops = 0;
-Bitboard Black_Knights = 0;
-Bitboard Black_Pawns = 0;
-
 Bitboard CurrZobkey = 0;
 
 //Contains the squares that a knight on a given index can move to. For example, the 0th element has the bits of b3 and c2 set
@@ -98,69 +82,69 @@ void Print_Board()
 {
     for( int h = 0; h < 64; h++)
     {
-        if(GeneralBoard[h] & White_King)
+        if(GeneralBoard[h] & pos.White_King)
         {
             cout << "White king is on " << PlayerMoves[h] << endl;
         }
 
-        if(GeneralBoard[h] & Black_King)
+        if(GeneralBoard[h] & pos.Black_King)
         {
             cout << "Black king is on " << PlayerMoves[h] << endl;
         }
 
-        if(GeneralBoard[h] & White_Queens)
+        if(GeneralBoard[h] & pos.White_Queens)
         {
             cout << "White queen is on " << PlayerMoves[h] << endl;
         }
 
-        if(GeneralBoard[h] & Black_Queens)
+        if(GeneralBoard[h] & pos.Black_Queens)
         {
             cout << "Black queen is on " << PlayerMoves[h] << endl;
         }
 
-        if(GeneralBoard[h] & White_Rooks)
+        if(GeneralBoard[h] & pos.White_Rooks)
         {
             cout << "White rook is on " << PlayerMoves[h] << endl;
         }
 
-        if(GeneralBoard[h] & Black_Rooks)
+        if(GeneralBoard[h] & pos.Black_Rooks)
         {
             cout << "Black rook is on " << PlayerMoves[h] << endl;
         }
 
-        if(GeneralBoard[h] & White_Bishops)
+        if(GeneralBoard[h] & pos.White_Bishops)
         {
             cout << "White Bishop is on " << PlayerMoves[h] << endl;
         }
 
-        if(GeneralBoard[h] & Black_Bishops)
+        if(GeneralBoard[h] & pos.Black_Bishops)
         {
             cout << "Black Bishop is on " << PlayerMoves[h] << endl;
         }
 
-        if(GeneralBoard[h] & White_Knights)
+        if(GeneralBoard[h] & pos.White_Knights)
         {
             cout << "White Knight is on " << PlayerMoves[h] << endl;
         }
 
-        if(GeneralBoard[h] & Black_Knights)
+        if(GeneralBoard[h] & pos.Black_Knights)
         {
             cout << "Black Knight is on " << PlayerMoves[h] << endl;
         }
 
-        if(GeneralBoard[h] & White_Pawns)
+        if(GeneralBoard[h] & pos.White_Pawns)
         {
             cout << "White Pawn is on " << PlayerMoves[h] << endl;
         }
 
-        if(GeneralBoard[h] & Black_Pawns)
+        if(GeneralBoard[h] & pos.Black_Pawns)
         {
             cout << "Black Pawn is on " << PlayerMoves[h] << endl;
         }
         //cout << "White king: " << White_King << endl;
     }
 
-    if(Search::Current_Turn)
+    if(pos.Current_Turn)
     {
         cout << "It is White's turn" << endl;
     }
