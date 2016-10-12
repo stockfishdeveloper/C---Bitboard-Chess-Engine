@@ -3,7 +3,7 @@
 typedef unsigned long long int Bitboard;
 using namespace std;
 //This is an array containing one bit set in each bitboard corresponding to the index of the array; the square A1 is the first (0th) element
-Bitboard GeneralBoard[64] =
+const Bitboard GeneralBoard[64] =
 {
     1, 2, 4, 8, 16, 32, 64, 128,
     256, 512, 1024, 2048, 4096, 8192, 16384, 32768,
@@ -21,7 +21,7 @@ Bitboard Seventh_Rank_Black = 65280;//See last comment
 Bitboard CurrZobkey = 0;
 
 //Contains the squares that a knight on a given index can move to. For example, the 0th element has the bits of b3 and c2 set
-Bitboard Knight_Lookup_Table[64] =
+const Bitboard Knight_Lookup_Table[64] =
 {
     132096, 329728, 659712, 1319424, 2638848, 5277696, 10489856, 4202496,
     33816580, 84410376, 168886289, 337772578, 675545156, 1351090312, 2685403152LL, 1075839008LL,
@@ -35,7 +35,7 @@ Bitboard Knight_Lookup_Table[64] =
 };
 
 //This one is the same as the Knight_Lookup_Table except that this one is for kings
-Bitboard King_Lookup_Table[64] =
+const Bitboard King_Lookup_Table[64] =
 {
     770, 1797, 3594, 7188, 14376, 28752, 57504, 49216,
     197123, 460039, 920078, 1840156, 3680312, 7360624, 14721248, 12599488,
