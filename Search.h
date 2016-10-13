@@ -111,11 +111,7 @@ namespace Search
 Move Think(int wtime, int btime, int winc, int binc);
 int AlphaBeta(Position* position, int alpha, int beta, int depth, LINE * pline, bool donullmove);
 int QuiescenceSearch(Position* posit, int alpha, int beta, int depth);
-int MateSearch(int alpha, int beta, int depth);
-//int SearchMax(int alpha, int beta, int depth, LINE * pline, bool donullmove);
-//int SearchMin(int alpha, int beta, int depth, LINE * pline, bool donullmove);
-//int QuiesceMax(int alpha, int beta, int depth);
-//int QuiesceMin(int alpha, int beta, int depth);
+int MateSearch(Position* posit, int alpha, int beta, int depth);
 int Get_Move_Score(Move& m);
 extern Bitboard Nodes;
 extern bool Searching;
