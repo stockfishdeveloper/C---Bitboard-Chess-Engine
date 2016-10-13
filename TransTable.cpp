@@ -7,9 +7,9 @@ TTEntry * TranspositionTable::probe(const Bitboard key1)
 {
 	int index = key1 % 8388608;
 	if(TT.table[index].key == key1)
-	return &table[index];
+		return &table[index];
 	else
-	return NULL;
+		return NULL;
 }
 void TranspositionTable::save(int depth1, int score1, Move best1, NodeType n, Bitboard hashkey)
 {
