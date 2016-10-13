@@ -19,7 +19,7 @@ int wtime = 0;
 int btime = 0;
 int Time_Usage = 0;
 LINE PVline;
-
+#include "Pawns.h"
 int CheckUci()
 {
     bool Is_Fen = false;
@@ -31,7 +31,8 @@ int CheckUci()
         if(UciCommand == "uci")
         {
             cout << "id name ";
-            cout << setfill('0') << Engine_Info() << "\n";
+            Engine_Info();
+            cout << "\n";
             cout << "id author David Cimbalista\n";
             cout << "option name TimePerMove type spin default 3 min 1 max 5\n";
             cout << "option name NalimovPath type string default NULL\n";
@@ -67,27 +68,24 @@ int CheckUci()
             //cout << Get_Current_Hash_Key() << endl;
 
         }
+        else if(UciCommand == "mate")
+        {
+        	int depth = 0;
+        	cin >> depth;
+        	cout << Search::MateSearch(&pos, -1, 1, depth) << endl;
+		}
 		else if(UciCommand == "bench")
         {
-            Timer time;
+        	Timer time;
+        	time.Start_Clock();
+        	for(Bitboard i = 1; i < 100000000; i++)
+            lsb(i);
+            cout << time.Get_Time() << endl;
+            Timer time2;
             time.Start_Clock();
-            for(int i = 0; i < 1000000; i++)
-            {
-            	Generate_White_Moves(false, &pos);
-            	Search::Clear();
-            	Generate_Black_Moves(false, &pos);
-            	Search::Clear();
-			}
-			cout << time.Get_Time() << endl;
-			Search::Clear();
-			time.Start_Clock();
-            for(int i = 0; i < 1000000; i++)
-            {
-            	Generate_White_Moves(false, &pos);
-            	Generate_Black_Moves(false, &pos);
-            }
-			cout << time.Get_Time() << endl;
-			Search::Clear();
+            for(Bitboard i = 1; i < 100000000; i++)
+            test_lsb(i);
+            cout << time.Get_Time() << endl;
 		}
         else if(UciCommand == "perft")
         {
@@ -125,11 +123,12 @@ int CheckUci()
                 cin >> value2;
                 Time_Usage = value2;
             }
-            if(optionname == "NalimovPath")
+        }
+        else if(UciCommand == "tb")
             {
-            	/*string option;
+            	string option;
             	cin >> option;
-            	cout << IInitializeTb(option.c_str()) << " man tablebases found" << endl;
+              	cout << IInitializeTb(option.c_str()) << " man tablebases found" << endl;
             	int pieces[10];
             	int wpieces[16];
             	int bpieces[16];
@@ -147,75 +146,73 @@ int CheckUci()
             	int tbid = IDescFindFromCounters(pieces);
             	cout << "Tablebase " << tbid << endl; 
             	Move m;
-            	while(m.White_Pawns2)
+            	while(pos.White_Pawns)
             	{
-            		int b = m.Convert_Bitboard(pos.White_Pawns);
+            		int b = Convert_Bitboard(pos.White_Pawns);
             		wpieces[wc++] = b;
-            		m.White_Pawns2 ^= GeneralBoard[b];
+            		pos.White_Pawns ^= GeneralBoard[b];
 				}
-				while(m.White_Knights2)
+				while(pos.White_Knights)
             	{
-            		int b = m.Convert_Bitboard(pos.White_Knights);
+            		int b = Convert_Bitboard(pos.White_Knights);
             		wpieces[wc++] = b;
-            		m.White_Knights2 ^= GeneralBoard[b];
+            		pos.White_Knights ^= GeneralBoard[b];
 				}
-				while(m.White_Bishops2)
+				while(pos.White_Bishops)
             	{
-            		int b = m.Convert_Bitboard(pos.White_Bishops);
+            		int b = Convert_Bitboard(pos.White_Bishops);
             		wpieces[wc++] = b;
-            		m.White_Bishops2 ^= GeneralBoard[b];
+            		pos.White_Bishops ^= GeneralBoard[b];
 				}
-				while(m.White_Rooks2)
+				while(pos.White_Rooks)
             	{
-            		int b = m.Convert_Bitboard(pos.White_Rooks);
+            		int b = Convert_Bitboard(pos.White_Rooks);
             		wpieces[wc++] = b;
-            		m.White_Rooks2 ^= GeneralBoard[b];
+            		pos.White_Rooks ^= GeneralBoard[b];
 				}
-				while(m.White_Queens2)
+				while(pos.White_Queens)
             	{
-            		int b = m.Convert_Bitboard(pos.White_Queens);
+            		int b = Convert_Bitboard(pos.White_Queens);
             		wpieces[wc++] = b;
-            		m.White_Queens2 ^= GeneralBoard[b];
+            		pos.White_Queens ^= GeneralBoard[b];
 				}
 				
-				while(m.Black_Pawns2)
+				while(pos.Black_Pawns)
             	{
-            		int b = m.Convert_Bitboard(pos.Black_Pawns);
+            		int b = Convert_Bitboard(pos.Black_Pawns);
             		bpieces[bc++] = b;
-            		m.Black_Pawns2 ^= GeneralBoard[b];
+            		pos.Black_Pawns ^= GeneralBoard[b];
 				}
-				while(m.Black_Knights2)
+				while(pos.Black_Knights)
             	{
-            		int b = m.Convert_Bitboard(pos.Black_Knights);
+            		int b = Convert_Bitboard(pos.Black_Knights);
             		bpieces[bc++] = b;
-            		m.Black_Knights2 ^= GeneralBoard[b];
+            		pos.Black_Knights ^= GeneralBoard[b];
 				}
-				while(m.White_Bishops2)
+				while(pos.White_Bishops)
             	{
-            		int b = m.Convert_Bitboard(pos.Black_Bishops);
+            		int b = Convert_Bitboard(pos.Black_Bishops);
             		bpieces[bc++] = b;
-            		m.Black_Bishops2 ^= GeneralBoard[b];
+            		pos.Black_Bishops ^= GeneralBoard[b];
 				}
-				while(m.Black_Rooks2)
+				while(pos.Black_Rooks)
             	{
-            		int b = m.Convert_Bitboard(pos.Black_Rooks);
+            		int b = Convert_Bitboard(pos.Black_Rooks);
             		bpieces[bc++] = b;
-            		m.Black_Rooks2 ^= GeneralBoard[b];
+            		pos.Black_Rooks ^= GeneralBoard[b];
 				}
-				while(m.Black_Queens2)
+				while(pos.Black_Queens)
             	{
-            		int b = m.Convert_Bitboard(pos.Black_Queens);
+            		int b = Convert_Bitboard(pos.Black_Queens);
             		bpieces[bc++] = b;
-            		m.Black_Queens2 ^= GeneralBoard[b];
+            		pos.Black_Queens ^= GeneralBoard[b];
 				}
-				wpieces[15] = m.Convert_Bitboard(pos.White_King);
-				bpieces[15] = m.Convert_Bitboard(pos.Black_King);
+				wpieces[15] = Convert_Bitboard(pos.White_King);
+				bpieces[15] = Convert_Bitboard(pos.Black_King);
 				unsigned long tbindex = PfnIndCalcFun(tbid, pos.Current_Turn);
             	cout << "Index " << tbindex << endl;
-            	cout << "Score is " << TbtProbeTable(tbid, 1, tbindex) << endl;*/
+            	cout << "Score is " << TbtProbeTable(tbid, 1, tbindex) << endl;
 			}
-        }
-
         else if(UciCommand == "go")
         {
             string time_left_white = "";
@@ -322,15 +319,19 @@ int Parse_Fen(string Fen)
     string Legal_Castling = "";
     cin >> Legal_Castling;
     Log << Legal_Castling << endl;
+    pos.WhiteCanCastleK = false;
+    pos.BlackCanCastleK = false;
+    pos.WhiteCanCastleQ = false;
+    pos.BlackCanCastleQ = false;
     for(int i = 0; i < Legal_Castling.length(); i++)
     {
-    	if(Legal_Castling[i] == "K")
+    	if(Legal_Castling[i] == 'K')
     		pos.WhiteCanCastleK = true;
-    	if(Legal_Castling[i] == "k")
+    	if(Legal_Castling[i] == 'k')
     		pos.BlackCanCastleK = true;
-    	if(Legal_Castling[i] == "Q")
+    	if(Legal_Castling[i] == 'Q')
     		pos.WhiteCanCastleQ = true;
-    	if(Legal_Castling[i] == "q")
+    	if(Legal_Castling[i] == 'q')
     		pos.BlackCanCastleQ = true;
     }
     string En_Passant;
@@ -476,6 +477,7 @@ int Read_Fen(char Current_Square)
 
 int Moves_Command()
 {
+	pos.Reset();
     char First_Part[5];
     char Second_Part[5];
     string Promotion_Type;
@@ -1186,7 +1188,7 @@ int Parse_Moves(string First, string Second, string Promotion_Type)
     }
     return 0;
 }
-string Engine_Info()
+void Engine_Info()
 {
     string Version = "";
     const string months("Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec");
@@ -1198,7 +1200,6 @@ string Engine_Info()
         date >> month >> day >> year;
         cout << setw(2) << day << setw(2) << (1 + months.find(month) / 4) << year.substr(2);
     }
-    return Version;
 }
 void Uci_Pv(int depth, int seldepth, Move best, int* matemoves, int time, int nodes)
 {
