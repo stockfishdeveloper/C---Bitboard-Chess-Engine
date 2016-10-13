@@ -10,6 +10,7 @@
 		Score = 0;
 		Castling = false;
 		Promotion = false;
+		PromotionType = NONE;
 	}
 	Move::Move(Piece piece, Piece captured, Bitboard from, Bitboard to, bool castling, bool promotion)
 	{
@@ -20,6 +21,7 @@
 		Castling = castling;
 		Promotion = promotion;
 		PromotionType = NONE;
+		Score = 0;
 	}
 	Position::Position()
 	{
@@ -38,12 +40,13 @@
 		Black_Knights = 0;
 		Black_Pawns = 0;
 		numlegalmoves = 0;
-		WhiteCanCastleK = true;
-		WhiteCanCastleQ = true;
-		BlackCanCastleK = true;
-		BlackCanCastleQ = true;
+		WhiteCanCastleK = false;
+		WhiteCanCastleQ = false;
+		BlackCanCastleK = false;
+		BlackCanCastleQ = false;
 		Current_Turn = true;
 		hashkey = 0;
+		numlegalmoves = 0;
 	}
 	Position::Position(Position* position)
 	{
@@ -67,10 +70,6 @@
 		BlackCanCastleK = position->BlackCanCastleK;
 		BlackCanCastleQ = position->BlackCanCastleQ;
 		hashkey = position->hashkey;
-		WhiteCanCastleK = true;
-		WhiteCanCastleQ = true;
-		BlackCanCastleK = true;
-		BlackCanCastleQ = true;
 		numlegalmoves = 0;
 	}
 	void Position::Reset()
@@ -182,7 +181,7 @@
 				White_Pieces ^= 144;
 				White_Pieces |= 96;
 			}
-			else
+			else if(m.To & 4611686018427387904)
 			{
 				Black_Rooks |= 2305843009213693952;
 				Black_Rooks ^= 9223372036854775808;
@@ -190,6 +189,24 @@
 				Black_King ^= 1152921504606846976;
 				Black_Pieces ^= 10376293541461622784;
 				Black_Pieces |= 6917529027641081856;
+			}
+			else if(m.To & 4)
+			{
+				White_Rooks |= 8;
+				White_Rooks ^= 1;
+				White_King |= 4;
+				White_King ^= 16;
+				White_Pieces ^= 17;
+				White_Pieces |= 12;
+			}
+			else if(m.To & 288230376151711744)
+			{
+				Black_Rooks |= 576460752303423488;
+				Black_Rooks ^= 72057594037927936;
+				Black_King |= 288230376151711744;
+				Black_King ^= 1152921504606846976;
+				Black_Pieces ^= 1224979098644774912;
+				Black_Pieces |= 864691128455135232;
 			}
 			Current_Turn ^= 1;
 			return;
@@ -238,7 +255,7 @@
 				White_Pieces |= 144;
 				White_Pieces ^= 96;
 			}
-			else
+			else if(m.To & 4611686018427387904)
 			{
 				Black_Rooks ^= 2305843009213693952;
 				Black_Rooks |= 9223372036854775808;
@@ -246,6 +263,24 @@
 				Black_King |= 1152921504606846976;
 				Black_Pieces |= 10376293541461622784;
 				Black_Pieces ^= 6917529027641081856;
+			}
+			else if(m.To & 4)
+			{
+				White_Rooks ^= 8;
+				White_Rooks |= 1;
+				White_King ^= 4;
+				White_King |= 16;
+				White_Pieces |= 17;
+				White_Pieces ^= 12;
+			}
+			else if(m.To & 288230376151711744)
+			{
+				Black_Rooks ^= 576460752303423488;
+				Black_Rooks |= 72057594037927936;
+				Black_King ^= 288230376151711744;
+				Black_King |= 1152921504606846976;
+				Black_Pieces |= 1224979098644774912;
+				Black_Pieces ^= 864691128455135232;
 			}
 			Current_Turn ^= 1;
 			return;
