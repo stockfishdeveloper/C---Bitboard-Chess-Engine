@@ -21,6 +21,6 @@ int Read_Fen(char Current_Square);
 extern Bitboard Current_Rank;
 extern string UciCommand;
 extern int Time_Usage;
-extern string Engine_Info();
+extern void Engine_Info();
 void Uci_Pv(int depth, int seldepth, Move best, int* matemoves, int time, int nodes);
 #endif
