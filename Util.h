@@ -2,9 +2,10 @@
 #define UTIL_H
 #include "Bitboard.h"
 #include "Search.h"
-int lsb(const Bitboard& b);
+short lsb(Bitboard b);
+int test_lsb(Bitboard b);
 enum Movetype { Capture, Promotion, Normal };
 Movetype Get_Move_Type(Move& m);
-const int Convert_Bitboard(const Bitboard& board);
+const short Convert_Bitboard(const Bitboard& board);
 const Bitboard Unconvert_Int(const int& number);
 #endif
