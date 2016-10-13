@@ -26,33 +26,20 @@ void Init_Zobrist()
 Bitboard Get_Current_Hash_Key(Position* position)
 {
 	Bitboard key = 0;
-	for(int i = 0; i < 64; i++)
-	{
-		if(position->White_Pawns & GeneralBoard[i])
-		key ^= GeneralBoard[i];
-		if(position->White_Knights & GeneralBoard[i])
-		key ^= GeneralBoard[i];
-		if(position->White_Bishops & GeneralBoard[i])
-		key ^= GeneralBoard[i];
-		if(position->White_Rooks & GeneralBoard[i])
-		key ^= GeneralBoard[i];
-		if(position->White_Queens & GeneralBoard[i])
-		key ^= GeneralBoard[i];
-		if(position->White_King & GeneralBoard[i])
-		key ^= GeneralBoard[i];
-		if(position->Black_Pawns & GeneralBoard[i])
-		key ^= GeneralBoard[i];
-		if(position->Black_Knights & GeneralBoard[i])
-		key ^= GeneralBoard[i];
-		if(position->Black_Bishops & GeneralBoard[i])
-		key ^= GeneralBoard[i];
-		if(position->Black_Rooks & GeneralBoard[i])
-		key ^= GeneralBoard[i];
-		if(position->Black_Queens & GeneralBoard[i])
-		key ^= GeneralBoard[i];
-		if(position->Black_King & GeneralBoard[i])
-		key ^= GeneralBoard[i];
-	}
+	key ^= position->White_Pawns;
+	key ^= position->White_Knights;
+	key ^= position->White_Bishops;
+	key ^= position->White_Rooks;
+	key ^= position->White_Queens;
+	key ^= position->White_King;
+	key ^= position->Black_Pawns;
+	key ^= position->Black_Knights;
+	key ^= position->Black_Bishops;
+	key ^= position->Black_Rooks;
+	key ^= position->Black_Queens;
+	key ^= position->Black_King;
+	
 	key ^= position->Current_Turn;
+	
 	return key;
 }
