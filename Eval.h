@@ -4,6 +4,7 @@
 namespace Eval
 {
 const int Evaluate_Position(Position* position);
+int Lazy_Eval(Position* position);
 extern const int WNpsqt[64];
 extern const int BNpsqt[64];
 extern const int WPpsqt[64];
