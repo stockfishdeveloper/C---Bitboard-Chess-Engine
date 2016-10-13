@@ -1,11 +1,14 @@
 #include "Util.h"
-int lsb(const Bitboard& b)
+short lsb(register Bitboard b)
 {
-	for(int i = 0; i < 64; i++)
+	if(b == 0) return 0;
+	register short temp = 0;
+	while(!(b & 1))
 	{
-		if(GeneralBoard[i] & b)
-		return i;
+		b >>= 1;
+		++temp;
 	}
+	return temp;
 }
 Movetype Get_Move_Type(Move& m)
 {
@@ -16,11 +19,11 @@ Movetype Get_Move_Type(Move& m)
 	else
 		return Normal;
 }
-const int Convert_Bitboard(const Bitboard& board)
+const short Convert_Bitboard(const Bitboard& board)
     {
         if(board == 0)
             return 0;
-        for(int i = 0; i < 64; i++)
+        for(short i = 0; i < 64; i++)
         {
             if(board & GeneralBoard[i])
                 return i;
@@ -31,3 +34,14 @@ const Bitboard Unconvert_Int(const int& number)
 	{
         return GeneralBoard[number];
     }
+int test_lsb(Bitboard b)
+{
+	if(b == 0) return 0;
+	int temp = 0;
+	while(!(b & 1))
+	{
+		b >>= 1;
+		++temp;
+	}
+	return temp;
+}
