@@ -41,6 +41,8 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
     	output.lock();
 		cout << "info depth " << Search::Depth << endl;
 		output.unlock();
+		rootAlpha -= 50;
+		rootBeta += 50;
 		if(q == 1)
 		{
 			pos.Current_Turn ? Generate_White_Moves(false, &pos) : Generate_Black_Moves(false, &pos);
@@ -53,26 +55,17 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
             {
             	for(int h = 0; h < pos.numlegalmoves; h++)
                 	{
-                    	pos.LegalMoves[h].Score = Get_Move_Score(pos.LegalMoves[h]);
-                    	rootstack.push_back(pos.LegalMoves[h]);
+                		if(pos.LegalMoves[h].Promotion == true)
+							pos.LegalMoves[h].Score += 100;
+                    	if(pos.LegalMoves[h].C != NONE)
+							pos.LegalMoves[h].Score += Get_Move_Score(pos.LegalMoves[h]);
+						rootstack.push_back(pos.LegalMoves[h]);
                     	count++;
                 	}
             }
-        for(int i = 0; i < count; i++)
-			{
-				if((rootstack[i].From == Best.From) && (rootstack[i].To == Best.To))
-					rootstack[i].Score += 1000;
-				if(rootstack[i].C != NONE)
-					rootstack[i].Score += 20;
-				if(rootstack[i].Promotion == true)
-					rootstack[i].Score += 100;
-				/*if(Get_Move_Score(rootstack[i], pos.Current_Turn) > 0)
-				{
-					rootstack[i].Score += 50;
-				}*/
-			}
-        std::sort(rootstack.begin(), rootstack.end(), [](const Move& lhs, const Move& rhs){ return (lhs.Score > rhs.Score);});
-        for(int i = 0; i < pos.numlegalmoves; i++)
+        std::stable_sort(rootstack.begin(), rootstack.end(), [](const Move& lhs, const Move& rhs){ return (lhs.Score > rhs.Score);});
+        bool inCheck = Search::Is_Mate(&pos) == -10000;
+        for(int i = 0; i < rootstack.size(); i++)
             {
             	Nodes++;
                 if(q >= 2 && timer.Get_Time() > 1000)
@@ -85,16 +78,17 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
                     output.unlock();
                 }
                 pos.Make_Move(rootstack[i]);
-                int score = -AlphaBeta(&pos, -rootBeta, -rootAlpha, (q - 1), &line, true);
-                (rootstack[i]).Score = score;
+                int score = -AlphaBeta(&pos, -rootBeta, -rootAlpha, q - 1, &line, true);
+                rootstack[i].Score = score;
+                pos.Undo_Move(rootstack[i]);
                 //cout << " " << score << endl;
                 if((score > rootBeta) || (score < rootAlpha))
                 {
                 	rootAlpha = -100000;
                 	rootBeta = 100000;
                 	score = -AlphaBeta(&pos, -rootBeta, -rootAlpha, (q - 1), &line, true);
+                	rootstack[i].Score = score;
                 }
-                pos.Undo_Move(rootstack[i]);
                 if(score > rootAlpha)
                 {
                 	LINE* f = new LINE;
@@ -130,8 +124,8 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
         }
         //rootAlpha -= 50;
         //rootBeta += 50;
-        rootAlpha = -100000;
-    	rootBeta = 100000;
+        //rootAlpha = -100000;
+    	//rootBeta = 100000;
     }
 
     return Best;
@@ -146,9 +140,17 @@ int Search::AlphaBeta(Position* posit, int alpha, int beta, int depth, LINE * pl
         return QuiescenceSearch(posit, alpha, beta, depth + 1);
     }
     Position position(posit);
-    LINE line;
-    bool inCheck = (position.Current_Turn ? (Search::Is_Mate(&position) == -10000) : (Search::Is_Mate(&position) == 10000));
-	/*NULLMOVE PRUNING*******************************************************
+    bool inCheck = Search::Is_Mate(&position) == -10000;
+    position.Current_Turn ? Generate_White_Moves(false, &position) : Generate_Black_Moves(false, &position);
+    if(position.numlegalmoves == 0)
+    {
+        alpha = inCheck * -10000;
+        pline->score = alpha;
+        pline->cmove = 0;
+        return alpha;
+	}
+	LINE line;
+    /*NULLMOVE PRUNING*******************************************************
     *************************************************************************
     *************************************************************************/
     if((!inCheck) && (donullmove) && (depth > 3))
@@ -165,15 +167,7 @@ int Search::AlphaBeta(Position* posit, int alpha, int beta, int depth, LINE * pl
     /************************************************************************
     *************************************************************************
     *************************************************************************/
-    position.Current_Turn ? Generate_White_Moves(false, &position) : Generate_Black_Moves(false, &position);
-    if(position.numlegalmoves == 0)
-    {
-        alpha = Is_Mate(&position);
-        pline->score = alpha;
-        pline->cmove = 0;
-        return alpha;
-	}
-	TTEntry* tt = TT.probe(Get_Current_Hash_Key(&position));
+    TTEntry* tt = TT.probe(Get_Current_Hash_Key(&position));
 	if(tt!= NULL)
 	{
 		if(tt->depth >= depth)
@@ -186,9 +180,9 @@ int Search::AlphaBeta(Position* posit, int alpha, int beta, int depth, LINE * pl
 				}
 		}
 	}
+	
 	NodeType node = Alpha;
     vector<Move> moves;
-    //moves.reserve(Current_Turn ? White_Move_Spacer : Black_Move_Spacer);
     for(int i = 0; i < position.numlegalmoves; i++)
     	{
     		if(tt != NULL) if(tt->best.From == position.LegalMoves[i].From && tt->best.To == position.LegalMoves[i].To) position.LegalMoves[i].Score += 1000;
@@ -198,21 +192,26 @@ int Search::AlphaBeta(Position* posit, int alpha, int beta, int depth, LINE * pl
 				position.LegalMoves[i].Score += 64 * 8;
     		moves.push_back(position.LegalMoves[i]);
 		}
-	std::sort(moves.begin(), moves.end(), [](const Move& lhs, const Move& rhs){ return lhs.Score > rhs.Score; });
+	std::stable_sort(moves.begin(), moves.end(), [](const Move& lhs, const Move& rhs){ return lhs.Score > rhs.Score; });
 	bool pvfound = false;
 	for(int i = 0; i < position.numlegalmoves; i++)
     {
         Nodes++;
         position.Make_Move(moves[i]);
         int score;
+        if(depth == 2 && !inCheck)
+		{
+			if((Eval::Evaluate_Position(&position) + 200) <= alpha)
+			continue;
+		}
         if(i < 3)
-        	score = -AlphaBeta(&position, -beta, -alpha, depth - 1, &line, true);
+           	score = -AlphaBeta(&position, -beta, -alpha, depth - 1, &line, true);
         else
         	{
         		if(depth > 2
 		   		&& i > 2
-		   		//&& (!(mt == Capture))
-		   		//&& (!(mt == Promotion))
+		   		&& (moves[i].C == NONE)
+		   		&& (!(moves[i].Promotion))
 				&& !inCheck)
 		   		{
 		   			score = -AlphaBeta(&position, -(alpha + 1), -alpha, depth - 2, &line, true);
@@ -224,16 +223,16 @@ int Search::AlphaBeta(Position* posit, int alpha, int beta, int depth, LINE * pl
 		   		else
 		   			score = -AlphaBeta(&position, -beta, -alpha, depth - 1, &line, true);
 		   	}
-		/*else if((pvfound == true) && (dofullsearch == 0))
+		/*else if(pvfound == true)
         {
-			score = -AlphaBeta(-(alpha-1), -alpha, depth - 1, &line, true);
+			score = -AlphaBeta(&position, -(alpha+1), -alpha, depth - 1, &line, true);
 			if(score > alpha)
-            	score = -AlphaBeta(-beta, -alpha, depth - 1, &line, true);
+            	score = -AlphaBeta(&position, -beta, -alpha, depth - 1, &line, true);
         }*/
         position.Undo_Move(moves[i]);
         if(score >= beta)
         {
-        	TT.save(depth, beta, pline->argmove[0], Beta, Get_Current_Hash_Key(&position));
+        	TT.save(depth, beta, moves[i], Beta, Get_Current_Hash_Key(&position));
         	return beta;
         }
         if(score > alpha)
@@ -303,13 +302,6 @@ Search::Is_Mate(Position* position)
     			else
     				return 10000;
 			}
-			if(score > 0)
-    		{
-    			if(position->Current_Turn)
-    				return 10000;
-    			else
-    				return -10000;
-			}
 		}
         for(int j = 0; j < 64; j++)
         {
@@ -351,14 +343,7 @@ Search::Is_Mate(Position* position)
             score = 1;
         if(score != 0)
     	{
-    		if(score < 0)
-    		{
-    			if(position->Current_Turn)
-    				return -10000;
-    			else
-    				return 10000;
-			}
-			if(score > 0)
+    		if(score > 0)
     		{
     			if(position->Current_Turn)
     				return 10000;
@@ -378,11 +363,11 @@ int Search::QuiescenceSearch(Position* posit, int alpha, int beta, int depth)
 {
 	int stand_pat = posit->Current_Turn ? Eval::Evaluate_Position(posit) : -Eval::Evaluate_Position(posit);
 	Search::Seldepth = std::max(depth, Search::Seldepth);
-	Nodes++;
-    if(stand_pat >= beta)
+	if(stand_pat >= beta)
         return beta;
     if(stand_pat > alpha)
         alpha = stand_pat;
+    Nodes++;
     Position position(posit);
     position.Current_Turn ? Generate_White_Moves(true, &position) : Generate_Black_Moves(true, &position);
 	if(position.numlegalmoves == 0)
@@ -401,16 +386,11 @@ int Search::QuiescenceSearch(Position* posit, int alpha, int beta, int depth)
 		{
 			if(tt->nodetype == Alpha) if(tt->score <= alpha) return alpha;
 			if(tt->nodetype == Beta) if(tt->score >= beta) return beta;
-			if(tt->nodetype == Exact) 
-				{
-					return tt->score;
-				}
+			if(tt->nodetype == Exact) return tt->score;
 		}
 	}
-    Move move;
     Move Best;
     vector<Move>stack;
-    //stack.reserve(Current_Turn ? White_Move_Spacer: Black_Move_Spacer);
     int count = 0;
     for(int i = 0; i < position.numlegalmoves; i++)
     	{
@@ -419,7 +399,8 @@ int Search::QuiescenceSearch(Position* posit, int alpha, int beta, int depth)
     		if(tt != NULL) if(tt->best.From == m.From && tt->best.To == m.To) m.Score += 100;
     		if(m.Score > 0) stack.push_back(m);
     	}
-	std::sort(stack.begin(), stack.end(), [](const Move& lhs, const Move& rhs){ return lhs.Score > rhs.Score; });
+	std::stable_sort(stack.begin(), stack.end(), [](const Move& lhs, const Move& rhs){ return lhs.Score > rhs.Score; });
+	if(stack.size() > 0) Best = stack[0];
 	NodeType n = Alpha;
 	for(int i = 0; i < (stack.size()); i++)
     {
@@ -429,13 +410,13 @@ int Search::QuiescenceSearch(Position* posit, int alpha, int beta, int depth)
         position.Undo_Move(stack[i]);
         if(score >= beta)
         {
-        	TT.save(depth, beta, move, Beta, Get_Current_Hash_Key(&position));
+        	TT.save(depth, beta, stack[i], Beta, Get_Current_Hash_Key(&position));
             return beta;
         }
         if(score > alpha)
         {
         	n = Exact;
-        	Best = move;
+        	Best = stack[i];
         	Best.Score = score;
         	alpha = score;
         }
@@ -443,24 +424,25 @@ int Search::QuiescenceSearch(Position* posit, int alpha, int beta, int depth)
     TT.save(depth, Best.Score, Best, n, Get_Current_Hash_Key(&position));
     return alpha;
 }
-int Search::MateSearch(int alpha, int beta, int depth)
+int Search::MateSearch(Position* posit, int alpha, int beta, int depth)
 {
 	if(depth <= 1)
     {
+    	Nodes++;
         return 0;
     }
-    pos.Current_Turn ? Generate_White_Moves(false, &pos) : Generate_Black_Moves(false, &pos);
-    if(pos.numlegalmoves == 0)
+    Position position(posit);
+    position.Current_Turn ? Generate_White_Moves(false, &position) : Generate_Black_Moves(false, &position);
+    if(position.numlegalmoves == 0)
     {
-        return (Is_Mate(&pos) / 10000);
+        return (Is_Mate(&position) / 10000);
     }
-	Move move;
-    for(int i = 0; i < pos.numlegalmoves; i++)
+    for(int i = 0; i < position.numlegalmoves; i++)
     {
         Nodes++;
-        pos.Make_Move(move);
-        int score = -MateSearch(-beta, -alpha, depth - 1);
-        pos.Undo_Move(move);
+        position.Make_Move(position.LegalMoves[i]);
+        int score = -MateSearch(&position, -beta, -alpha, depth - 1);
+        position.Undo_Move(position.LegalMoves[i]);
         if(score >= beta)
         {
         	return beta;
@@ -475,9 +457,7 @@ int Search::MateSearch(int alpha, int beta, int depth)
 
 int Search::Get_Move_Score(Move& m)
 {
-	int capturedtype = m.C;
-	int movedtype = m.P;
-	return ((64 * capturedtype) - movedtype);
+	return ((64 * m.C) - m.P);
 }
 
 
