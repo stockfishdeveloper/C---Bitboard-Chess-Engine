@@ -19,31 +19,21 @@ bool White_Is_Legal(Position* position, Move move)
     }
     Bitboard BAttacks = Bmagic(h, (position->White_Pieces | position->Black_Pieces));
     Bitboard RAttacks = Rmagic(h, (position->White_Pieces | position->Black_Pieces));
-    Bitboard QAttacks = Qmagic(h, (position->White_Pieces | position->Black_Pieces));
-    if(BAttacks & (position->Black_Bishops))
-    {
-    	position->Undo_Move(move);
-        return false;
-    }
-    if(RAttacks & (position->Black_Rooks))
-    	{
-    	position->Undo_Move(move);
-        return false;
-    	}
+    Bitboard QAttacks = BAttacks | RAttacks;
     if(QAttacks & (position->Black_Queens))
         {
     	position->Undo_Move(move);
-        return false;
+    	return false;
     	}
+    if(BAttacks & (position->Black_Bishops))
+    {
+    	position->Undo_Move(move);
+    	return false;
+    }
     if(Knight_Lookup_Table[h] & position->Black_Knights)
         {
     	position->Undo_Move(move);
-        return false;
-    	}
-    if(King_Lookup_Table[h] & position->Black_King)
-        {
-    	position->Undo_Move(move);
-        return false;
+    	return false;
     	}
     Bitboard Spare = position->Black_Pawns;
     Spare |= H_Pawn_Mask;
@@ -51,9 +41,8 @@ bool White_Is_Legal(Position* position, Move move)
     if((Spare >> 7) & position->White_King)
     	{
     	position->Undo_Move(move);
-        return false;
+    	return false;
     	}
-
     Bitboard Spare2 = position->Black_Pawns;
     Spare2 |= A_Pawn_Mask;
     Spare2 ^= A_Pawn_Mask;
@@ -62,7 +51,17 @@ bool White_Is_Legal(Position* position, Move move)
     	position->Undo_Move(move);
         return false;
     	}
-	Bitboard b = position->Black_Pawns;
+    if(RAttacks & (position->Black_Rooks))
+    	{
+    	position->Undo_Move(move);
+    	return false;
+    	}
+    if(King_Lookup_Table[h] & position->Black_King)
+        {
+    	position->Undo_Move(move);
+    	return false;
+    	}
+    Bitboard b = position->Black_Pawns;
     b |= A_Pawn_Mask;
     b ^= A_Pawn_Mask;
     b |= H_Pawn_Mask;
@@ -95,19 +94,13 @@ bool Black_Is_Legal(Position* position, Move move)
     }
     Bitboard BAttacks = Bmagic(h, (position->White_Pieces | position->Black_Pieces));
     Bitboard RAttacks = Rmagic(h, (position->White_Pieces | position->Black_Pieces));
-    Bitboard QAttacks = Qmagic(h, (position->White_Pieces | position->Black_Pieces));
-
+    Bitboard QAttacks = BAttacks | RAttacks;
+	if(QAttacks & (position->White_Queens))
+        {
+    	position->Undo_Move(move);
+        return false;
+    	}
     if(BAttacks & (position->White_Bishops))
-        {
-    	position->Undo_Move(move);
-        return false;
-    	}
-    if(RAttacks & (position->White_Rooks))
-        {
-    	position->Undo_Move(move);
-        return false;
-    	}
-    if(QAttacks & (position->White_Queens))
         {
     	position->Undo_Move(move);
         return false;
@@ -117,21 +110,6 @@ bool Black_Is_Legal(Position* position, Move move)
     	position->Undo_Move(move);
         return false;
     	}
-    if(King_Lookup_Table[h] & position->White_King)
-        {
-    	position->Undo_Move(move);
-        return false;
-    	}
-
-    Bitboard Spare = position->White_Pawns;
-    Spare |= H_Pawn_Mask;
-    Spare ^= H_Pawn_Mask;
-    if((Spare << 9) & position->Black_King)
-        {
-    	position->Undo_Move(move);
-        return false;
-    	}
-
     Bitboard Spare2 = position->White_Pawns;
     Spare2 |= A_Pawn_Mask;
     Spare2 ^= A_Pawn_Mask;
@@ -140,7 +118,25 @@ bool Black_Is_Legal(Position* position, Move move)
     	position->Undo_Move(move);
         return false;
     	}
-	Bitboard w = position->White_Pawns;
+    Bitboard Spare = position->White_Pawns;
+    Spare |= H_Pawn_Mask;
+    Spare ^= H_Pawn_Mask;
+    if((Spare << 9) & position->Black_King)
+        {
+    	position->Undo_Move(move);
+        return false;
+    	}
+    if(RAttacks & (position->White_Rooks))
+        {
+    	position->Undo_Move(move);
+        return false;
+    	}
+    if(King_Lookup_Table[h] & position->White_King)
+        {
+    	position->Undo_Move(move);
+        return false;
+    	}
+    Bitboard w = position->White_Pawns;
     w |= A_Pawn_Mask;
     w ^= A_Pawn_Mask;
     w |= H_Pawn_Mask;
