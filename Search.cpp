@@ -19,7 +19,7 @@ int Search::Depth = 0;
 int Search::Seldepth = 0;
 bool Search::STOP_SEARCHING_NOW = false;
 
-Move Search::Think(int wtime, int btime, int winc, int binc)
+Move Search::Think(int wtime, int btime, int winc, int binc, int Maxdepth = 60)
 {
     Move Best;
     Best.Score = -100000;
@@ -29,7 +29,7 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
     Move move;
     int rootAlpha = -100000;
     int rootBeta = 100000;
-    const int MAXDEPTH = 60;
+    const int MAXDEPTH = Maxdepth;
     int Plies_Searched = 0;
     LINE line;
     vector<Move>rootstack;
@@ -39,10 +39,8 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
     {
     	Search::Depth = q;
     	output.lock();
-		cout << "info depth " << Search::Depth << endl;
+		cout << "info depth " << Search::Depth << " nodes " << Search::Nodes << endl;
 		output.unlock();
-		rootAlpha -= 50;
-		rootBeta += 50;
 		if(q == 1)
 		{
 			pos.Current_Turn ? Generate_White_Moves(false, &pos) : Generate_Black_Moves(false, &pos);
@@ -55,6 +53,8 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
             {
             	for(int h = 0; h < pos.numlegalmoves; h++)
                 	{
+                		//if(pos.LegalMoves[h].From == Best.From && pos.LegalMoves[h].To == Best.To)
+                			//pos.LegalMoves[h].Score += 100000;
                 		if(pos.LegalMoves[h].Promotion == true)
 							pos.LegalMoves[h].Score += 100;
                     	if(pos.LegalMoves[h].C != NONE)
@@ -63,12 +63,13 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
                     	count++;
                 	}
             }
+        rootAlpha -= 50;
+		rootBeta += 50;
         std::stable_sort(rootstack.begin(), rootstack.end(), [](const Move& lhs, const Move& rhs){ return (lhs.Score > rhs.Score);});
         bool inCheck = Search::Is_Mate(&pos) == -10000;
         for(int i = 0; i < rootstack.size(); i++)
             {
-            	Nodes++;
-                if(q >= 2 && timer.Get_Time() > 1000)
+            	if(q >= 2 && timer.Get_Time() > 1000)
                 {
                     output.lock();
                     cout << "info currmove " << PlayerMoves[(Convert_Bitboard(rootstack[i].From))] << PlayerMoves[(Convert_Bitboard(rootstack[i].To))];
@@ -82,13 +83,18 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
                 rootstack[i].Score = score;
                 pos.Undo_Move(rootstack[i]);
                 //cout << " " << score << endl;
-                if((score > rootBeta) || (score < rootAlpha))
-                {
-                	rootAlpha = -100000;
+                if(score > rootBeta) 
+                {cout << "Here root beta................" << endl;
                 	rootBeta = 100000;
-                	score = -AlphaBeta(&pos, -rootBeta, -rootAlpha, (q - 1), &line, true);
+                	score = -AlphaBeta(&pos, -rootBeta, -rootAlpha, (q - 1), &line, false);
                 	rootstack[i].Score = score;
                 }
+                else if(score < rootAlpha)
+                {cout << "Here root alpha................" << endl;
+                	rootAlpha = -100000;
+                	score = -AlphaBeta(&pos, -rootBeta, -rootAlpha, (q - 1), &line, false);
+                	rootstack[i].Score = score;
+				}
                 if(score > rootAlpha)
                 {
                 	LINE* f = new LINE;
@@ -110,6 +116,7 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
             			return Best;
         			}
             }
+        
         Uci_Pv(q, Seldepth, Best, &matemoves, timer.Get_Time(), Nodes);
 		LINE* f = new LINE;
         f->cmove = 0;
@@ -122,10 +129,6 @@ Move Search::Think(int wtime, int btime, int winc, int binc)
             Time_Allocation = 0;
             return Best;
         }
-        //rootAlpha -= 50;
-        //rootBeta += 50;
-        //rootAlpha = -100000;
-    	//rootBeta = 100000;
     }
 
     return Best;
@@ -194,16 +197,17 @@ int Search::AlphaBeta(Position* posit, int alpha, int beta, int depth, LINE * pl
 		}
 	std::stable_sort(moves.begin(), moves.end(), [](const Move& lhs, const Move& rhs){ return lhs.Score > rhs.Score; });
 	bool pvfound = false;
+	int pos_score = Eval::Evaluate_Position(&position);
 	for(int i = 0; i < position.numlegalmoves; i++)
     {
         Nodes++;
         position.Make_Move(moves[i]);
         int score;
-        if(depth == 2 && !inCheck)
+        /*if(depth == 2 && !inCheck && donullmove)
 		{
-			if((Eval::Evaluate_Position(&position) + 200) <= alpha)
+			if((pos_score + 200) <= alpha)
 			continue;
-		}
+		}*/
         if(i < 3)
            	score = -AlphaBeta(&position, -beta, -alpha, depth - 1, &line, true);
         else
@@ -356,6 +360,9 @@ Search::Is_Mate(Position* position)
 
 void Search::Clear()
 {
+	Search::Searching = false;
+    Search::STOP_SEARCHING_NOW = false;
+    Search::Nodes = 0;
     Search::Depth = 0;
 }
 
@@ -364,7 +371,7 @@ int Search::QuiescenceSearch(Position* posit, int alpha, int beta, int depth)
 	int stand_pat = posit->Current_Turn ? Eval::Evaluate_Position(posit) : -Eval::Evaluate_Position(posit);
 	Search::Seldepth = std::max(depth, Search::Seldepth);
 	if(stand_pat >= beta)
-        return beta;
+		return beta;
     if(stand_pat > alpha)
         alpha = stand_pat;
     Nodes++;
@@ -404,6 +411,12 @@ int Search::QuiescenceSearch(Position* posit, int alpha, int beta, int depth)
 	NodeType n = Alpha;
 	for(int i = 0; i < (stack.size()); i++)
     {
+    	if(stand_pat + Get_Cp_Value(stack[i].C) <= alpha)
+    	//if(stand_pat <= -300 && (Get_Cp_Value(stack[i].C) < 300))
+    	{
+    		//cout << "Pruned................" << endl;
+    		return alpha;
+		}
     	Nodes++;
         position.Make_Move(stack[i]);
         int score = -QuiescenceSearch(&position, -beta, -alpha, depth + 1);
