@@ -8,4 +8,5 @@ enum Movetype { Capture, Promotion, Normal };
 Movetype Get_Move_Type(Move& m);
 const short Convert_Bitboard(const Bitboard& board);
 const Bitboard Unconvert_Int(const int& number);
+void Benchmark();
 #endif
