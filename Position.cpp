@@ -316,3 +316,17 @@
 		}
 		Current_Turn ^= 1;
 	}
+	int Get_Cp_Value(Piece piece)
+	{
+		if(piece == WP || piece == BP)
+			return 100;
+		if(piece == WN || piece == BN)
+			return 300;
+		if(piece == WB || piece == BB)
+			return 300;
+		if(piece == WR || piece == BR)
+			return 500;
+		if(piece == WQ || piece == BQ)
+			return 800;
+		return 0;
+	}
