@@ -2,6 +2,7 @@
 #define Position_H_
 #include "Bitboard.h"
 enum Piece { WP, WN, WB, WR, WQ, WK, BP, BN, BB, BR, BQ, BK, NONE };
+
 class Move
 {
 	public:
@@ -49,6 +50,6 @@ class Position
 	Bitboard* Get_Bitboard_From_Piece(Piece p);
 	Piece Get_Piece_From_Bitboard(Bitboard b);
 };
-
+int Get_Cp_Value(Piece piece);
 extern Position pos;
 #endif
