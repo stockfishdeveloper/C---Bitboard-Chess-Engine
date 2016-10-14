@@ -10,6 +10,7 @@
 #include "MoveGen.h"
 #include "Util.h"
 #include "TransTable.h"
+#include "Position.h"
 using namespace std;
 int CheckUci();
 string UciCommand;
@@ -23,9 +24,8 @@ LINE PVline;
 int CheckUci()
 {
     bool Is_Fen = false;
-    int Parse_Fen(string Fen);
-
-    while (cin >> UciCommand)
+    
+	while (cin >> UciCommand)
     {
         Log << ">> " << UciCommand << endl;
         if(UciCommand == "uci")
@@ -76,16 +76,7 @@ int CheckUci()
 		}
 		else if(UciCommand == "bench")
         {
-        	Timer time;
-        	time.Start_Clock();
-        	for(Bitboard i = 1; i < 100000000; i++)
-            lsb(i);
-            cout << time.Get_Time() << endl;
-            Timer time2;
-            time.Start_Clock();
-            for(Bitboard i = 1; i < 100000000; i++)
-            test_lsb(i);
-            cout << time.Get_Time() << endl;
+        	Benchmark();
 		}
         else if(UciCommand == "perft")
         {
@@ -102,7 +93,16 @@ int CheckUci()
 
         else if (Is_Fen)
         {
-            Parse_Fen(UciCommand);
+        	string temp = UciCommand + " ";
+        	string a = " ";
+        	for(int i = 0; i < 5; i++)
+        	{
+        		cin >> a;
+        		if(i != 4)
+        			a += " ";
+        		temp += a;
+        	}
+            Parse_Fen(temp);
             Is_Fen = false;
         }
 
@@ -268,6 +268,7 @@ int CheckUci()
         else if (UciCommand == "moves")
         {
         	Moves_Command();
+        	Print_Board();
         }
     }
 
@@ -277,13 +278,28 @@ int CheckUci()
 
 int Parse_Fen(string Fen)
 {
-    pos.Reset();
-    Search::Searching = false;
-    wtime = 0;
-    btime = 0;
-    Search::STOP_SEARCHING_NOW = false;
-    Search::Nodes = 0;
-
+	cout << Fen << endl;
+	string str = Fen;
+	string temp = str;
+	string hold[6];
+	int processed = 0;
+	for(int j = 0; j < 6; j++)
+	{
+		int a = temp.find(" ") + 1;
+		for(int i = 0; i < a; i++)
+			hold[j] += temp[i];
+		processed += a;
+		temp = "";
+		for(int p = processed; p < str.length(); p++)
+			temp += str[p];	
+	}
+	hold[5] = "";
+	for(int i = str.find_last_of(" ") + 1; i <= str.length(); i++)
+		hold[5] += str[i];
+		
+	Search::Clear();
+	//pos.Reset();
+    
     pos.White_Pieces = 0;
     pos.Black_Pieces = 0;
     pos.White_King = 0;
@@ -299,16 +315,15 @@ int Parse_Fen(string Fen)
     pos.Black_Knights = 0;
     pos.Black_Pawns = 0;
     char Current_Square;
-    for(unsigned int h = 0; h < (Fen.length()); h++)
+    for(unsigned int h = 0; h < (hold[0].length()); h++)
     {
-        Current_Square = Fen[h];
+        Current_Square = hold[0][h];
         Read_Fen(Current_Square);
     }
     Current_Rank = 72057594037927936;
-    char Curr_Turn;
-    cin >> Curr_Turn;
+    string Curr_Turn = hold[1];
     Log << Curr_Turn << endl;
-    if(Curr_Turn == 'w')
+    if(Curr_Turn.find("w") != string::npos)
     {
         pos.Current_Turn = true;
     }
@@ -316,8 +331,7 @@ int Parse_Fen(string Fen)
     {
         pos.Current_Turn = false;
     }
-    string Legal_Castling = "";
-    cin >> Legal_Castling;
+    string Legal_Castling = hold[2];
     Log << Legal_Castling << endl;
     pos.WhiteCanCastleK = false;
     pos.BlackCanCastleK = false;
@@ -325,16 +339,17 @@ int Parse_Fen(string Fen)
     pos.BlackCanCastleQ = false;
     for(int i = 0; i < Legal_Castling.length(); i++)
     {
-    	if(Legal_Castling[i] == 'K')
+    	if(Legal_Castling.find("K") != string::npos)
     		pos.WhiteCanCastleK = true;
-    	if(Legal_Castling[i] == 'k')
+    	if(Legal_Castling.find("k") != string::npos)
     		pos.BlackCanCastleK = true;
-    	if(Legal_Castling[i] == 'Q')
+    	if(Legal_Castling.find("Q") != string::npos)
     		pos.WhiteCanCastleQ = true;
-    	if(Legal_Castling[i] == 'q')
+    	if(Legal_Castling.find("q") != string::npos)
     		pos.BlackCanCastleQ = true;
     }
-    string En_Passant;
+     
+    /*string En_Passant;
     cin >> En_Passant;
     Log << En_Passant << endl;
     int Pawn_Moves;
@@ -342,8 +357,7 @@ int Parse_Fen(string Fen)
     Log << Pawn_Moves << endl;
     int Move_Count;
     cin >> Move_Count;
-    Log << Move_Count << endl;
-
+    Log << Move_Count << endl;*/
     return 0;
 }
 
@@ -477,19 +491,17 @@ int Read_Fen(char Current_Square)
 
 int Moves_Command()
 {
-	pos.Reset();
+	//pos.Reset();
     char First_Part[5];
     char Second_Part[5];
     string Promotion_Type;
     while(true)
     {
     	Move m;
-    	//TT.save(0, 0, m, Exact, Get_Current_Hash_Key());
-        cin.get();
+    	cin.get();
         cin.get(First_Part, 3);
         Log << ">> " << First_Part;
         string F = "go";
-        //cin.get();
         if(First_Part == F)
         {
             cin.putback('o');
@@ -501,9 +513,6 @@ int Moves_Command()
         {
             cin.putback('e');
             cin.putback('p');
-            //string ucicommand;
-            //cin >> ucicommand;
-            //cout << ucicommand;
             return 0;
         }
         string g = "be";
@@ -547,8 +556,8 @@ int Moves_Command()
         string f2 = "f2";
         string g2 = "g2";
         string h2 = "h2";
-        Bitboard Fr = 0;;
-        Bitboard T_o = 0;;
+        Bitboard Fr = 0;
+        Bitboard T_o = 0;
         for(int i = 0; i < 64; i++)
         {
             if(First_Part == PlayerMoves[i])
@@ -571,12 +580,12 @@ int Moves_Command()
         }
         else
             Parse_Moves(First_Part, Second_Part);
-        pos.Current_Turn ^= 1;
+        //pos.Current_Turn ^= 1;
     }
 	return 0;
 }
 
-int Parse_Moves(string First, string Second)
+int Parse_Moves(string First, string Second, string PromotionType = "")
 {
     Bitboard From = 0;
     Bitboard To = 0;
@@ -590,604 +599,61 @@ int Parse_Moves(string First, string Second)
         if(PlayerMoves[i] == Second)
             To = GeneralBoard[i];
     }
+    Piece p = pos.Get_Piece_From_Bitboard(From);
+    Piece Captured = NONE;
+    bool Castling = (From & (pos.White_King | pos.Black_King)) && (From & 1152921504606846992) && (To & 4899916394579099716);
+    bool Promotion = ((From & pos.White_Pawns) && From & Seventh_Rank_White) || ((From & pos.Black_Pawns) && (From & Seventh_Rank_Black));
     if(pos.Current_Turn)
     {
-        pos.White_Pieces ^= From;
-        pos.White_Pieces |= To;
-        if(pos.White_Rooks & From)
-        {
-            pos.White_Rooks ^= From;
-            pos.White_Rooks |= To;
-            if(pos.Black_Pieces & To)
-            {
-                pos.Black_Pieces ^= To;
-                pos.Black_Queens |= To;
-                pos.Black_Queens ^= To;
-                pos.Black_Rooks |= To;
-                pos.Black_Rooks ^= To;
-                pos.Black_Bishops |= To;
-                pos.Black_Bishops ^= To;
-                pos.Black_Knights |= To;
-                pos.Black_Knights ^= To;
-                pos.Black_Pawns |= To;
-                pos.Black_Pawns ^= To;
-            }
-            if(From == 1)
-            {
-                pos.WhiteCanCastleQ = false;
-            }
-            if(From == 128)
-            {
-                pos.WhiteCanCastleK = false;
-            }
-        }
-        if(pos.White_Knights & From)
-        {
-            pos.White_Knights ^= From;
-            pos.White_Knights |= To;
-            if(pos.Black_Pieces & To)
-            {
-                pos.Black_Pieces ^= To;
-                pos.Black_Queens |= To;
-                pos.Black_Queens ^= To;
-                pos.Black_Rooks |= To;
-                pos.Black_Rooks ^= To;
-                pos.Black_Bishops |= To;
-                pos.Black_Bishops ^= To;
-                pos.Black_Knights |= To;
-                pos.Black_Knights ^= To;
-                pos.Black_Pawns |= To;
-                pos.Black_Pawns ^= To;
-            }
-        }
-        if(pos.White_Bishops & From)
-        {
-            pos.White_Bishops ^= From;
-            pos.White_Bishops |= To;
-            if(pos.Black_Pieces & To)
-            {
-                pos.Black_Pieces ^= To;
-                pos.Black_Queens |= To;
-                pos.Black_Queens ^= To;
-                pos.Black_Rooks |= To;
-                pos.Black_Rooks ^= To;
-                pos.Black_Bishops |= To;
-                pos.Black_Bishops ^= To;
-                pos.Black_Knights |= To;
-                pos.Black_Knights ^= To;
-                pos.Black_Pawns |= To;
-                pos.Black_Pawns ^= To;
-            }
-        }
-        if(pos.White_Pawns & From)
-        {
-            pos.White_Pawns ^= From;
-            pos.White_Pawns |= To;
-            if(pos.Black_Pieces & To)
-            {
-                pos.Black_Pieces ^= To;
-                pos.Black_Queens |= To;
-                pos.Black_Queens ^= To;
-                pos.Black_Rooks |= To;
-                pos.Black_Rooks ^= To;
-                pos.Black_Bishops |= To;
-                pos.Black_Bishops ^= To;
-                pos.Black_Knights |= To;
-                pos.Black_Knights ^= To;
-                pos.Black_Pawns |= To;
-                pos.Black_Pawns ^= To;
-                return 0;
-            }
-            if(((pos.Black_Pawns << 8) & To) && (From & 1095216660480))
+    	if(To & pos.Black_Pieces)
+    		Captured = pos.Get_Piece_From_Bitboard(To);
+	}
+	else
+	{
+		if(To & pos.White_Pieces)
+    		Captured = pos.Get_Piece_From_Bitboard(To);
+	}
+	if(((pos.Black_Pawns << 8) & To) && (From & 1095216660480))
             {
                 pos.Black_Pawns ^= (To >> 8);
                 pos.Black_Pieces ^= (To >> 8);
-            }
-        }
-        if(pos.White_King & From)
-        {
-            pos.White_King ^= From;
-            pos.White_King |= To;
-            if(pos.Black_Pieces & To)
-            {
-                pos.Black_Pieces ^= To;
-                pos.Black_Queens |= To;
-                pos.Black_Queens ^= To;
-                pos.Black_Rooks |= To;
-                pos.Black_Rooks ^= To;
-                pos.Black_Bishops |= To;
-                pos.Black_Bishops ^= To;
-                pos.Black_Knights |= To;
-                pos.Black_Knights ^= To;
-                pos.Black_Pawns |= To;
-                pos.Black_Pawns ^= To;
-            }
-            if((To == 64) && From == 16)
-            {
-                pos.White_Pieces |= 64;
-                pos.White_Pieces |= 32;
-                pos.White_Pieces ^= 128;
-                pos.White_Rooks |= 32;
-                pos.White_Rooks ^= 128;
-            }
-            if(To == 4 && From == 16)
-            {
-                pos.White_Pieces |= 4;
-                pos.White_Pieces |= 8;
-                pos.White_Pieces ^= 1;
-                pos.White_Rooks |= 8;
-                pos.White_Rooks ^= 1;
-            }
-            pos.WhiteCanCastleK = false;
-            pos.WhiteCanCastleQ = false;
-        }
-        if(pos.White_Queens & From)
-        {
-            pos.White_Queens ^= From;
-            pos.White_Queens |= To;
-            if(pos.Black_Pieces & To)
-            {
-                pos.Black_Pieces ^= To;
-                pos.Black_Queens |= To;
-                pos.Black_Queens ^= To;
-                pos.Black_Rooks |= To;
-                pos.Black_Rooks ^= To;
-                pos.Black_Bishops |= To;
-                pos.Black_Bishops ^= To;
-                pos.Black_Knights |= To;
-                pos.Black_Knights ^= To;
-                pos.Black_Pawns |= To;
-                pos.Black_Pawns ^= To;
-            }
-
-        }
-    }
-    else
-    {
-        pos.Black_Pieces ^= From;
-        pos.Black_Pieces |= To;
-        if(pos.Black_Rooks & From)
-        {
-            pos.Black_Rooks ^= From;
-            pos.Black_Rooks |= To;
-            if(pos.White_Pieces & To)
-            {
-                pos.White_Pieces ^= To;
-                pos.White_Queens |= To;
-                pos.White_Queens ^= To;
-                pos.White_Rooks |= To;
-                pos.White_Rooks ^= To;
-                pos.White_Bishops |= To;
-                pos.White_Bishops ^= To;
-                pos.White_Knights |= To;
-                pos.White_Knights ^= To;
                 pos.White_Pawns |= To;
-                pos.White_Pawns ^= To;
+                pos.White_Pawns ^= From;
+                pos.White_Pieces |= To;
+                pos.White_Pieces ^= From;
             }
-            if(From == 72057594037927936)
-            {
-                pos.BlackCanCastleQ = false;
-            }
-            if(From == 9223372036854775808ULL)
-            {
-                pos.BlackCanCastleK = false;
-            }
-        }
-        if(pos.Black_Knights & From)
-        {
-            pos.Black_Knights ^= From;
-            pos.Black_Knights |= To;
-            if(pos.White_Pieces & To)
-            {
-                pos.White_Pieces ^= To;
-                pos.White_Queens |= To;
-                pos.White_Queens ^= To;
-                pos.White_Rooks |= To;
-                pos.White_Rooks ^= To;
-                pos.White_Bishops |= To;
-                pos.White_Bishops ^= To;
-                pos.White_Knights |= To;
-                pos.White_Knights ^= To;
-                pos.White_Pawns |= To;
-                pos.White_Pawns ^= To;
-            }
-        }
-        if(pos.Black_Bishops & From)
-        {
-            pos.Black_Bishops ^= From;
-            pos.Black_Bishops |= To;
-            if(pos.White_Pieces & To)
-            {
-                pos.White_Pieces ^= To;
-                pos.White_Queens |= To;
-                pos.White_Queens ^= To;
-                pos.White_Rooks |= To;
-                pos.White_Rooks ^= To;
-                pos.White_Bishops |= To;
-                pos.White_Bishops ^= To;
-                pos.White_Knights |= To;
-                pos.White_Knights ^= To;
-                pos.White_Pawns |= To;
-                pos.White_Pawns ^= To;
-            }
-        }
-        if(pos.Black_Pawns & From)
-        {
-            pos.Black_Pawns ^= From;
-            pos.Black_Pawns |= To;
-            if(pos.White_Pieces & To)
-            {
-                pos.White_Pieces ^= To;
-                pos.White_Queens |= To;
-                pos.White_Queens ^= To;
-                pos.White_Rooks |= To;
-                pos.White_Rooks ^= To;
-                pos.White_Bishops |= To;
-                pos.White_Bishops ^= To;
-                pos.White_Knights |= To;
-                pos.White_Knights ^= To;
-                pos.White_Pawns |= To;
-                pos.White_Pawns ^= To;
-                return 0;
-            }
-            if(((pos.White_Pawns >> 8) & To) && (From & 4278190080))
+    else if(((pos.White_Pawns >> 8) & To) && (From & 4278190080))
             {
                 pos.White_Pawns ^= (To << 8);
                 pos.White_Pieces ^= (To << 8);
-            }
-        }
-        if(pos.Black_King & From)
-        {
-            pos.Black_King ^= From;
-            pos.Black_King |= To;
-            if(pos.White_Pieces & To)
-            {
-                pos.White_Pieces ^= To;
-                pos.White_Queens |= To;
-                pos.White_Queens ^= To;
-                pos.White_Rooks |= To;
-                pos.White_Rooks ^= To;
-                pos.White_Bishops |= To;
-                pos.White_Bishops ^= To;
-                pos.White_Knights |= To;
-                pos.White_Knights ^= To;
-                pos.White_Pawns |= To;
-                pos.White_Pawns ^= To;
-            }
-            if((To == 4611686018427387904) && From == 1152921504606846976)
-            {
-                pos.Black_Pieces |= 4611686018427387904;
-                pos.Black_Pieces |= 2305843009213693952;
-                pos.Black_Pieces ^= 9223372036854775808ULL;
-                pos.Black_Rooks |= 2305843009213693952;
-                pos.Black_Rooks ^= 9223372036854775808ULL;
-            }
-            if(To == 288230376151711744 && From == 1152921504606846976)
-            {
-                pos.Black_Pieces |= 288230376151711744;
-                pos.Black_Pieces |= 576460752303423488;
-                pos.Black_Pieces ^= 72057594037927936;
-                pos.Black_Rooks |= 576460752303423488;
-                pos.Black_Rooks ^= 72057594037927936;
-            }
-            pos.BlackCanCastleK = false;
-            pos.BlackCanCastleQ = false;
-        }
-        if(pos.Black_Queens & From)
-        {
-            pos.Black_Queens ^= From;
-            pos.Black_Queens |= To;
-            if(pos.White_Pieces & To)
-            {
-                pos.White_Pieces ^= To;
-                pos.White_Queens |= To;
-                pos.White_Queens ^= To;
-                pos.White_Rooks |= To;
-                pos.White_Rooks ^= To;
-                pos.White_Bishops |= To;
-                pos.White_Bishops ^= To;
-                pos.White_Knights |= To;
-                pos.White_Knights ^= To;
-                pos.White_Pawns |= To;
-                pos.White_Pawns ^= To;
-            }
-
-        }
-
-    }
-    return 0;
-}
-
-
-
-
-int Parse_Moves(string First, string Second, string Promotion_Type)
-{
-    Bitboard From = 0;
-    Bitboard To = 0;
-    for(int i = 0; i < 64; i++)
-    {
-        if(PlayerMoves[i] == First)
-            From = GeneralBoard[i];
-    }
-    for(int i = 0; i < 64; i++)
-    {
-        if(PlayerMoves[i] == Second)
-            To = GeneralBoard[i];
-    }
-    if(pos.Current_Turn)
-    {
-        pos.White_Pieces ^= From;
-        pos.White_Pieces |= To;
-        if(pos.White_Rooks & From)
-        {
-            pos.White_Rooks ^= From;
-            pos.White_Rooks |= To;
-            if(pos.Black_Pieces & To)
-            {
-                pos.Black_Pieces ^= To;
-                pos.Black_Queens |= To;
-                pos.Black_Queens ^= To;
-                pos.Black_Rooks |= To;
-                pos.Black_Rooks ^= To;
-                pos.Black_Bishops |= To;
-                pos.Black_Bishops ^= To;
-                pos.Black_Knights |= To;
-                pos.Black_Knights ^= To;
                 pos.Black_Pawns |= To;
-                pos.Black_Pawns ^= To;
+                pos.Black_Pawns ^= From;
+                pos.Black_Pieces |= To;
+                pos.Black_Pieces ^= From;
             }
-        }
-        if(pos.White_Knights & From)
-        {
-            pos.White_Knights ^= From;
-            pos.White_Knights |= To;
-            if(pos.Black_Pieces & To)
-            {
-                pos.Black_Pieces ^= To;
-                pos.Black_Queens |= To;
-                pos.Black_Queens ^= To;
-                pos.Black_Rooks |= To;
-                pos.Black_Rooks ^= To;
-                pos.Black_Bishops |= To;
-                pos.Black_Bishops ^= To;
-                pos.Black_Knights |= To;
-                pos.Black_Knights ^= To;
-                pos.Black_Pawns |= To;
-                pos.Black_Pawns ^= To;
-            }
-        }
-        if(pos.White_Bishops & From)
-        {
-            pos.White_Bishops ^= From;
-            pos.White_Bishops |= To;
-            if(pos.Black_Pieces & To)
-            {
-                pos.Black_Pieces ^= To;
-                pos.Black_Queens |= To;
-                pos.Black_Queens ^= To;
-                pos.Black_Rooks |= To;
-                pos.Black_Rooks ^= To;
-                pos.Black_Bishops |= To;
-                pos.Black_Bishops ^= To;
-                pos.Black_Knights |= To;
-                pos.Black_Knights ^= To;
-                pos.Black_Pawns |= To;
-                pos.Black_Pawns ^= To;
-            }
-        }
-        if(pos.White_Pawns & From)
-        {
-            pos.White_Pawns ^= From;
-            //White_Pawns |= To;
-            if(pos.Black_Pieces & To)
-            {
-                pos.Black_Pieces ^= To;
-                pos.Black_Queens |= To;
-                pos.Black_Queens ^= To;
-                pos.Black_Rooks |= To;
-                pos.Black_Rooks ^= To;
-                pos.Black_Bishops |= To;
-                pos.Black_Bishops ^= To;
-                pos.Black_Knights |= To;
-                pos.Black_Knights ^= To;
-                pos.Black_Pawns |= To;
-                pos.Black_Pawns ^= To;
-            }
-        }
-        if(pos.White_King & From)
-        {
-            pos.White_King ^= From;
-            pos.White_King |= To;
-            if(pos.Black_Pieces & To)
-            {
-                pos.Black_Pieces ^= To;
-                pos.Black_Queens |= To;
-                pos.Black_Queens ^= To;
-                pos.Black_Rooks |= To;
-                pos.Black_Rooks ^= To;
-                pos.Black_Bishops |= To;
-                pos.Black_Bishops ^= To;
-                pos.Black_Knights |= To;
-                pos.Black_Knights ^= To;
-                pos.Black_Pawns |= To;
-                pos.Black_Pawns ^= To;
-            }
-        }
-        if(pos.White_Queens & From)
-        {
-            pos.White_Queens ^= From;
-            pos.White_Queens |= To;
-            if(pos.Black_Pieces & To)
-            {
-                pos.Black_Pieces ^= To;
-                pos.Black_Queens |= To;
-                pos.Black_Queens ^= To;
-                pos.Black_Rooks |= To;
-                pos.Black_Rooks ^= To;
-                pos.Black_Bishops |= To;
-                pos.Black_Bishops ^= To;
-                pos.Black_Knights |= To;
-                pos.Black_Knights ^= To;
-                pos.Black_Pawns |= To;
-                pos.Black_Pawns ^= To;
-            }
-        }
-    }
     else
     {
-        pos.Black_Pieces ^= From;
-        pos.Black_Pieces |= To;
-        if(pos.Black_Rooks & From)
-        {
-            pos.Black_Rooks ^= From;
-            pos.Black_Rooks |= To;
-            if(pos.White_Pieces & To)
-            {
-                pos.White_Pieces ^= To;
-                pos.White_Queens |= To;
-                pos.White_Queens ^= To;
-                pos.White_Rooks |= To;
-                pos.White_Rooks ^= To;
-                pos.White_Bishops |= To;
-                pos.White_Bishops ^= To;
-                pos.White_Knights |= To;
-                pos.White_Knights ^= To;
-                pos.White_Pawns |= To;
-                pos.White_Pawns ^= To;
-            }
-        }
-        if(pos.Black_Knights & From)
-        {
-            pos.Black_Knights ^= From;
-            pos.Black_Knights |= To;
-            if(pos.White_Pieces & To)
-            {
-                pos.White_Pieces ^= To;
-                pos.White_Queens |= To;
-                pos.White_Queens ^= To;
-                pos.White_Rooks |= To;
-                pos.White_Rooks ^= To;
-                pos.White_Bishops |= To;
-                pos.White_Bishops ^= To;
-                pos.White_Knights |= To;
-                pos.White_Knights ^= To;
-                pos.White_Pawns |= To;
-                pos.White_Pawns ^= To;
-            }
-        }
-        if(pos.Black_Bishops & From)
-        {
-            pos.Black_Bishops ^= From;
-            pos.Black_Bishops |= To;
-            if(pos.White_Pieces & To)
-            {
-                pos.White_Pieces ^= To;
-                pos.White_Queens |= To;
-                pos.White_Queens ^= To;
-                pos.White_Rooks |= To;
-                pos.White_Rooks ^= To;
-                pos.White_Bishops |= To;
-                pos.White_Bishops ^= To;
-                pos.White_Knights |= To;
-                pos.White_Knights ^= To;
-                pos.White_Pawns |= To;
-                pos.White_Pawns ^= To;
-            }
-        }
-        if(pos.Black_Pawns & From)
-        {
-            pos.Black_Pawns ^= From;
-            //Black_Pawns |= To;
-            if(pos.White_Pieces & To)
-            {
-                pos.White_Pieces ^= To;
-                pos.White_Queens |= To;
-                pos.White_Queens ^= To;
-                pos.White_Rooks |= To;
-                pos.White_Rooks ^= To;
-                pos.White_Bishops |= To;
-                pos.White_Bishops ^= To;
-                pos.White_Knights |= To;
-                pos.White_Knights ^= To;
-                pos.White_Pawns |= To;
-                pos.White_Pawns ^= To;
-            }
-        }
-        if(pos.Black_King & From)
-        {
-            pos.Black_King ^= From;
-            pos.Black_King |= To;
-            if(pos.White_Pieces & To)
-            {
-                pos.White_Pieces ^= To;
-                pos.White_Queens |= To;
-                pos.White_Queens ^= To;
-                pos.White_Rooks |= To;
-                pos.White_Rooks ^= To;
-                pos.White_Bishops |= To;
-                pos.White_Bishops ^= To;
-                pos.White_Knights |= To;
-                pos.White_Knights ^= To;
-                pos.White_Pawns |= To;
-                pos.White_Pawns ^= To;
-            }
-        }
-        if(pos.Black_Queens & From)
-        {
-            pos.Black_Queens ^= From;
-            pos.Black_Queens |= To;
-            if(pos.White_Pieces & To)
-            {
-                pos.White_Pieces ^= To;
-                pos.White_Queens |= To;
-                pos.White_Queens ^= To;
-                pos.White_Rooks |= To;
-                pos.White_Rooks ^= To;
-                pos.White_Bishops |= To;
-                pos.White_Bishops ^= To;
-                pos.White_Knights |= To;
-                pos.White_Knights ^= To;
-                pos.White_Pawns |= To;
-                pos.White_Pawns ^= To;
-            }
-        }
+    	Move m(p, Captured, From, To, Castling, Promotion);
+    	if(PromotionType != "")
+    	{
+    		if(PromotionType.find("q") != string::npos)
+    			m.PromotionType = pos.Current_Turn ? WQ : BK;
+    		else if(PromotionType.find("r") != string::npos)
+    			m.PromotionType = pos.Current_Turn ? WR : BR;
+    		else if(PromotionType.find("b") != string::npos)
+    			m.PromotionType = pos.Current_Turn ? WB : BB;
+    		else if(PromotionType.find("n") != string::npos)
+    			m.PromotionType = pos.Current_Turn ? WN : BN;
+		}
+    	pos.Make_Move(m);
+	}
 
-    }
-    string Queen = "q";
-    string Rook = "r";
-    string Bishop = "b";
-    string Knight = "n";
-    if(Promotion_Type == Queen)
-    {
-        if(pos.Current_Turn)
-            pos.White_Queens |= To;
-        else
-            pos.Black_Queens |= To;
-    }
-    if(Promotion_Type == Rook)
-    {
-        if(pos.Current_Turn)
-            pos.White_Rooks |= To;
-        else
-            pos.Black_Rooks |= To;
-    }
-    if(Promotion_Type == Bishop)
-    {
-        if(pos.Current_Turn)
-            pos.White_Bishops |= To;
-        else
-            pos.Black_Bishops |= To;
-    }
-    if(Promotion_Type == Knight)
-    {
-        if(pos.Current_Turn)
-            pos.White_Knights |= To;
-        else
-            pos.Black_Knights |= To;
-    }
     return 0;
 }
+
+
+
+
 void Engine_Info()
 {
     string Version = "";
