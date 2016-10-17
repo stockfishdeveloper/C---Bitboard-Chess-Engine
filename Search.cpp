@@ -30,7 +30,6 @@ Move Search::Think(int wtime, int btime, int winc, int binc, int Maxdepth = 60)
     int rootAlpha = -100000;
     int rootBeta = 100000;
     const int MAXDEPTH = Maxdepth;
-    int Plies_Searched = 0;
     LINE line;
     vector<Move>rootstack;
     int count = 0;
@@ -67,7 +66,7 @@ Move Search::Think(int wtime, int btime, int winc, int binc, int Maxdepth = 60)
 		rootBeta += 50;
         std::stable_sort(rootstack.begin(), rootstack.end(), [](const Move& lhs, const Move& rhs){ return (lhs.Score > rhs.Score);});
         bool inCheck = Search::Is_Mate(&pos) == -10000;
-        for(int i = 0; i < rootstack.size(); i++)
+        for(unsigned int i = 0; i < rootstack.size(); i++)
             {
             	if(q >= 2 && timer.Get_Time() > 1000)
                 {
@@ -110,7 +109,7 @@ Move Search::Think(int wtime, int btime, int winc, int binc, int Maxdepth = 60)
                     Uci_Pv(q, Seldepth, Best, &matemoves, timer.Get_Time(), Nodes);
                     rootAlpha = score;
                 }
-                if((timer.Get_Time() >= (Search::Time_Allocation / 30)) && q > 3)
+                if((timer.Get_Time() >= (Search::Time_Allocation / 30)) && q > 4)
         			{
             			Search::STOP_SEARCHING_NOW = true;
             			return Best;
@@ -196,7 +195,6 @@ int Search::AlphaBeta(Position* posit, int alpha, int beta, int depth, LINE * pl
     		moves.push_back(position.LegalMoves[i]);
 		}
 	std::stable_sort(moves.begin(), moves.end(), [](const Move& lhs, const Move& rhs){ return lhs.Score > rhs.Score; });
-	bool pvfound = false;
 	int pos_score = Eval::Evaluate_Position(&position);
 	for(int i = 0; i < position.numlegalmoves; i++)
     {
@@ -247,8 +245,7 @@ int Search::AlphaBeta(Position* posit, int alpha, int beta, int depth, LINE * pl
             pline->cmove = line.cmove + 1;
             alpha = score;
             node = Exact;
-            pvfound = true;
-		}
+        }
     }
     TT.save(depth, alpha, pline->argmove[0], node, Get_Current_Hash_Key(&position));
     return alpha;
@@ -257,15 +254,7 @@ int Search::AlphaBeta(Position* posit, int alpha, int beta, int depth, LINE * pl
 Search::Is_Mate(Position* position)
 {
 	int score = 0;
-    int h;
-        for(int j = 0; j < 64; j++)
-        {
-            if(position->White_King & GeneralBoard[j])//Get the index (0-63) of White's king
-            {
-                h = j;
-                break;
-            }
-        }
+	int h = Convert_Bitboard(position->White_King);
         Bitboard BAttacks = Bmagic(h, (position->White_Pieces | position->Black_Pieces));
         Bitboard RAttacks = Rmagic(h, (position->White_Pieces | position->Black_Pieces));
         Bitboard QAttacks = Qmagic(h, (position->White_Pieces | position->Black_Pieces));
@@ -281,13 +270,13 @@ Search::Is_Mate(Position* position)
         if(King_Lookup_Table[h] & position->Black_King)
             score = -1;
         Bitboard Spare = position->Black_Pawns;
-        Spare |= A_Pawn_Mask;
-        Spare ^= A_Pawn_Mask;
+        Spare |= H_Pawn_Mask;
+        Spare ^= H_Pawn_Mask;
         if((Spare >> 7) & position->White_King)
             score = -1;
         Bitboard Spare2 = position->Black_Pawns;
-        Spare2 |= H_Pawn_Mask;
-        Spare2 ^= H_Pawn_Mask;
+        Spare2 |= A_Pawn_Mask;
+        Spare2 ^= A_Pawn_Mask;
         if((Spare2 >> 9) & position->White_King)
             score = -1;
         Bitboard Black_Pawns5 = position->Black_Pawns;
@@ -307,14 +296,7 @@ Search::Is_Mate(Position* position)
     				return 10000;
 			}
 		}
-        for(int j = 0; j < 64; j++)
-        {
-            if(position->Black_King & GeneralBoard[j])//Get the index(0-63) of the black king
-            {
-                h = j;
-                break;
-            }
-        }
+        h = Convert_Bitboard(position->Black_King);
         BAttacks = Bmagic(h, (position->White_Pieces | position->Black_Pieces));
         RAttacks = Rmagic(h, (position->White_Pieces | position->Black_Pieces));
         QAttacks = Qmagic(h, (position->White_Pieces | position->Black_Pieces));
@@ -398,7 +380,6 @@ int Search::QuiescenceSearch(Position* posit, int alpha, int beta, int depth)
 	}
     Move Best;
     vector<Move>stack;
-    int count = 0;
     for(int i = 0; i < position.numlegalmoves; i++)
     	{
     		Move m = position.LegalMoves[i];
@@ -409,14 +390,10 @@ int Search::QuiescenceSearch(Position* posit, int alpha, int beta, int depth)
 	std::stable_sort(stack.begin(), stack.end(), [](const Move& lhs, const Move& rhs){ return lhs.Score > rhs.Score; });
 	if(stack.size() > 0) Best = stack[0];
 	NodeType n = Alpha;
-	for(int i = 0; i < (stack.size()); i++)
+	for(unsigned int i = 0; i < (stack.size()); i++)
     {
     	if(stand_pat + Get_Cp_Value(stack[i].C) <= alpha)
-    	//if(stand_pat <= -300 && (Get_Cp_Value(stack[i].C) < 300))
-    	{
-    		//cout << "Pruned................" << endl;
     		return alpha;
-		}
     	Nodes++;
         position.Make_Move(stack[i]);
         int score = -QuiescenceSearch(&position, -beta, -alpha, depth + 1);
@@ -470,7 +447,7 @@ int Search::MateSearch(Position* posit, int alpha, int beta, int depth)
 
 int Search::Get_Move_Score(Move& m)
 {
-	return ((64 * m.C) - m.P);
+	return ((64 * Get_Cp_Value(m.C)) - Get_Cp_Value(m.P));
 }
 
 
