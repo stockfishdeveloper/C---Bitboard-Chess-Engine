@@ -66,6 +66,8 @@ public:
                     		case BQ:
                     			f += "q";
                     			break;
+                    		default:
+                    			break;
 						}
 					}
                     f += " ";
@@ -108,7 +110,7 @@ class Timer
 
 namespace Search
 {
-Move Think(int wtime, int btime, int winc, int binc);
+Move Think(int wtime, int btime, int winc, int binc, int Maxdepth = 60);
 int AlphaBeta(Position* position, int alpha, int beta, int depth, LINE * pline, bool donullmove);
 int QuiescenceSearch(Position* posit, int alpha, int beta, int depth);
 int MateSearch(Position* posit, int alpha, int beta, int depth);
