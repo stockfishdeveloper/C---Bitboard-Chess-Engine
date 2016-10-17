@@ -5,18 +5,11 @@
 /* This function takes a bitboard called To_Square that has only the bit set that the move moves to; it takes a From_Square that is the same,
 and it has the bit set that the piece in the move moves to. It also takes a Move_Type, which tells it which way to update its bitboards
 */
+#include "Util.h"
 bool White_Is_Legal(Position* position, Move move)
 {
 	position->Make_Move(move);
-    int h;
-    for(int j = 0; j < 64; j++)
-    {
-        if(position->White_King & GeneralBoard[j])//Get the index (0-63) of White's king
-        {
-            h = j;
-            break;
-        }
-    }
+    int h = Convert_Bitboard(position->White_King);
     Bitboard BAttacks = Bmagic(h, (position->White_Pieces | position->Black_Pieces));
     Bitboard RAttacks = Rmagic(h, (position->White_Pieces | position->Black_Pieces));
     Bitboard QAttacks = BAttacks | RAttacks;
@@ -83,15 +76,7 @@ bool White_Is_Legal(Position* position, Move move)
 bool Black_Is_Legal(Position* position, Move move)
 {
 	position->Make_Move(move);
-    int h;
-    for(int j = 0; j < 64; j++)
-    {
-        if(position->Black_King & GeneralBoard[j])//Get the index(0-63) of the black king
-        {
-            h = j;
-            break;
-        }
-    }
+	int h = Convert_Bitboard(position->Black_King);
     Bitboard BAttacks = Bmagic(h, (position->White_Pieces | position->Black_Pieces));
     Bitboard RAttacks = Rmagic(h, (position->White_Pieces | position->Black_Pieces));
     Bitboard QAttacks = BAttacks | RAttacks;
