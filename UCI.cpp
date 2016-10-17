@@ -1,6 +1,5 @@
 #include "Bitboard.h"
 #include "UCI.h"
-#include "windows.h"
 #include <thread> //For multithreading--must be using C++11 compiler
 #include "Thread.h"//Threading header file
 #include "Search.h"
@@ -268,7 +267,7 @@ int CheckUci()
         else if (UciCommand == "moves")
         {
         	Moves_Command();
-        	Print_Board();
+        	//Print_Board();
         }
     }
 
@@ -290,11 +289,11 @@ int Parse_Fen(string Fen)
 			hold[j] += temp[i];
 		processed += a;
 		temp = "";
-		for(int p = processed; p < str.length(); p++)
+		for(unsigned int p = processed; p < str.length(); p++)
 			temp += str[p];	
 	}
 	hold[5] = "";
-	for(int i = str.find_last_of(" ") + 1; i <= str.length(); i++)
+	for(unsigned int i = str.find_last_of(" ") + 1; i <= str.length(); i++)
 		hold[5] += str[i];
 		
 	Search::Clear();
@@ -337,7 +336,7 @@ int Parse_Fen(string Fen)
     pos.BlackCanCastleK = false;
     pos.WhiteCanCastleQ = false;
     pos.BlackCanCastleQ = false;
-    for(int i = 0; i < Legal_Castling.length(); i++)
+    for(unsigned int i = 0; i < Legal_Castling.length(); i++)
     {
     	if(Legal_Castling.find("K") != string::npos)
     		pos.WhiteCanCastleK = true;
@@ -600,20 +599,29 @@ int Parse_Moves(string First, string Second, string PromotionType = "")
             To = GeneralBoard[i];
     }
     Piece p = pos.Get_Piece_From_Bitboard(From);
+    assert(p != NONE);
     Piece Captured = NONE;
     bool Castling = (From & (pos.White_King | pos.Black_King)) && (From & 1152921504606846992) && (To & 4899916394579099716);
     bool Promotion = ((From & pos.White_Pawns) && From & Seventh_Rank_White) || ((From & pos.Black_Pawns) && (From & Seventh_Rank_Black));
-    if(pos.Current_Turn)
+    if(pos.Current_Turn == true)
     {
     	if(To & pos.Black_Pieces)
+    	{
     		Captured = pos.Get_Piece_From_Bitboard(To);
+    		assert(Captured != NONE);
+    	}
 	}
 	else
 	{
 		if(To & pos.White_Pieces)
+		{
     		Captured = pos.Get_Piece_From_Bitboard(To);
+    		assert(Captured != NONE);
+    	}
 	}
-	if(((pos.Black_Pawns << 8) & To) && (From & 1095216660480))
+	if(pos.Current_Turn == true)
+	{
+		if(((pos.Black_Pawns << 8) & To) && (From & 1095216660480) && (pos.White_Pawns & From) && (!(pos.Black_Pieces & To)))
             {
                 pos.Black_Pawns ^= (To >> 8);
                 pos.Black_Pieces ^= (To >> 8);
@@ -621,8 +629,13 @@ int Parse_Moves(string First, string Second, string PromotionType = "")
                 pos.White_Pawns ^= From;
                 pos.White_Pieces |= To;
                 pos.White_Pieces ^= From;
+                pos.Current_Turn ^= 1;
+                return 0;
             }
-    else if(((pos.White_Pawns >> 8) & To) && (From & 4278190080))
+    }
+	else if(pos.Current_Turn == false)
+	{
+    	if(((pos.White_Pawns >> 8) & To) && (From & 4278190080) && (pos.Black_Pawns & From) && (!(pos.White_Pieces & To)))
             {
                 pos.White_Pawns ^= (To << 8);
                 pos.White_Pieces ^= (To << 8);
@@ -630,24 +643,38 @@ int Parse_Moves(string First, string Second, string PromotionType = "")
                 pos.Black_Pawns ^= From;
                 pos.Black_Pieces |= To;
                 pos.Black_Pieces ^= From;
+                pos.Current_Turn ^= 1;
+                return 0;
             }
-    else
-    {
-    	Move m(p, Captured, From, To, Castling, Promotion);
-    	if(PromotionType != "")
-    	{
-    		if(PromotionType.find("q") != string::npos)
-    			m.PromotionType = pos.Current_Turn ? WQ : BK;
-    		else if(PromotionType.find("r") != string::npos)
-    			m.PromotionType = pos.Current_Turn ? WR : BR;
-    		else if(PromotionType.find("b") != string::npos)
-    			m.PromotionType = pos.Current_Turn ? WB : BB;
-    		else if(PromotionType.find("n") != string::npos)
-    			m.PromotionType = pos.Current_Turn ? WN : BN;
-		}
-    	pos.Make_Move(m);
+    }
+    if(p == WK)
+	{ 
+		pos.WhiteCanCastleK = false;
+		pos.WhiteCanCastleQ = false;
 	}
-
+	else if(p == BK)
+	{ 
+		pos.BlackCanCastleK = false;
+		pos.BlackCanCastleQ = false;
+	}
+	if(p == WR && From == 1) pos.WhiteCanCastleQ = false;
+	if(p == WR && From == 128) pos.WhiteCanCastleK = false;
+	if(p == BR && From == 72057594037927936) pos.BlackCanCastleQ = false;
+	if(p == BR && From == 9223372036854775808) pos.BlackCanCastleK = false;
+	Move m(p, Captured, From, To, Castling, Promotion);
+    if(PromotionType != "")
+    {
+    	if(PromotionType.find("q") != string::npos)
+    		m.PromotionType = pos.Current_Turn ? WQ : BK;
+    	else if(PromotionType.find("r") != string::npos)
+    		m.PromotionType = pos.Current_Turn ? WR : BR;
+    	else if(PromotionType.find("b") != string::npos)
+    		m.PromotionType = pos.Current_Turn ? WB : BB;
+    	else if(PromotionType.find("n") != string::npos)
+    		m.PromotionType = pos.Current_Turn ? WN : BN;
+	}
+    pos.Make_Move(m);
+	
     return 0;
 }
 
