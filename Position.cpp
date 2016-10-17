@@ -1,4 +1,6 @@
 	#include "Position.h"
+	#include "Util.h"
+	#include "magicmoves.h"
 	Position pos;
 	
 	Move::Move()
@@ -47,6 +49,8 @@
 		Current_Turn = true;
 		hashkey = 0;
 		numlegalmoves = 0;
+		WhiteAttacks = 0;
+		BlackAttacks = 0;
 	}
 	Position::Position(Position* position)
 	{
@@ -71,6 +75,8 @@
 		BlackCanCastleQ = position->BlackCanCastleQ;
 		hashkey = position->hashkey;
 		numlegalmoves = 0;
+		WhiteAttacks = position->WhiteAttacks;
+		BlackAttacks = position->BlackAttacks;
 	}
 	void Position::Reset()
 	{
@@ -94,7 +100,9 @@
 		BlackCanCastleQ = true;
         Current_Turn = true;
         numlegalmoves = 0;
-        hashkey = 18446462598732906494;
+        hashkey = 18446462598732906494ULL;
+        Update_White_Attacks();
+        Update_Black_Attacks();
 	}
 	Bitboard* Position::Get_Bitboard_From_Piece(Piece p)
 	{
@@ -184,10 +192,10 @@
 			else if(m.To & 4611686018427387904)
 			{
 				Black_Rooks |= 2305843009213693952;
-				Black_Rooks ^= 9223372036854775808;
+				Black_Rooks ^= 9223372036854775808ULL;
 				Black_King |= 4611686018427387904;
 				Black_King ^= 1152921504606846976;
-				Black_Pieces ^= 10376293541461622784;
+				Black_Pieces ^= 10376293541461622784ULL;
 				Black_Pieces |= 6917529027641081856;
 			}
 			else if(m.To & 4)
@@ -258,10 +266,10 @@
 			else if(m.To & 4611686018427387904)
 			{
 				Black_Rooks ^= 2305843009213693952;
-				Black_Rooks |= 9223372036854775808;
+				Black_Rooks |= 9223372036854775808ULL;
 				Black_King ^= 4611686018427387904;
 				Black_King |= 1152921504606846976;
-				Black_Pieces |= 10376293541461622784;
+				Black_Pieces |= 10376293541461622784ULL;
 				Black_Pieces ^= 6917529027641081856;
 			}
 			else if(m.To & 4)
@@ -329,4 +337,92 @@
 		if(piece == WQ || piece == BQ)
 			return 800;
 		return 0;
+	}
+	void Position::Update_White_Attacks()
+	{
+		WhiteAttacks = 0;
+		Bitboard b = White_Pawns;
+		b |= A_Pawn_Mask;
+		b ^= A_Pawn_Mask;
+		WhiteAttacks |= b << 7;
+		b = Black_Pawns;
+		b |= H_Pawn_Mask;
+		b ^= H_Pawn_Mask;
+		WhiteAttacks |= b << 9;
+		b = White_Knights;
+		while(b)
+		{
+			int lookup = lsb(b);
+			WhiteAttacks |= Knight_Lookup_Table[lookup];
+			b ^= GeneralBoard[lookup];
+		}
+		b = White_Bishops;
+		while(b)
+		{
+			int lookup = lsb(b);
+			WhiteAttacks |= Bmagic(lookup, White_Pieces | Black_Pieces);
+			b ^= GeneralBoard[lookup];
+		}
+		b = White_Rooks;
+		while(b)
+		{
+			int lookup = lsb(b);
+			WhiteAttacks |= Rmagic(lookup, White_Pieces | Black_Pieces);
+			b ^= GeneralBoard[lookup];
+		}
+		b = White_Queens;
+		while(b)
+		{
+			int lookup = lsb(b);
+			WhiteAttacks |= Qmagic(lookup, White_Pieces | Black_Pieces);
+			b ^= GeneralBoard[lookup];
+		}
+		b = White_King;
+		int lookup = lsb(b);
+		WhiteAttacks |= King_Lookup_Table[lookup];
+		
+	}
+	void Position::Update_Black_Attacks()
+	{
+		BlackAttacks = 0;
+		Bitboard b = Black_Pawns;
+		b |= A_Pawn_Mask;
+		b ^= A_Pawn_Mask;
+		BlackAttacks |= b >> 9;
+		b = Black_Pawns;
+		b |= H_Pawn_Mask;
+		b ^= H_Pawn_Mask;
+		BlackAttacks |= b >> 7;
+		b = Black_Knights;
+		while(b)
+		{
+			int lookup = lsb(b);
+			BlackAttacks |= Knight_Lookup_Table[lookup];
+			b ^= GeneralBoard[lookup];
+		}
+		b = Black_Bishops;
+		while(b)
+		{
+			int lookup = lsb(b);
+			BlackAttacks |= Bmagic(lookup, White_Pieces | Black_Pieces);
+			b ^= GeneralBoard[lookup];
+		}
+		b = Black_Rooks;
+		while(b)
+		{
+			int lookup = lsb(b);
+			BlackAttacks |= Rmagic(lookup, White_Pieces | Black_Pieces);
+			b ^= GeneralBoard[lookup];
+		}
+		b = Black_Queens;
+		while(b)
+		{
+			int lookup = lsb(b);
+			BlackAttacks |= Qmagic(lookup, White_Pieces | Black_Pieces);
+			b ^= GeneralBoard[lookup];
+		}
+		b = Black_King;
+		int lookup = lsb(b);
+		BlackAttacks |= King_Lookup_Table[lookup];
+		
 	}
