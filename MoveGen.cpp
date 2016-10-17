@@ -81,14 +81,13 @@ void Generate_White_Moves(const bool caps, Position* position)
 						for(int p = 1; p < 5; p++)
 						{
 							m.PromotionType = WP + p;
-						if(inCheck || (m.From & blockers))
-						if(inCheck || (m.From & blockers))
-						{
-							if(White_Is_Legal(position, m))
+							if(inCheck || (m.From & blockers))
+							{
+								if(White_Is_Legal(position, m))
+									position->LegalMoves[position->numlegalmoves++] = m;
+							}
+							else
 								position->LegalMoves[position->numlegalmoves++] = m;
-						}
-						else
-							position->LegalMoves[position->numlegalmoves++] = m;
 						}
 					}
 				}
@@ -675,7 +674,7 @@ void Generate_Black_Moves(const bool caps, Position* position)
 				Bitboard first = (GeneralBoard[i] & 1152921504606846976);
         		Bitboard second = ((position->White_Pieces | position->Black_Pieces) & 6917529027641081856);
         		Bitboard e8 = 1152921504606846976, f8 = 2305843009213693952, g8 = 4611686018427387904;
-        		bool Rookonh8 = (position->Black_Rooks & 9223372036854775808);
+        		bool Rookonh8 = (position->Black_Rooks & 9223372036854775808ULL);
         		if(first && !second && Rookonh8)
         		{
         			Move m(BK, NONE, GeneralBoard[i], f8, false, false);
