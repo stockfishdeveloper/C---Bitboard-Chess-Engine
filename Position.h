@@ -1,6 +1,7 @@
 #ifndef Position_H_
 #define Position_H_
 #include "Bitboard.h"
+
 enum Piece { WP, WN, WB, WR, WQ, WK, BP, BN, BB, BR, BQ, BK, NONE };
 
 class Move
@@ -41,12 +42,16 @@ class Position
 	bool Current_Turn;
 	Bitboard hashkey;
 	int numlegalmoves;
+	Bitboard WhiteAttacks;
+	Bitboard BlackAttacks;
 	Move LegalMoves[100];
 	Position();
 	Position(Position* position);
 	void Reset();
 	void Make_Move(Move m);
 	void Undo_Move(Move m);
+	void Update_White_Attacks();
+	void Update_Black_Attacks();
 	Bitboard* Get_Bitboard_From_Piece(Piece p);
 	Piece Get_Piece_From_Bitboard(Bitboard b);
 };
