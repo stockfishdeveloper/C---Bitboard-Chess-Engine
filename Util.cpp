@@ -1,15 +1,16 @@
 #include "Util.h"
 #include "Uci.h"
-short lsb(register Bitboard b)
+
+int lsb(Bitboard bb)
 {
-	if(b == 0) return 0;
-	register short temp = 0;
-	while(!(b & 1))
-	{
-		b >>= 1;
-		++temp;
-	}
-	return temp;
+	unsigned int t32;
+   	if(bb == 0) return 0;
+   	bb  ^= bb - 1;
+   	t32  = (int)bb ^ (int)(bb >> 32);
+   	t32 ^= 0x01C5FC81;
+   	t32 +=  t32 >> 16;
+   	t32 -= (t32 >> 8) + 51;
+   	return LSB_64_table [t32 & 255]; // 0..63
 }
 Movetype Get_Move_Type(Move& m)
 {
@@ -20,7 +21,7 @@ Movetype Get_Move_Type(Move& m)
 	else
 		return Normal;
 }
-const short Convert_Bitboard(const Bitboard& board)
+short Convert_Bitboard(const Bitboard& board)
     {
         if(board == 0)
             return 0;
@@ -31,21 +32,20 @@ const short Convert_Bitboard(const Bitboard& board)
         }
         return 0;
     }
-const Bitboard Unconvert_Int(const int& number)
+Bitboard Unconvert_Int(const int& number)
 	{
         return GeneralBoard[number];
     }
-int test_lsb(Bitboard b)
-{
-	if(b == 0) return 0;
-	int temp = 0;
-	while(!(b & 1))
-	{
-		b >>= 1;
-		++temp;
-	}
-	return temp;
-}
+
+ 
+/**
+ * bitScanForward
+ * @author Walter Faxon, slightly modified
+ * @param bb bitboard to scan
+ * @precondition bb != 0
+ * @return index (0..63) of least significant one bit
+ */
+
 string fen[37] = {
   "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
   "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 10",
@@ -95,7 +95,7 @@ void Benchmark()
 {
 	Timer time;
 	time.Start_Clock();
-	int nodes = 0;
+	Bitboard nodes = 0;
 	for(int i = 0; i < 37; i++)
 	{
 		Parse_Fen(fen[i]);
