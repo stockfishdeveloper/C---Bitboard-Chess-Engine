@@ -9,7 +9,7 @@ bool Is_Legal;
 void Generate_White_Moves(const bool caps, Position* position)
 {
 	bool inCheck = Search::Is_Mate(position) < 0;
-	Bitboard blockers = Qmagic(Convert_Bitboard(position->White_King), position->White_Pieces | position->Black_Pieces) & position->White_Pieces;
+	Bitboard blockers = Qmagic(lsb(position->White_King), position->White_Pieces | position->Black_Pieces) & position->White_Pieces;
 	position->numlegalmoves = 0;
     for(int i = 0; i < 64; i++)
 	{
@@ -362,7 +362,7 @@ void Generate_White_Moves(const bool caps, Position* position)
 void Generate_Black_Moves(const bool caps, Position* position)
 {
 	bool inCheck = Search::Is_Mate(position) < 0;
-	Bitboard blockers = Qmagic(Convert_Bitboard(position->Black_King), position->White_Pieces | position->Black_Pieces) & position->Black_Pieces;
+	Bitboard blockers = Qmagic(lsb(position->Black_King), position->White_Pieces | position->Black_Pieces) & position->Black_Pieces;
 	position->numlegalmoves = 0;
 	for(int i = 0; i < 64; i++)
 	{
