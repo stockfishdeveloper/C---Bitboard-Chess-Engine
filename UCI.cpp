@@ -147,67 +147,67 @@ int CheckUci()
             	Move m;
             	while(pos.White_Pawns)
             	{
-            		int b = Convert_Bitboard(pos.White_Pawns);
+            		int b = lsb(pos.White_Pawns);
             		wpieces[wc++] = b;
             		pos.White_Pawns ^= GeneralBoard[b];
 				}
 				while(pos.White_Knights)
             	{
-            		int b = Convert_Bitboard(pos.White_Knights);
+            		int b = lsb(pos.White_Knights);
             		wpieces[wc++] = b;
             		pos.White_Knights ^= GeneralBoard[b];
 				}
 				while(pos.White_Bishops)
             	{
-            		int b = Convert_Bitboard(pos.White_Bishops);
+            		int b = lsb(pos.White_Bishops);
             		wpieces[wc++] = b;
             		pos.White_Bishops ^= GeneralBoard[b];
 				}
 				while(pos.White_Rooks)
             	{
-            		int b = Convert_Bitboard(pos.White_Rooks);
+            		int b = lsb(pos.White_Rooks);
             		wpieces[wc++] = b;
             		pos.White_Rooks ^= GeneralBoard[b];
 				}
 				while(pos.White_Queens)
             	{
-            		int b = Convert_Bitboard(pos.White_Queens);
+            		int b = lsb(pos.White_Queens);
             		wpieces[wc++] = b;
             		pos.White_Queens ^= GeneralBoard[b];
 				}
 				
 				while(pos.Black_Pawns)
             	{
-            		int b = Convert_Bitboard(pos.Black_Pawns);
+            		int b =lsb(pos.Black_Pawns);
             		bpieces[bc++] = b;
             		pos.Black_Pawns ^= GeneralBoard[b];
 				}
 				while(pos.Black_Knights)
             	{
-            		int b = Convert_Bitboard(pos.Black_Knights);
+            		int b = lsb(pos.Black_Knights);
             		bpieces[bc++] = b;
             		pos.Black_Knights ^= GeneralBoard[b];
 				}
 				while(pos.White_Bishops)
             	{
-            		int b = Convert_Bitboard(pos.Black_Bishops);
+            		int b = lsb(pos.Black_Bishops);
             		bpieces[bc++] = b;
             		pos.Black_Bishops ^= GeneralBoard[b];
 				}
 				while(pos.Black_Rooks)
             	{
-            		int b = Convert_Bitboard(pos.Black_Rooks);
+            		int b = lsb(pos.Black_Rooks);
             		bpieces[bc++] = b;
             		pos.Black_Rooks ^= GeneralBoard[b];
 				}
 				while(pos.Black_Queens)
             	{
-            		int b = Convert_Bitboard(pos.Black_Queens);
+            		int b = lsb(pos.Black_Queens);
             		bpieces[bc++] = b;
             		pos.Black_Queens ^= GeneralBoard[b];
 				}
-				wpieces[15] = Convert_Bitboard(pos.White_King);
-				bpieces[15] = Convert_Bitboard(pos.Black_King);
+				wpieces[15] = lsb(pos.White_King);
+				bpieces[15] = lsb(pos.Black_King);
 				unsigned long tbindex = PfnIndCalcFun(tbid, pos.Current_Turn);
             	cout << "Index " << tbindex << endl;
             	cout << "Score is " << TbtProbeTable(tbid, 1, tbindex) << endl;
