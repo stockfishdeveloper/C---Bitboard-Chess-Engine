@@ -21,17 +21,6 @@ Movetype Get_Move_Type(Move& m)
 	else
 		return Normal;
 }
-short Convert_Bitboard(const Bitboard& board)
-    {
-        if(board == 0)
-            return 0;
-        for(short i = 0; i < 64; i++)
-        {
-            if(board & GeneralBoard[i])
-                return i;
-        }
-        return 0;
-    }
 Bitboard Unconvert_Int(const int& number)
 	{
         return GeneralBoard[number];
