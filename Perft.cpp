@@ -48,6 +48,8 @@ int Root_Perft(int depth)
                     		case BQ:
                     			cout << "q";
                     			break;
+                    		default:
+                    			break;
 						}
 				}
 				cout << ": ";
