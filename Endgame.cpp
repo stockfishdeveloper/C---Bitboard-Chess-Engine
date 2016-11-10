@@ -14,33 +14,21 @@ const int Center_Distance[64] =
   6, 5, 4, 3, 3, 4, 5, 6
 };
 
-const int Drive_To_Corner(bool Losing_King)
+int Drive_To_Corner(Bitboard Losing_King)
 {
-	if(Losing_King)
-	{
-		for(int i = 0; i < 64; i++)
+	for(int i = 0; i < 64; i++)
 		{
-			if(pos.White_King & GeneralBoard[i])
+			if(Losing_King & GeneralBoard[i])
 			{
 				return Center_Distance[i];
 			}		
 		}
-	}
-	else
-	{
-		for(int i = 0; i < 64; i++)
-		{
-			if(pos.Black_King & GeneralBoard[i])
-			{
-				return Center_Distance[i];
-			}		
-		}
-	}
+	return 0;
 }
 
-const int Dist_Betw(Bitboard sq1, Bitboard sq2)
+int Dist_Betw(Bitboard sq1, Bitboard sq2)
 {
-	int wk, bk;
+	int wk = 0, bk = 0;
 	for(int i = 0; i < 64; i++)
 		{
 			if(sq2 & GeneralBoard[i])
