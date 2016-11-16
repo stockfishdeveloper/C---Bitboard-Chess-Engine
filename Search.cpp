@@ -22,13 +22,13 @@ bool Search::STOP_SEARCHING_NOW = false;
 Move Search::Think(int wtime, int btime, int winc, int binc, int Maxdepth = 60)
 {
     Move Best;
-    Best.Score = -100000;
+    Best.Score = -INF;
     Timer timer;
     timer.Start_Clock();
     Time_Allocation = (pos.Current_Turn ? wtime : btime);
     Move move;
-    int rootAlpha = -100000;
-    int rootBeta = 100000;
+    int rootAlpha = -INF;
+    int rootBeta = INF;
     const int MAXDEPTH = Maxdepth;
     LINE line;
     vector<Move>rootstack;
@@ -53,17 +53,16 @@ Move Search::Think(int wtime, int btime, int winc, int binc, int Maxdepth = 60)
             	for(int h = 0; h < pos.numlegalmoves; h++)
                 	{
                 		if(pos.LegalMoves[h].Promotion == true)
-							pos.LegalMoves[h].Score += 100;
+							pos.LegalMoves[h].Score += 10000;
                     	if(pos.LegalMoves[h].C != NONE)
 							pos.LegalMoves[h].Score += Get_Move_Score(pos.LegalMoves[h]);
 						rootstack.push_back(pos.LegalMoves[h]);
                     	count++;
                 	}
             }
-        rootAlpha -= 50;
-		rootBeta += 50;
-		std::stable_sort(rootstack.begin(), rootstack.end(), [](const Move& lhs, const Move& rhs){ return (lhs.Score > rhs.Score);});
-        bool inCheck = Search::Is_Mate(&pos) == -10000;
+        std::stable_sort(rootstack.begin(), rootstack.end(), [](const Move& lhs, const Move& rhs){ return (lhs.Score > rhs.Score);});
+        bool inCheck = Search::Is_Mate(&pos) == -INF;
+        bool pvfound = false;
         for(unsigned int i = 0; i < rootstack.size(); i++)
             {
             	if(q >= 2 && timer.Get_Time() > 1000)
@@ -76,25 +75,14 @@ Move Search::Think(int wtime, int btime, int winc, int binc, int Maxdepth = 60)
                     output.unlock();
                 }
                 pos.Make_Move(rootstack[i]);
-                int score = 0;
-                if(q < 5) score = -AlphaBeta(&pos, -rootBeta, -rootAlpha, q - 1, &line, true);
-                else
-                {
-                	if(i > 2)
-                	{
-                		score = -AlphaBeta(&pos, -(rootAlpha+1), -rootAlpha, q - 1, &line, true);
-                		if(score > rootAlpha)
-                			score = -AlphaBeta(&pos, -rootBeta, -rootAlpha, q - 1, &line, true);
-                	}
-                	else
-                		score = -AlphaBeta(&pos, -rootBeta, -rootAlpha, q - 1, &line, true);
-				}
+                int score = -AlphaBeta(&pos, -rootBeta, -rootAlpha, q - 1, &line, true);
                 rootstack[i].Score = score;
                 pos.Undo_Move(rootstack[i]);
+                //cout << score << endl;
                 if(score >= rootBeta) 
                 {
-                	rootBeta = 100000;
-                	score = -AlphaBeta(&pos, -rootBeta, -rootAlpha, (q - 1), &line, false);
+                	rootBeta = INF;
+                	score = -AlphaBeta(&pos, -rootBeta, -rootAlpha, (q - 1), &line, true);
                 	rootstack[i].Score = score;
                 }
                 if(score > rootAlpha)
@@ -111,6 +99,7 @@ Move Search::Think(int wtime, int btime, int winc, int binc, int Maxdepth = 60)
                     Best.Score = score;
                     Uci_Pv(q, Seldepth, Best, &matemoves, timer.Get_Time(), Nodes);
                     rootAlpha = score;
+                    pvfound = true;
                 }
                 if((timer.Get_Time() >= (Search::Time_Allocation / 30)) && q > 4)
         			{
@@ -118,7 +107,8 @@ Move Search::Think(int wtime, int btime, int winc, int binc, int Maxdepth = 60)
             			return Best;
         			}
             }
-        
+        rootAlpha = Best.Score - 50;
+		rootBeta = Best.Score + 50;
         Uci_Pv(q, Seldepth, Best, &matemoves, timer.Get_Time(), Nodes);
 		LINE* f = new LINE;
         f->cmove = 0;
@@ -136,7 +126,7 @@ Move Search::Think(int wtime, int btime, int winc, int binc, int Maxdepth = 60)
     return Best;
 }
 
-int Search::AlphaBeta(Position* posit, int alpha, int beta, int depth, LINE * pline, bool donullmove)
+int Search::AlphaBeta(Position* posit, int alpha, int beta, int depth, LINE * pline, bool PvNode)
 {
 	if(depth <= 1)
     {
@@ -145,11 +135,11 @@ int Search::AlphaBeta(Position* posit, int alpha, int beta, int depth, LINE * pl
         return QuiescenceSearch(posit, alpha, beta, depth + 1);
     }
     Position position(posit);
-    bool inCheck = Search::Is_Mate(&position) == -10000;
+    bool inCheck = Search::Is_Mate(&position) == -INF;
     LINE line;
     //TT Probe
     TTEntry* tt = TT.probe(Get_Current_Hash_Key(&position));
-	if(tt!= NULL)
+	if(!PvNode && tt!= NULL)
 	{
 		if(tt->depth >= depth)
 		{
@@ -159,7 +149,7 @@ int Search::AlphaBeta(Position* posit, int alpha, int beta, int depth, LINE * pl
 		}
 	}
 	//Null Move Pruning
-    if((!inCheck) && (donullmove) && (depth > 3))
+    if((!inCheck) && !PvNode && (depth > 3))
     {
         position.Current_Turn ^= 1;
         int score = -AlphaBeta(&position, -beta, -beta + 1, depth - 3, &line, false);
@@ -173,7 +163,7 @@ int Search::AlphaBeta(Position* posit, int alpha, int beta, int depth, LINE * pl
     position.Current_Turn ? Generate_White_Moves(false, &position) : Generate_Black_Moves(false, &position);
     if(position.numlegalmoves == 0)
     {
-        alpha = inCheck * -10000;
+        alpha = inCheck * -INF;
         pline->score = alpha;
         pline->cmove = 0;
         return alpha;
@@ -196,19 +186,20 @@ int Search::AlphaBeta(Position* posit, int alpha, int beta, int depth, LINE * pl
 	}
 	Log << "END" << endl;*/
 	int pos_score = Eval::Evaluate_Position(&position);
+	bool pvfound = false;
 	for(int i = 0; i < position.numlegalmoves; i++)
     {
-    	if(depth == 2 && !inCheck && donullmove)
+    	if(depth == 2 && !inCheck && !PvNode)
 		{
 			if((pos_score + 200) <= alpha)
 			continue;
 		}
-		if(depth == 3 && !inCheck && donullmove)
+		if(depth == 3 && !inCheck && !PvNode)
 		{
 			if((pos_score + 500) <= alpha)
 			continue;
 		}
-		if(depth == 4 && !inCheck && donullmove)
+		if(depth == 4 && !inCheck && !PvNode)
 		{
 			if((pos_score + 800) <= alpha)
 			continue;
@@ -217,31 +208,28 @@ int Search::AlphaBeta(Position* posit, int alpha, int beta, int depth, LINE * pl
         position.Make_Move(moves[i]);
         int score;
         if(i < 3)
-           	score = -AlphaBeta(&position, -beta, -alpha, depth - 1, &line, true);
-        else
-        	{
-        		if(depth < 4
+           	score = -AlphaBeta(&position, -beta, -alpha, depth - 1, &line, false);
+        else if(depth > 2
 		   		&& i > 2
-		   		&& donullmove
+		   		&& !PvNode
 		   		&& (moves[i].C == NONE)
 		   		&& (!(moves[i].Promotion))
 				&& !inCheck)
 		   		{
-		   			score = -AlphaBeta(&position, -(alpha + 1), -alpha, depth - 2, &line, true);
+		   			score = -AlphaBeta(&position, -(alpha + 1), -alpha, depth - 2, &line, false);
 		   			if(score > alpha)
-				   		score = -AlphaBeta(&position, -(alpha + 1), -alpha, depth - 1, &line, true);
-				   	if(score > alpha && score < beta)
-          				score = -AlphaBeta(&position, -beta, -alpha, depth - 1, &line, true);
+				   		score = -AlphaBeta(&position, -(alpha + 1), -alpha, depth - 1, &line, false);
+				   	if(score > alpha)
+          				score = -AlphaBeta(&position, -beta, -alpha, depth - 1, &line, false);
           		}
-		   		else
-		   			score = -AlphaBeta(&position, -beta, -alpha, depth - 1, &line, true);
-		   	}
-		/*else if(pvfound == true)
+		else if(pvfound && PvNode)
         {
 			score = -AlphaBeta(&position, -(alpha+1), -alpha, depth - 1, &line, true);
-			if(score > alpha)
-            	score = -AlphaBeta(&position, -beta, -alpha, depth - 1, &line, true);
-        }*/
+			//if(score > alpha)
+            	//score = -AlphaBeta(&position, -beta, -alpha, depth - 1, &line, true);
+        }
+        else
+           	score = -AlphaBeta(&position, -beta, -alpha, depth - 1, &line, false);
         position.Undo_Move(moves[i]);
         if(score >= beta)
         {
@@ -256,13 +244,14 @@ int Search::AlphaBeta(Position* posit, int alpha, int beta, int depth, LINE * pl
             pline->cmove = line.cmove + 1;
             alpha = score;
             node = Exact;
+            pvfound = true;
         }
     }
     TT.save(depth, alpha, pline->argmove[0], node, Get_Current_Hash_Key(&position));
     return alpha;
 }
 
-Search::Is_Mate(Position* position)
+int Search::Is_Mate(Position* position)
 {
 	int score = 0;
 	int h = lsb(position->White_King);
@@ -302,9 +291,9 @@ Search::Is_Mate(Position* position)
     		if(score < 0)
     		{
     			if(position->Current_Turn)
-    				return -10000;
+    				return -INF;
     			else
-    				return 10000;
+    				return INF;
 			}
 		}
         h = lsb(position->Black_King);
@@ -343,9 +332,9 @@ Search::Is_Mate(Position* position)
     		if(score > 0)
     		{
     			if(position->Current_Turn)
-    				return 10000;
+    				return INF;
     			else
-    				return -10000;
+    				return -INF;
 			}
 		}
     return 0;
@@ -395,8 +384,7 @@ int Search::QuiescenceSearch(Position* posit, int alpha, int beta, int depth)
     	{
     		Move m = position.LegalMoves[i];
     		m.Score = Get_Move_Score(m);
-    		if((Get_Cp_Value(m.C) - Get_Cp_Value(m.P)) > 0) m.Score += 1000;
-    		if(tt != NULL) if(tt->best.From == m.From && tt->best.To == m.To) m.Score += 10000;
+    		if(tt != NULL) if(tt->best.From == m.From && tt->best.To == m.To) m.Score += 100000;
     		stack.push_back(m);
     	}
 	std::stable_sort(stack.begin(), stack.end(), [](const Move& lhs, const Move& rhs){ return lhs.Score > rhs.Score; });
@@ -405,7 +393,7 @@ int Search::QuiescenceSearch(Position* posit, int alpha, int beta, int depth)
 	for(unsigned int i = 0; i < (stack.size()); i++)
     {
     	if(stand_pat + Get_Cp_Value(stack[i].C) <= alpha)
-    		return alpha;
+    		continue;
     	Nodes++;
         position.Make_Move(stack[i]);
         int score = -QuiescenceSearch(&position, -beta, -alpha, depth + 1);
@@ -437,7 +425,7 @@ int Search::MateSearch(Position* posit, int alpha, int beta, int depth)
     position.Current_Turn ? Generate_White_Moves(false, &position) : Generate_Black_Moves(false, &position);
     if(position.numlegalmoves == 0)
     {
-        return (Is_Mate(&position) / 10000);
+        return (Is_Mate(&position));
     }
     for(int i = 0; i < position.numlegalmoves; i++)
     {
