@@ -8,6 +8,8 @@
 #include <chrono>
 #include <string>
 
+//const int INF = 2147483647;
+const int INF = 10000000;
 typedef std::chrono::milliseconds::rep TimePoint; // A value in milliseconds
 
 class LINE
@@ -111,7 +113,7 @@ class Timer
 namespace Search
 {
 Move Think(int wtime, int btime, int winc, int binc, int Maxdepth = 60);
-int AlphaBeta(Position* position, int alpha, int beta, int depth, LINE * pline, bool donullmove);
+int AlphaBeta(Position* position, int alpha, int beta, int depth, LINE * pline, bool PvNode);
 int QuiescenceSearch(Position* posit, int alpha, int beta, int depth);
 int MateSearch(Position* posit, int alpha, int beta, int depth);
 int Get_Move_Score(Move& m);
