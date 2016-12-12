@@ -1,6 +1,7 @@
 #ifndef Position_H_
 #define Position_H_
 #include "Bitboard.h"
+#include "Types.h"
 
 enum Piece { WP, WN, WB, WR, WQ, WK, BP, BN, BB, BR, BQ, BK, NONE };
 
@@ -50,8 +51,11 @@ class Position
 	void Reset();
 	void Make_Move(Move m);
 	void Undo_Move(Move m);
-	void Update_White_Attacks();
-	void Update_Black_Attacks();
+	Bitboard Get_White_Attacks();
+	Bitboard GetLeastWhiteAttacker(Bitboard b);
+	Bitboard Get_Black_Attacks();
+	Bitboard GetLeastBlackAttacker(Bitboard board);
+	int Non_Pawn_Material();
 	Bitboard* Get_Bitboard_From_Piece(Piece p);
 	Piece Get_Piece_From_Bitboard(Bitboard b);
 };
