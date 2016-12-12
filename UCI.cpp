@@ -10,6 +10,7 @@
 #include "Util.h"
 #include "TransTable.h"
 #include "Position.h"
+#include "Eval.h"
 using namespace std;
 int CheckUci();
 string UciCommand;
@@ -76,6 +77,10 @@ int CheckUci()
 		else if(UciCommand == "bench")
         {
         	Benchmark();
+		}
+		else if(UciCommand == "eval")
+        {
+        	cout << Eval::Evaluate_Position(&pos) << endl;
 		}
         else if(UciCommand == "perft")
         {
@@ -277,7 +282,7 @@ int CheckUci()
 
 int Parse_Fen(string Fen)
 {
-	cout << Fen << endl;
+	//cout << Fen << endl;
 	string str = Fen;
 	string temp = str;
 	string hold[6];
@@ -521,6 +526,13 @@ int Moves_Command()
             cin.putback('b');
             return 0;
 		}
+		string e = "ev";
+        if(First_Part == e)
+        {
+        	cin.putback('v');
+            cin.putback('e');
+            return 0;
+		}
         cin.get(Second_Part, 3);
         Log << Second_Part << endl;
         string a8 = "a8";
@@ -699,7 +711,7 @@ void Uci_Pv(int depth, int seldepth, Move best, int* matemoves, int time, int no
 		output.lock();
 		cout << "info multipv 1 depth " << depth << " seldepth " << depth + seldepth << " score ";
         Log << "<< info multipv 1 depth " << depth << " seldepth " << depth + seldepth << " score ";
-        if(best.Score == 10000)
+        if(best.Score == INF)
         {
         	if(depth + 1 < *matemoves)
                 {
@@ -713,7 +725,7 @@ void Uci_Pv(int depth, int seldepth, Move best, int* matemoves, int time, int no
                     Log << "mate " << (*matemoves / 2) - 1;
                 }
         }
-        else if(best.Score == -10000)
+        else if(best.Score == -INF)
         {
         	if(depth + 1 < *matemoves)
                 {
