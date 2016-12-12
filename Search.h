@@ -43,34 +43,34 @@ public:
                     if(argmove[i].PromotionType != NONE)
                     {
                     	switch(argmove[i].PromotionType)
-                    	{
-                    		case WN:
-                    			f += "n";
-                    			break;
-                    		case WB:
-                    			f += "b";
-                    			break;
-                    		case WR:
-                    			f += "r";
-                    			break;
-                    		case WQ:
-                    			f += "q";
-                    			break;
-                    		case BN:
-                    			f += "n";
-                    			break;
-							case BB:
-                    			f += "b";
-                    			break;
-                    		case BR:
-                    			f += "r";
-                    			break;
-                    		case BQ:
-                    			f += "q";
-                    			break;
-                    		default:
-                    			break;
-						}
+                        {
+                                case WN:
+                                        f += "n";
+                                        break;
+                                case WB:
+                                        f += "b";
+                                        break;
+                                case WR:
+                                        f += "r";
+                                        break;
+                                case WQ:
+                                        f += "q";
+                                        break;
+                                case BN:
+                                        f += "n";
+                                        break;
+                                case BB:
+                                        f += "b";
+                                        break;
+                                case BR:
+                                        f += "r";
+                                        break;
+                                case BQ:
+                                        f += "q";
+                                        break;
+                                default:
+                                        break;
+                        }
 					}
                     f += " ";
                 }
@@ -113,10 +113,11 @@ class Timer
 namespace Search
 {
 Move Think(int wtime, int btime, int winc, int binc, int Maxdepth = 60);
-int AlphaBeta(Position* position, int alpha, int beta, int depth, LINE * pline, bool PvNode);
+int AlphaBeta(Position* position, int alpha, int beta, int depth, LINE * pline, bool PvNode, bool donullmove);
 int QuiescenceSearch(Position* posit, int alpha, int beta, int depth);
 int MateSearch(Position* posit, int alpha, int beta, int depth);
 int Get_Move_Score(Move& m);
+int SEE(Position* position, Bitboard square);
 extern Bitboard Nodes;
 extern bool Searching;
 extern LINE line;
