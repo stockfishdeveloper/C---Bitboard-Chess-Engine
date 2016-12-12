@@ -63,8 +63,8 @@ const int Eval::BPpsqt[64] =
 
 const int Eval::WKpsqt[64] =
 {
-    20,  30,  10,   0,   0,  10,  30,  20,
-    20,  20,   0,   0,   0,   0,  20,  20,
+    20,  30,  10,   0,   0,  0,  30,  20,
+    20,  20,  -10, -10, -10, -10,  20,  20,
     -10, -20, -20, -20, -20, -20, -20, -10,
     -20, -30, -30, -40, -40, -30, -30, -20,
     -30, -40, -40, -50, -50, -40, -40, -30,
@@ -80,7 +80,7 @@ const int Eval::BKpsqt[64] =
   -30, -40, -40, -50, -50, -40, -40, -30,
   -20, -30, -30, -40, -40, -30, -30, -20,
   -10, -20, -20, -20, -20, -20, -20, -10,
-   20,  20,   0,   0,   0,   0,  20,  20,
+   20,  20,  -5,  -5,  -5,  -5,  20,  20,
    20,  30,  10,   0,   0,  10,  30,  20
 };
 
@@ -120,9 +120,9 @@ Piece piece_v[5] =  { 100, 300, 300, 500, 800 };
 //Evaluates the current position based on the bitboards in Bitboard.cpp
 int Eval::Lazy_Eval(Position* position)
 {
-    White_Score = 0;
+	White_Score = 0;
     Black_Score = 0;
-    White_Score += piece_v[WP] * __builtin_popcountll(position->White_Pawns);
+	White_Score += piece_v[WP] * __builtin_popcountll(position->White_Pawns);
     White_Score += piece_v[WN] * __builtin_popcountll(position->White_Knights);
     White_Score += piece_v[WB] * __builtin_popcountll(position->White_Bishops);
     White_Score += piece_v[WR] * __builtin_popcountll(position->White_Rooks);
@@ -137,10 +137,10 @@ int Eval::Lazy_Eval(Position* position)
 int Eval::Evaluate_Position(Position* position)
 {
     
-    White_Score = 0; //White's Score
+	White_Score = 0; //White's Score
     Black_Score = 0; //Black's Score
     wk = 0;
-    bk = 0;
+	bk = 0;
     White_Score += piece_v[WP] * __builtin_popcountll(position->White_Pawns);
     White_Score += piece_v[WN] * __builtin_popcountll(position->White_Knights);
     White_Score += piece_v[WB] * __builtin_popcountll(position->White_Bishops);
@@ -182,14 +182,14 @@ int Eval::Evaluate_Position(Position* position)
         
     	}
     int wpona = __builtin_popcountll(position->White_Pawns & A_Pawn_Mask);
-    int wponb = __builtin_popcountll(position->White_Pawns & B_Pawn_Mask);
-    int wponc = __builtin_popcountll(position->White_Pawns & C_Pawn_Mask);
-    int wpond = __builtin_popcountll(position->White_Pawns & D_Pawn_Mask);
-    int wpone = __builtin_popcountll(position->White_Pawns & E_Pawn_Mask);
-    int wponf = __builtin_popcountll(position->White_Pawns & F_Pawn_Mask);
-    int wpong = __builtin_popcountll(position->White_Pawns & G_Pawn_Mask);
-    int wponh = __builtin_popcountll(position->White_Pawns & H_Pawn_Mask);
-    int bpona = __builtin_popcountll(position->Black_Pawns & A_Pawn_Mask);
+	int wponb = __builtin_popcountll(position->White_Pawns & B_Pawn_Mask);
+	int wponc = __builtin_popcountll(position->White_Pawns & C_Pawn_Mask);
+	int wpond = __builtin_popcountll(position->White_Pawns & D_Pawn_Mask);
+	int wpone = __builtin_popcountll(position->White_Pawns & E_Pawn_Mask);
+	int wponf = __builtin_popcountll(position->White_Pawns & F_Pawn_Mask);
+	int wpong = __builtin_popcountll(position->White_Pawns & G_Pawn_Mask);
+	int wponh = __builtin_popcountll(position->White_Pawns & H_Pawn_Mask);
+	int bpona = __builtin_popcountll(position->Black_Pawns & A_Pawn_Mask);
     int bponb = __builtin_popcountll(position->Black_Pawns & B_Pawn_Mask);
     int bponc = __builtin_popcountll(position->Black_Pawns & C_Pawn_Mask);
     int bpond = __builtin_popcountll(position->Black_Pawns & D_Pawn_Mask);
@@ -206,8 +206,8 @@ int Eval::Evaluate_Position(Position* position)
 	}
     else
 	{	//hashmisses++;
-	    int wscore = 0;
-	    int bscore = 0;	    
+		int wscore = 0;
+		int bscore = 0;	    
 	    wscore -= (wpona > 1 ? Doubled_Pawn_Penalty * (wpona - 1) : 0);
 	    wscore -= (wponb > 1 ? Doubled_Pawn_Penalty * (wponb - 1) : 0);
 	    wscore -= (wponc > 1 ? Doubled_Pawn_Penalty * (wponc - 1) : 0);
@@ -291,12 +291,12 @@ int Eval::Evaluate_Position(Position* position)
                 {
                 	if(White_Score > Black_Score)
                 	{
-                	White_Score  += (Drive_To_Corner(position->White_King));
+                	White_Score  += (Drive_To_Corner(position->Black_King));
 					White_Score -= Dist_Betw(position->White_King, position->Black_King);
 					}
                 	else
                 	{
-                	Black_Score  += (Drive_To_Corner(position->Black_King));
+                	Black_Score  += (Drive_To_Corner(position->White_King));
 					Black_Score -= Dist_Betw(position->White_King, position->Black_King);
 					}
 				}
