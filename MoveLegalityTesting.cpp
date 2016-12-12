@@ -36,10 +36,10 @@ bool White_Is_Legal(Position* position, Move move)
     	position->Undo_Move(move);
     	return false;
     	}
-    Bitboard Spare2 = position->Black_Pawns;
-    Spare2 |= A_Pawn_Mask;
-    Spare2 ^= A_Pawn_Mask;
-    if((Spare2 >> 9) & position->White_King)
+    Spare = position->Black_Pawns;
+    Spare |= A_Pawn_Mask;
+    Spare ^= A_Pawn_Mask;
+    if((Spare >> 9) & position->White_King)
         {
     	position->Undo_Move(move);
         return false;
@@ -81,15 +81,15 @@ bool Black_Is_Legal(Position* position, Move move)
     	position->Undo_Move(move);
         return false;
     	}
-    Bitboard Spare2 = position->White_Pawns;
-    Spare2 |= A_Pawn_Mask;
-    Spare2 ^= A_Pawn_Mask;
-    if((Spare2 << 7) & position->Black_King)
+    Bitboard Spare = position->White_Pawns;
+    Spare |= A_Pawn_Mask;
+    Spare ^= A_Pawn_Mask;
+    if((Spare << 7) & position->Black_King)
         {
     	position->Undo_Move(move);
         return false;
     	}
-    Bitboard Spare = position->White_Pawns;
+    Spare = position->White_Pawns;
     Spare |= H_Pawn_Mask;
     Spare ^= H_Pawn_Mask;
     if((Spare << 9) & position->Black_King)
