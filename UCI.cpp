@@ -11,6 +11,7 @@
 #include "TransTable.h"
 #include "Position.h"
 #include "Eval.h"
+#include "CounterMove.h"
 using namespace std;
 int CheckUci();
 string UciCommand;
@@ -65,6 +66,7 @@ int CheckUci()
             Search::Nodes = 0;
             Search::Clear();
             TT.clear();
+            InitCounterMove();
             //cout << Get_Current_Hash_Key() << endl;
 
         }
