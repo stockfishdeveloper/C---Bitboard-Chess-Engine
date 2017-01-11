@@ -134,6 +134,14 @@ int Eval::Lazy_Eval(Position* position)
     Black_Score += piece_v[WQ] * __builtin_popcountll(position->Black_Queens);
     return (White_Score - Black_Score);
 }
+int Eval::EvalPSQTResult(Position* position, Move m)
+{
+	int eval = Evaluate_Position(position);
+	position->Make_Move(m);
+	int eval2 = Evaluate_Position(position);
+	position->Undo_Move(m);
+	return (eval2 - eval);
+}
 int Eval::Evaluate_Position(Position* position)
 {
     
