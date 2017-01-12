@@ -49,22 +49,23 @@ Move Search::Think(int wtime, int btime, int winc, int binc, int Maxdepth = 60)
             }
 		}
 		if(q == 1)
-            {
-            	TTEntry* tt = TT.probe(Get_Current_Hash_Key(&pos));
-            	for(int h = 0; h < pos.numlegalmoves; h++)
-                	{
-                		if(tt != NULL) if(tt->best.From == pos.LegalMoves[h].From && tt->best.To == pos.LegalMoves[h].To) pos.LegalMoves[h].Score += 1000;
-                		if(pos.LegalMoves[h].Promotion == true)
-							pos.LegalMoves[h].Score += 10;
-                    	if(pos.LegalMoves[h].C != NONE)
-							pos.LegalMoves[h].Score += (Get_Move_Score(pos.LegalMoves[h]) / 100);
-						pos.LegalMoves[h].Score += CounterMove[q - 1][lsb(pos.LegalMoves[h].From)][lsb(pos.LegalMoves[h].To)] * 100;
-						rootstack.push_back(pos.LegalMoves[h]);
-                    	count++;
-                	}
+        {
+        	TTEntry* tt = TT.probe(Get_Current_Hash_Key(&pos));
+        	for(int h = 0; h < pos.numlegalmoves; h++)
+            	{
+            		if(tt != NULL) if(tt->best.From == pos.LegalMoves[h].From && tt->best.To == pos.LegalMoves[h].To) pos.LegalMoves[h].Score += 1000;
+            		if(pos.LegalMoves[h].Promotion == true)
+						pos.LegalMoves[h].Score += 50;
+                	if(pos.LegalMoves[h].C != NONE)
+						pos.LegalMoves[h].Score += (Get_Move_Score(pos.LegalMoves[h]) / 100);
+					//pos.LegalMoves[h].Score += Eval::EvalPSQTResult(&pos, pos.LegalMoves[h]);
+					pos.LegalMoves[h].Score += CounterMove[q - 1][lsb(pos.LegalMoves[h].From)][lsb(pos.LegalMoves[h].To)] * 100;
+					rootstack.push_back(pos.LegalMoves[h]);
+                	count++;
+            	}
             }
         std::stable_sort(rootstack.begin(), rootstack.end(), [](const Move& lhs, const Move& rhs){ return (lhs.Score > rhs.Score);});
-        bool inCheck = Search::Is_Mate(&pos) == -INF;
+        bool inCheck = Search::Is_Mate(&pos) == -MATE;
         bool pvfound = false;
         for(unsigned int i = 0; i < rootstack.size(); i++)
             {
@@ -78,18 +79,19 @@ Move Search::Think(int wtime, int btime, int winc, int binc, int Maxdepth = 60)
                     output.unlock();
                 }
                 pos.Make_Move(rootstack[i]);
-                //cout << "Called rootAlpha " << rootAlpha << " and rootBeta " << rootBeta << ", search returned ";
                 int score = -AlphaBeta(&pos, -rootBeta, -rootAlpha, q - 1, &line, true, true);
-                //cout << score << endl;
                 rootstack[i].Score = score;
                 pos.Undo_Move(rootstack[i]);
-                if(score >= rootBeta) 
+                /*if(score >= rootBeta) 
                 {
                 	rootBeta = INF;
-                	continue;
-                	//score = -AlphaBeta(&pos, -rootBeta, -rootAlpha, (q - 1), &line, true, true);
-                	//rootstack[i].Score = score;
-                }
+                	rootAlpha = -INF;
+                	cout << "before " << score << endl;
+                	//continue;
+                	score = -AlphaBeta(&pos, -rootBeta, -rootAlpha, (q - 1), &line, true, true);
+                	cout << "after " << score << endl;
+                	rootstack[i].Score = score;
+                }*/
                 if(score > rootAlpha)
                 {
                 	LINE* f = new LINE;
@@ -140,7 +142,7 @@ int Search::AlphaBeta(Position* posit, int alpha, int beta, int depth, LINE * pl
         return QuiescenceSearch(posit, alpha, beta, depth + 1);
     }
     Position position(posit);
-    bool inCheck = Search::Is_Mate(&position) == -INF;
+    bool inCheck = Search::Is_Mate(&position) == -MATE;
     LINE line;
     //TT Probe
     TTEntry* tt = TT.probe(Get_Current_Hash_Key(&position));
@@ -148,8 +150,8 @@ int Search::AlphaBeta(Position* posit, int alpha, int beta, int depth, LINE * pl
 	{
 		if(tt->depth >= depth)
 		{
-			if(tt->nodetype == Alpha) alpha = tt->score;//if(tt->score <= alpha) return alpha;
-			if(tt->nodetype == Beta) beta = tt->score;//if(tt->score >= beta) return beta;
+			if(tt->nodetype == Alpha) /*alpha = tt->score;*/if(tt->score <= alpha) return alpha;
+			if(tt->nodetype == Beta) /*beta = tt->score;*/if(tt->score >= beta) return beta;
 			if(tt->nodetype == Exact) return tt->score;
 		}
 	}
@@ -170,7 +172,7 @@ int Search::AlphaBeta(Position* posit, int alpha, int beta, int depth, LINE * pl
     position.Current_Turn ? Generate_White_Moves(false, &position) : Generate_Black_Moves(false, &position);
     if(position.numlegalmoves == 0)
     {
-        alpha = inCheck * -INF;
+        alpha = inCheck * -MATE;
         pline->score = alpha;
         pline->cmove = 0;
         return alpha;
@@ -182,11 +184,11 @@ int Search::AlphaBeta(Position* posit, int alpha, int beta, int depth, LINE * pl
     		position.LegalMoves[i].Score = 0;
     		if(tt != NULL) if(tt->best.From == position.LegalMoves[i].From && tt->best.To == position.LegalMoves[i].To) position.LegalMoves[i].Score += 1000;
     		if(position.LegalMoves[i].C != NONE)
-    			position.LegalMoves[i].Score += (Get_Move_Score(position.LegalMoves[i]) / 100);
+    			position.LegalMoves[i].Score += (Get_Move_Score(position.LegalMoves[i])/* / 100*/);
     		if(position.LegalMoves[i].Promotion)
 				position.LegalMoves[i].Score += 50;
-			position.LegalMoves[i].Score += CounterMove[depth][lsb(position.LegalMoves[i].From)][lsb(position.LegalMoves[i].To)] * 100;
-			//position.LegalMoves[i].Score += Eval::EvalPSQTResult(&position, position.LegalMoves[i]); SEEMED TO BE WORTH A LOT OF ELO
+			position.LegalMoves[i].Score += CounterMove[depth][lsb(position.LegalMoves[i].From)][lsb(position.LegalMoves[i].To)] * 200;
+			//position.LegalMoves[i].Score += Eval::EvalPSQTResult(&position, position.LegalMoves[i]); //SEEMED TO BE WORTH A LOT OF ELO
 			moves.push_back(position.LegalMoves[i]);
 		}
 	std::sort(moves.begin(), moves.end(), [](const Move& lhs, const Move& rhs){ return lhs.Score > rhs.Score; });
@@ -201,6 +203,7 @@ int Search::AlphaBeta(Position* posit, int alpha, int beta, int depth, LINE * pl
 	Log << "END" << endl;*/
 	//int pos_score = Eval::Evaluate_Position(&position);
 	bool pvfound = false;
+	//if(inCheck) depth++; Check extension--seems to be worth ~50-100 ELO
 	for(int i = 0; i < position.numlegalmoves; i++)
     {
     	/*if(depth == 2 && !inCheck && !PvNode)
@@ -307,9 +310,9 @@ int Search::Is_Mate(Position* position)
     		if(score < 0)
     		{
     			if(position->Current_Turn)
-    				return -INF;
+    				return -MATE;
     			else
-    				return INF;
+    				return MATE;
 			}
 		}
         h = lsb(position->Black_King);
@@ -348,9 +351,9 @@ int Search::Is_Mate(Position* position)
     		if(score > 0)
     		{
     			if(position->Current_Turn)
-    				return INF;
+    				return MATE;
     			else
-    				return -INF;
+    				return -MATE;
 			}
 		}
     return 0;
@@ -389,8 +392,8 @@ int Search::QuiescenceSearch(Position* posit, int alpha, int beta, int depth)
 	{
 		if(tt->depth >= depth)
 		{
-			if(tt->nodetype == Alpha) alpha = tt->score;//if(tt->score <= alpha) return alpha;
-			if(tt->nodetype == Beta) beta = tt->score;//if(tt->score >= beta) return beta;
+			if(tt->nodetype == Alpha) /*alpha = tt->score;*/if(tt->score <= alpha) return alpha;
+			if(tt->nodetype == Beta) /*beta = tt->score;*/if(tt->score >= beta) return beta;
 			if(tt->nodetype == Exact) return tt->score;
 		}
 	}
