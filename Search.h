@@ -8,8 +8,8 @@
 #include <chrono>
 #include <string>
 
-//const int INF = 2147483647;
-const int INF = 10000000;
+const int INF = 2147483647;
+const int MATE = 10000000;
 typedef std::chrono::milliseconds::rep TimePoint; // A value in milliseconds
 
 class LINE
