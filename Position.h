@@ -17,6 +17,7 @@ class Move
 	bool Promotion;
 	Piece PromotionType;
 	Move();
+	void Output();
 	Move(Piece piece, Piece captured, Bitboard from, Bitboard to, bool castling, bool promotion);
 };
 class Position
@@ -36,6 +37,7 @@ class Position
 	Bitboard Black_Bishops;
 	Bitboard Black_Knights;
 	Bitboard Black_Pawns;
+	//Bitboard PLM;
 	bool WhiteCanCastleK;
 	bool WhiteCanCastleQ;
 	bool BlackCanCastleK;
@@ -47,6 +49,7 @@ class Position
 	Bitboard BlackAttacks;
 	Move LegalMoves[100];
 	Position();
+	~Position();
 	Position(Position* position);
 	void Reset();
 	void Make_Move(Move m);
