@@ -25,7 +25,12 @@ Bitboard Unconvert_Int(const int& number)
 	{
         return GeneralBoard[number];
     }
-
+void Display_Move(Move m)
+{
+	int least = lsb(m.From);
+	int least1 = lsb(m.To);
+	Log << PlayerMoves[least] << PlayerMoves[least1] << endl;
+}
  
 /**
  * bitScanForward
