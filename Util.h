@@ -7,6 +7,7 @@ enum Movetype { Capture, Promotion, Normal };
 Movetype Get_Move_Type(Move& m);
 Bitboard Unconvert_Int(const int& number);
 void Benchmark();
+void Display_Move(Move m);
 const char LSB_64_table[154] =
 {
 #define __ 0
