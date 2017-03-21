@@ -76,6 +76,19 @@ int CheckUci()
         	cin >> depth;
         	cout << Search::MateSearch(&pos, -1, 1, depth) << endl;
 		}
+		else if(UciCommand == "see")
+        {
+        	pos.Current_Turn ? Generate_White_Moves(false, &pos) : Generate_Black_Moves(false, &pos);
+        	for(int i = 0; i < pos.numlegalmoves; i++)
+        	{
+        		if(pos.LegalMoves[i].C != NONE)
+        		{
+	        		pos.LegalMoves[i].Output();
+	        		cout << " : ";
+	        		cout << Search::SEE(&pos, pos.LegalMoves[i].To) << endl;
+        		}
+        	}
+		}
 		else if(UciCommand == "bench")
         {
         	Benchmark();
@@ -535,6 +548,13 @@ int Moves_Command()
             cin.putback('e');
             return 0;
 		}
+		string h = "se";
+        if(First_Part == h)
+        {
+        	cin.putback('e');
+            cin.putback('s');
+            return 0;
+		}
         cin.get(Second_Part, 3);
         Log << Second_Part << endl;
         string a8 = "a8";
@@ -593,8 +613,8 @@ int Moves_Command()
         }
         else
             Parse_Moves(First_Part, Second_Part);
-        //pos.Current_Turn ^= 1;
-    }
+        }
+    //Print_Board();
 	return 0;
 }
 
@@ -679,7 +699,7 @@ int Parse_Moves(string First, string Second, string PromotionType = "")
     if(PromotionType != "")
     {
     	if(PromotionType.find("q") != string::npos)
-    		m.PromotionType = pos.Current_Turn ? WQ : BK;
+    		m.PromotionType = pos.Current_Turn ? WQ : BQ;
     	else if(PromotionType.find("r") != string::npos)
     		m.PromotionType = pos.Current_Turn ? WR : BR;
     	else if(PromotionType.find("b") != string::npos)
@@ -688,8 +708,7 @@ int Parse_Moves(string First, string Second, string PromotionType = "")
     		m.PromotionType = pos.Current_Turn ? WN : BN;
 	}
     pos.Make_Move(m);
-	
-    return 0;
+	return 0;
 }
 
 
@@ -713,7 +732,7 @@ void Uci_Pv(int depth, int seldepth, Move best, int* matemoves, int time, int no
 		output.lock();
 		cout << "info multipv 1 depth " << depth << " seldepth " << depth + seldepth << " score ";
         Log << "<< info multipv 1 depth " << depth << " seldepth " << depth + seldepth << " score ";
-        if(best.Score == INF)
+        if(best.Score == MATE)
         {
         	if(depth + 1 < *matemoves)
                 {
@@ -727,7 +746,7 @@ void Uci_Pv(int depth, int seldepth, Move best, int* matemoves, int time, int no
                     Log << "mate " << (*matemoves / 2) - 1;
                 }
         }
-        else if(best.Score == -INF)
+        else if(best.Score == -MATE)
         {
         	if(depth + 1 < *matemoves)
                 {
