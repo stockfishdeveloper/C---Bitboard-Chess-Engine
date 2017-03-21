@@ -25,6 +25,19 @@
 		PromotionType = NONE;
 		Score = 0;
 	}
+	void Move::Output()
+	{
+		for(int i = 0; i < 64; i++)
+		{
+			if(GeneralBoard[i] & From)
+				cout << PlayerMoves[i];
+		}
+		for(int i = 0; i < 64; i++)
+		{
+			if(GeneralBoard[i] & To)
+				cout << PlayerMoves[i];
+		}
+	}
 	Position::Position()
 	{
 		White_Pieces = 0;
@@ -41,6 +54,7 @@
 		Black_Bishops = 0;
 		Black_Knights = 0;
 		Black_Pawns = 0;
+		//PLM = 0;
 		numlegalmoves = 0;
 		WhiteCanCastleK = false;
 		WhiteCanCastleQ = false;
@@ -52,6 +66,7 @@
 		WhiteAttacks = 0;
 		BlackAttacks = 0;
 	}
+	Position::~Position() {}
 	Position::Position(Position* position)
 	{
 		Current_Turn = position->Current_Turn;
@@ -69,6 +84,7 @@
 		Black_Bishops = position->Black_Bishops;
 		Black_Knights = position->Black_Knights;
 		Black_Pawns = position->Black_Pawns;
+		//PLM = position->PLM;
 		WhiteCanCastleK = position->WhiteCanCastleK;
 		WhiteCanCastleQ = position->WhiteCanCastleQ;
 		BlackCanCastleK = position->BlackCanCastleK;
@@ -94,6 +110,7 @@
         Black_Bishops = 2594073385365405696;
         Black_Knights = 4755801206503243776;
         Black_Pawns = 71776119061217280;
+        //PLM = 0;
         WhiteCanCastleK = true;
 		WhiteCanCastleQ = true;
 		BlackCanCastleK = true;
@@ -178,6 +195,7 @@
 	}
 	void Position::Make_Move(Move m)
 	{
+		//PLM = m.To;
 		if(m.Castling)
 		{
 			if(m.To & 64)
@@ -336,6 +354,8 @@
 			return 500;
 		if(piece == WQ || piece == BQ)
 			return 800;
+		if(piece == WK || piece == BK)
+			return MATE;
 		return 0;
 	}
 	Bitboard Position::Get_White_Attacks()
@@ -384,52 +404,64 @@
 	}
 	Bitboard Position::GetLeastWhiteAttacker(Bitboard board)
 	{
-		Bitboard WhiteAttacks = 0;
+		WhiteAttacks = 0;
 		Bitboard b = White_Pawns;
 		b |= A_Pawn_Mask;
 		b ^= A_Pawn_Mask;
-		WhiteAttacks |= b << 7;
-		b = Black_Pawns;
+		while(b)
+		{
+			int lookup = lsb(b);
+			WhiteAttacks |= b << 7;
+			if(WhiteAttacks & board) return GeneralBoard[lookup];
+			b ^= GeneralBoard[lookup];
+		}
+		b = White_Pawns;
 		b |= H_Pawn_Mask;
 		b ^= H_Pawn_Mask;
-		WhiteAttacks |= b << 9;
+		while(b)
+		{
+			int lookup = lsb(b);
+			WhiteAttacks |= b << 9;
+			if(WhiteAttacks & board) return GeneralBoard[lookup];
+			b ^= GeneralBoard[lookup];
+		}
 		if(WhiteAttacks & board) return WhiteAttacks & board;
 		b = White_Knights;
 		while(b)
 		{
 			int lookup = lsb(b);
 			WhiteAttacks |= Knight_Lookup_Table[lookup];
+			if(WhiteAttacks & board) return GeneralBoard[lookup];
 			b ^= GeneralBoard[lookup];
 		}
-		if(WhiteAttacks & board) return WhiteAttacks & board;
 		b = White_Bishops;
 		while(b)
 		{
 			int lookup = lsb(b);
 			WhiteAttacks |= Bmagic(lookup, White_Pieces | Black_Pieces);
+			if(WhiteAttacks & board) return GeneralBoard[lookup];
 			b ^= GeneralBoard[lookup];
 		}
-		if(WhiteAttacks & board) return WhiteAttacks & board;
 		b = White_Rooks;
 		while(b)
 		{
 			int lookup = lsb(b);
 			WhiteAttacks |= Rmagic(lookup, White_Pieces | Black_Pieces);
+			if(WhiteAttacks & board) return GeneralBoard[lookup];
 			b ^= GeneralBoard[lookup];
 		}
-		if(WhiteAttacks & board) return WhiteAttacks & board;
 		b = White_Queens;
 		while(b)
 		{
 			int lookup = lsb(b);
 			WhiteAttacks |= Qmagic(lookup, White_Pieces | Black_Pieces);
+			if(WhiteAttacks & board) return GeneralBoard[lookup];
 			b ^= GeneralBoard[lookup];
 		}
-		if(WhiteAttacks & board) return WhiteAttacks & board;
 		b = White_King;
 		int lookup = lsb(b);
 		WhiteAttacks |= King_Lookup_Table[lookup];
-		if(WhiteAttacks & board) return WhiteAttacks & board;
+		if(WhiteAttacks & board) return GeneralBoard[lookup];
 		return 0;
 	}
 	Bitboard Position::Get_Black_Attacks()
@@ -487,47 +519,58 @@
 		Bitboard b = Black_Pawns;
 		b |= A_Pawn_Mask;
 		b ^= A_Pawn_Mask;
-		BlackAttacks |= b >> 9;
+		while(b)
+		{
+			int lookup = lsb(b);
+			BlackAttacks |= b >> 9;
+			if(BlackAttacks & board) return GeneralBoard[lookup];
+			b ^= GeneralBoard[lookup];
+		}
 		b = Black_Pawns;
 		b |= H_Pawn_Mask;
 		b ^= H_Pawn_Mask;
-		BlackAttacks |= b >> 7;
-		if(BlackAttacks & board) return BlackAttacks & board;
+		while(b)
+		{
+			int lookup = lsb(b);
+			BlackAttacks |= b >> 7;
+			if(BlackAttacks & board) return GeneralBoard[lookup];
+			b ^= GeneralBoard[lookup];
+		}
 		b = Black_Knights;
 		while(b)
 		{
 			int lookup = lsb(b);
 			BlackAttacks |= Knight_Lookup_Table[lookup];
+			if(BlackAttacks & board) return GeneralBoard[lookup];
 			b ^= GeneralBoard[lookup];
 		}
-		if(BlackAttacks & board) return BlackAttacks & board;
 		b = Black_Bishops;
 		while(b)
 		{
 			int lookup = lsb(b);
 			BlackAttacks |= Bmagic(lookup, White_Pieces | Black_Pieces);
+			if(BlackAttacks & board) return GeneralBoard[lookup];
 			b ^= GeneralBoard[lookup];
 		}
-		if(BlackAttacks & board) return BlackAttacks & board;
 		b = Black_Rooks;
 		while(b)
 		{
 			int lookup = lsb(b);
 			BlackAttacks |= Rmagic(lookup, White_Pieces | Black_Pieces);
+			if(BlackAttacks & board) return GeneralBoard[lookup];
 			b ^= GeneralBoard[lookup];
 		}
-		if(BlackAttacks & board) return BlackAttacks & board;
 		b = Black_Queens;
 		while(b)
 		{
 			int lookup = lsb(b);
 			BlackAttacks |= Qmagic(lookup, White_Pieces | Black_Pieces);
+			if(BlackAttacks & board) return GeneralBoard[lookup];
 			b ^= GeneralBoard[lookup];
 		}
-		if(BlackAttacks & board) return BlackAttacks & board;
 		b = Black_King;
 		int lookup = lsb(b);
 		BlackAttacks |= King_Lookup_Table[lookup];
-		if(BlackAttacks & board) return BlackAttacks & board;
+		if(BlackAttacks & board) return GeneralBoard[lookup];
 		return 0;
 	}
