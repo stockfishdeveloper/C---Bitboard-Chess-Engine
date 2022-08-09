@@ -112,7 +112,7 @@ int wk = 0, bk = 0;
 const int Doubled_Pawn_Penalty = 10;
 const int Open_File_Bonus = 20;
 const int PassedPawnBonus = 75;
-Piece piece_v[5] =  { 100, 300, 300, 500, 800 };
+int piece_v[5] =  { 100, 300, 300, 500, 800 };
 //********************************************************************
 //Material
 //********************************************************************
@@ -122,16 +122,16 @@ int Eval::Lazy_Eval(Position* position)
 {
 	White_Score = 0;
     Black_Score = 0;
-	White_Score += piece_v[WP] * __builtin_popcountll(position->White_Pawns);
-    White_Score += piece_v[WN] * __builtin_popcountll(position->White_Knights);
-    White_Score += piece_v[WB] * __builtin_popcountll(position->White_Bishops);
-    White_Score += piece_v[WR] * __builtin_popcountll(position->White_Rooks);
-    White_Score += piece_v[WQ] * __builtin_popcountll(position->White_Queens);
-    Black_Score += piece_v[WP] * __builtin_popcountll(position->Black_Pawns);
-    Black_Score += piece_v[WN] * __builtin_popcountll(position->Black_Knights);
-    Black_Score += piece_v[WB] * __builtin_popcountll(position->Black_Bishops);
-    Black_Score += piece_v[WR] * __builtin_popcountll(position->Black_Rooks);
-    Black_Score += piece_v[WQ] * __builtin_popcountll(position->Black_Queens);
+	White_Score += piece_v[WP] * __popcnt64(position->White_Pawns);
+    White_Score += piece_v[WN] * __popcnt64(position->White_Knights);
+    White_Score += piece_v[WB] * __popcnt64(position->White_Bishops);
+    White_Score += piece_v[WR] * __popcnt64(position->White_Rooks);
+    White_Score += piece_v[WQ] * __popcnt64(position->White_Queens);
+    Black_Score += piece_v[WP] * __popcnt64(position->Black_Pawns);
+    Black_Score += piece_v[WN] * __popcnt64(position->Black_Knights);
+    Black_Score += piece_v[WB] * __popcnt64(position->Black_Bishops);
+    Black_Score += piece_v[WR] * __popcnt64(position->Black_Rooks);
+    Black_Score += piece_v[WQ] * __popcnt64(position->Black_Queens);
     return (White_Score - Black_Score);
 }
 int Eval::EvalPSQTResult(Position* position, Move m)
@@ -149,16 +149,16 @@ int Eval::Evaluate_Position(Position* position)
     Black_Score = 0; //Black's Score
     wk = 0;
 	bk = 0;
-    White_Score += piece_v[WP] * __builtin_popcountll(position->White_Pawns);
-    White_Score += piece_v[WN] * __builtin_popcountll(position->White_Knights);
-    White_Score += piece_v[WB] * __builtin_popcountll(position->White_Bishops);
-    White_Score += piece_v[WR] * __builtin_popcountll(position->White_Rooks);
-    White_Score += piece_v[WQ] * __builtin_popcountll(position->White_Queens);
-    Black_Score += piece_v[WP] * __builtin_popcountll(position->Black_Pawns);
-    Black_Score += piece_v[WN] * __builtin_popcountll(position->Black_Knights);
-    Black_Score += piece_v[WB] * __builtin_popcountll(position->Black_Bishops);
-    Black_Score += piece_v[WR] * __builtin_popcountll(position->Black_Rooks);
-    Black_Score += piece_v[WQ] * __builtin_popcountll(position->Black_Queens);
+    White_Score += piece_v[WP] * __popcnt64(position->White_Pawns);
+    White_Score += piece_v[WN] * __popcnt64(position->White_Knights);
+    White_Score += piece_v[WB] * __popcnt64(position->White_Bishops);
+    White_Score += piece_v[WR] * __popcnt64(position->White_Rooks);
+    White_Score += piece_v[WQ] * __popcnt64(position->White_Queens);
+    Black_Score += piece_v[WP] * __popcnt64(position->Black_Pawns);
+    Black_Score += piece_v[WN] * __popcnt64(position->Black_Knights);
+    Black_Score += piece_v[WB] * __popcnt64(position->Black_Bishops);
+    Black_Score += piece_v[WR] * __popcnt64(position->Black_Rooks);
+    Black_Score += piece_v[WQ] * __popcnt64(position->Black_Queens);
     for(int i = 0; i < 64; i++)
     	{
     	if(!(GeneralBoard[i] & (position->White_Pieces | position->Black_Pieces))) continue;
@@ -189,22 +189,22 @@ int Eval::Evaluate_Position(Position* position)
     		}
         
     	}
-    int wpona = __builtin_popcountll(position->White_Pawns & A_Pawn_Mask);
-	int wponb = __builtin_popcountll(position->White_Pawns & B_Pawn_Mask);
-	int wponc = __builtin_popcountll(position->White_Pawns & C_Pawn_Mask);
-	int wpond = __builtin_popcountll(position->White_Pawns & D_Pawn_Mask);
-	int wpone = __builtin_popcountll(position->White_Pawns & E_Pawn_Mask);
-	int wponf = __builtin_popcountll(position->White_Pawns & F_Pawn_Mask);
-	int wpong = __builtin_popcountll(position->White_Pawns & G_Pawn_Mask);
-	int wponh = __builtin_popcountll(position->White_Pawns & H_Pawn_Mask);
-	int bpona = __builtin_popcountll(position->Black_Pawns & A_Pawn_Mask);
-    int bponb = __builtin_popcountll(position->Black_Pawns & B_Pawn_Mask);
-    int bponc = __builtin_popcountll(position->Black_Pawns & C_Pawn_Mask);
-    int bpond = __builtin_popcountll(position->Black_Pawns & D_Pawn_Mask);
-    int bpone = __builtin_popcountll(position->Black_Pawns & E_Pawn_Mask);
-    int bponf = __builtin_popcountll(position->Black_Pawns & F_Pawn_Mask);
-    int bpong = __builtin_popcountll(position->Black_Pawns & G_Pawn_Mask);
-    int bponh = __builtin_popcountll(position->Black_Pawns & H_Pawn_Mask);
+    int wpona = __popcnt64(position->White_Pawns & A_Pawn_Mask);
+	int wponb = __popcnt64(position->White_Pawns & B_Pawn_Mask);
+	int wponc = __popcnt64(position->White_Pawns & C_Pawn_Mask);
+	int wpond = __popcnt64(position->White_Pawns & D_Pawn_Mask);
+	int wpone = __popcnt64(position->White_Pawns & E_Pawn_Mask);
+	int wponf = __popcnt64(position->White_Pawns & F_Pawn_Mask);
+	int wpong = __popcnt64(position->White_Pawns & G_Pawn_Mask);
+	int wponh = __popcnt64(position->White_Pawns & H_Pawn_Mask);
+	int bpona = __popcnt64(position->Black_Pawns & A_Pawn_Mask);
+    int bponb = __popcnt64(position->Black_Pawns & B_Pawn_Mask);
+    int bponc = __popcnt64(position->Black_Pawns & C_Pawn_Mask);
+    int bpond = __popcnt64(position->Black_Pawns & D_Pawn_Mask);
+    int bpone = __popcnt64(position->Black_Pawns & E_Pawn_Mask);
+    int bponf = __popcnt64(position->Black_Pawns & F_Pawn_Mask);
+    int bpong = __popcnt64(position->Black_Pawns & G_Pawn_Mask);
+    int bponh = __popcnt64(position->Black_Pawns & H_Pawn_Mask);
     PawnEntry* p = pawnhash.probe(Get_Pawn_Hash(position));
     if(p != NULL)
     {
@@ -295,7 +295,7 @@ int Eval::Evaluate_Position(Position* position)
     	White_Score += PassedPawnBonus;
     if(position->Black_Pawns & Seventh_Rank_Black)
     	Black_Score += PassedPawnBonus;
-    if(__builtin_popcountll(position->White_Pieces | position->Black_Pieces) <= 10)
+    if(__popcnt64(position->White_Pieces | position->Black_Pieces) <= 10)
                 {
                 	if(White_Score > Black_Score)
                 	{

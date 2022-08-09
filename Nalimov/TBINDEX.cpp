@@ -3680,8 +3680,8 @@ int FRegisteredFun
 #define PfnIndCalc(iTb, side)	(rgtbdDesc[iTb].m_rgpfnCalcIndex[side])
 PfnCalcIndex PfnIndCalcFun
 	(
-	int		iTb,
-	color	side
+	int iTb,
+	int	side
 	)
 	{
 	return PfnIndCalc (iTb, side);
@@ -3830,8 +3830,8 @@ int FUnMapTableFromMemory
 int TbtProbeTable
 	(
 	int		iTb,
-	color	side,
-	INDEX	indOffset
+	int	side,
+	unsigned long	indOffset
 	)
 	{
 	CTbDesc	*ptbd;
@@ -4128,7 +4128,7 @@ int FCheckExistance
 	{
 	FILE			*fp;
 	char			*pchCopy;
-	char			*pchExt = PchExt (side);
+	const char			*pchExt = PchExt (side);
 	char			rgchTbName[256];
 	CTbCacheBucket	*prgtbcbBuckets;
 	INDEX			cb;
@@ -4195,7 +4195,7 @@ int FCheckExistance
 
 int IInitializeTb
 	(
-	char *pszPath
+	const char *pszPath
 	)
 	{
 	char	szTemp[1024];

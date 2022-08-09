@@ -510,7 +510,7 @@
 	}
 	int Position::Non_Pawn_Material()
 	{
-		return __builtin_popcountll((Current_Turn ? White_Knights | White_Bishops | White_Rooks | White_Queens :
+		return __popcnt64((Current_Turn ? White_Knights | White_Bishops | White_Rooks | White_Queens :
 													Black_Knights | Black_Bishops | Black_Rooks | Black_Queens));
 	}
 	Bitboard Position::GetLeastBlackAttacker(Bitboard board)

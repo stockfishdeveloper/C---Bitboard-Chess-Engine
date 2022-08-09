@@ -6,6 +6,12 @@
 class PawnEntry
 {
 	public:
+
+	PawnEntry() {
+		key = 0;
+		score_white = 0;
+		score_black = 0;
+	}
 	Bitboard key;
 	int score_white;
 	int score_black;

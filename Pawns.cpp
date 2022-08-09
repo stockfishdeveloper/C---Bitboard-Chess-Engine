@@ -22,7 +22,7 @@ void PawnHash::save(int scorewhite, int scoreblack, Bitboard hashkey)
 
 void PawnHash::clear()
 {
-	PawnEntry p;
+	PawnEntry p = PawnEntry();
 	for(int i = 0; i < 16777216; i++)
 	{
 		pawnhash.table[i] = p;

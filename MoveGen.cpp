@@ -62,7 +62,7 @@ void Generate_White_Moves(const bool caps, Position* position)
 				Move m(WP, NONE, GeneralBoard[i], GeneralBoard[i] << 8, false, true);
 				for(int p = 1; p < 5; p++)
 					{
-						m.PromotionType = WP + p;
+						m.PromotionType = Piece(int(WP) + p);
 						if(inCheck || (m.From & blockers))
 						{
 							if(White_Is_Legal(position, m))
@@ -80,7 +80,7 @@ void Generate_White_Moves(const bool caps, Position* position)
 					{
 						for(int p = 1; p < 5; p++)
 						{
-							m.PromotionType = WP + p;
+							m.PromotionType = Piece(int(WP) + p);
 							if(inCheck || (m.From & blockers))
 							{
 								if(White_Is_Legal(position, m))
@@ -110,7 +110,7 @@ void Generate_White_Moves(const bool caps, Position* position)
 					Move m(WP, position->Get_Piece_From_Bitboard(GeneralBoard[i] << 9), GeneralBoard[i], GeneralBoard[i] << 9, false, true);
 					for(int p = 1; p < 5; p++)
 						{
-							m.PromotionType = WP + p;
+							m.PromotionType = Piece(int(WP) + p);
 						if(inCheck || (m.From & blockers))
 						{
 							if(White_Is_Legal(position, m))
@@ -139,7 +139,7 @@ void Generate_White_Moves(const bool caps, Position* position)
 			Bitboard b = Knight_Lookup_Table[i];
 			b |= position->White_Pieces;
 			b ^= position->White_Pieces;
-			int p = __builtin_popcountll(b);
+			int p = __popcnt64(b);
 			for(int m = 0; m < p; m++)
 			{
 				short j = lsb(b);
@@ -177,7 +177,7 @@ void Generate_White_Moves(const bool caps, Position* position)
 			Bitboard b = Bmagic(i, position->White_Pieces | position->Black_Pieces);
 			b |= position->White_Pieces;
 			b ^= position->White_Pieces;
-			int p = __builtin_popcountll(b);
+			int p = __popcnt64(b);
 			for(int m = 0; m < p; m++)
 			{
 				short j = lsb(b);
@@ -215,7 +215,7 @@ void Generate_White_Moves(const bool caps, Position* position)
 			Bitboard b = Rmagic(i, position->White_Pieces | position->Black_Pieces);
 			b |= position->White_Pieces;
 			b ^= position->White_Pieces;
-			int p = __builtin_popcountll(b);
+			int p = __popcnt64(b);
 			for(int m = 0; m < p; m++)
 			{
 				short j = lsb(b);
@@ -253,7 +253,7 @@ void Generate_White_Moves(const bool caps, Position* position)
 			Bitboard b = Qmagic(i, position->White_Pieces | position->Black_Pieces);
 			b |= position->White_Pieces;
 			b ^= position->White_Pieces;
-			int p = __builtin_popcountll(b);
+			int p = __popcnt64(b);
 			for(int m = 0; m < p; m++)
 			{
 				short j = lsb(b);
@@ -291,7 +291,7 @@ void Generate_White_Moves(const bool caps, Position* position)
 			Bitboard b = King_Lookup_Table[i];
 			b |= position->White_Pieces;
 			b ^= position->White_Pieces;
-			int p = __builtin_popcountll(b);
+			int p = __popcnt64(b);
 			for(int m = 0; m < p; m++)
 			{
 				short j = lsb(b);
@@ -415,7 +415,7 @@ void Generate_Black_Moves(const bool caps, Position* position)
 				Move m(BP, NONE, GeneralBoard[i], GeneralBoard[i] >> 8, false, true);
 				for(int p = 1; p < 5; p++)
 					{
-						m.PromotionType = BP + p;
+						m.PromotionType = Piece(int(BP) + p);
 						if(inCheck || (m.From & blockers))
 						{
 							if(Black_Is_Legal(position, m))
@@ -432,7 +432,7 @@ void Generate_Black_Moves(const bool caps, Position* position)
 					Move m(BP, position->Get_Piece_From_Bitboard(GeneralBoard[i] >> 7), GeneralBoard[i], GeneralBoard[i] >> 7, false, true);
 				 for(int p = 1; p < 5; p++)
 							{
-								m.PromotionType = BP + p;
+								m.PromotionType = Piece(int(BP) + p);
 								if(inCheck || (m.From & blockers))
 								{
 									if(Black_Is_Legal(position, m))
@@ -461,7 +461,7 @@ void Generate_Black_Moves(const bool caps, Position* position)
 					Move m(BP, position->Get_Piece_From_Bitboard(GeneralBoard[i] >> 9), GeneralBoard[i], GeneralBoard[i] >> 9, false, true);
 					for(int p = 1; p < 5; p++)
 						{
-							m.PromotionType = BP + p;
+							m.PromotionType = Piece(int(BP) + p);
 							if(inCheck || (m.From & blockers))
 							{
 								if(Black_Is_Legal(position, m))
@@ -490,7 +490,7 @@ void Generate_Black_Moves(const bool caps, Position* position)
 			Bitboard b = Knight_Lookup_Table[i];
 			b |= position->Black_Pieces;
 			b ^= position->Black_Pieces;
-			int p = __builtin_popcountll(b);
+			int p = __popcnt64(b);
 			for(int m = 0; m < p; m++)
 			{
 				short j = lsb(b);
@@ -529,7 +529,7 @@ void Generate_Black_Moves(const bool caps, Position* position)
 			Bitboard b = Bmagic(i, position->White_Pieces | position->Black_Pieces);
 			b |= position->Black_Pieces;
 			b ^= position->Black_Pieces;
-			int p = __builtin_popcountll(b);
+			int p = __popcnt64(b);
 			for(int m = 0; m < p; m++)
 			{
 				short j = lsb(b);
@@ -567,7 +567,7 @@ void Generate_Black_Moves(const bool caps, Position* position)
 			Bitboard b = Rmagic(i, position->White_Pieces | position->Black_Pieces);
 			b |= position->Black_Pieces;
 			b ^= position->Black_Pieces;
-			int p = __builtin_popcountll(b);
+			int p = __popcnt64(b);
 			for(int m = 0; m < p; m++)
 			{
 				short j = lsb(b);
@@ -605,7 +605,7 @@ void Generate_Black_Moves(const bool caps, Position* position)
 			Bitboard b = Qmagic(i, position->White_Pieces | position->Black_Pieces);
 			b |= position->Black_Pieces;
 			b ^= position->Black_Pieces;
-			int p = __builtin_popcountll(b);
+			int p = __popcnt64(b);
 			for(int m = 0; m < p; m++)
 			{
 				short j = lsb(b);
@@ -643,7 +643,7 @@ void Generate_Black_Moves(const bool caps, Position* position)
 			Bitboard b = King_Lookup_Table[i];
 			b |= position->Black_Pieces;
 			b ^= position->Black_Pieces;
-			int p = __builtin_popcountll(b);
+			int p = __popcnt64(b);
 			for(int m = 0; m < p; m++)
 			{
 				short j = lsb(b);

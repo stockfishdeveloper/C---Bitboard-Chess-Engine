@@ -12,6 +12,8 @@
 #include "Position.h"
 #include "Eval.h"
 #include "CounterMove.h"
+#include "Pawns.h"
+
 using namespace std;
 int CheckUci();
 string UciCommand;
@@ -21,7 +23,7 @@ int wtime = 0;
 int btime = 0;
 int Time_Usage = 0;
 LINE PVline;
-#include "Pawns.h"
+
 int CheckUci()
 {
     bool Is_Fen = false;
@@ -152,16 +154,16 @@ int CheckUci()
             	int wpieces[16];
             	int bpieces[16];
             	int wc = 0, bc = 0;
-            	pieces[0] = __builtin_popcountll(pos.White_Pawns);
-            	pieces[1] = __builtin_popcountll(pos.White_Knights);
-            	pieces[2] = __builtin_popcountll(pos.White_Bishops);
-            	pieces[3] = __builtin_popcountll(pos.White_Rooks);
-            	pieces[4] = __builtin_popcountll(pos.White_Queens);
-            	pieces[5] = __builtin_popcountll(pos.Black_Pawns);
-            	pieces[6] = __builtin_popcountll(pos.Black_Knights);
-            	pieces[7] = __builtin_popcountll(pos.Black_Bishops);
-            	pieces[8] = __builtin_popcountll(pos.Black_Rooks);
-            	pieces[9] = __builtin_popcountll(pos.Black_Queens);
+            	pieces[0] = __popcnt64(pos.White_Pawns);
+            	pieces[1] = __popcnt64(pos.White_Knights);
+            	pieces[2] = __popcnt64(pos.White_Bishops);
+            	pieces[3] = __popcnt64(pos.White_Rooks);
+            	pieces[4] = __popcnt64(pos.White_Queens);
+            	pieces[5] = __popcnt64(pos.Black_Pawns);
+            	pieces[6] = __popcnt64(pos.Black_Knights);
+            	pieces[7] = __popcnt64(pos.Black_Bishops);
+            	pieces[8] = __popcnt64(pos.Black_Rooks);
+            	pieces[9] = __popcnt64(pos.Black_Queens);
             	int tbid = IDescFindFromCounters(pieces);
             	cout << "Tablebase " << tbid << endl; 
             	Move m;
@@ -228,7 +230,7 @@ int CheckUci()
 				}
 				wpieces[15] = lsb(pos.White_King);
 				bpieces[15] = lsb(pos.Black_King);
-				unsigned long tbindex = PfnIndCalcFun(tbid, pos.Current_Turn);
+                unsigned long tbindex = 0;//PfnIndCalcFun(tbid, pos.Current_Turn);                              DISABLED BECAUSE OF COMPILER ERROR
             	cout << "Index " << tbindex << endl;
             	cout << "Score is " << TbtProbeTable(tbid, 1, tbindex) << endl;
 			}
@@ -618,7 +620,7 @@ int Moves_Command()
 	return 0;
 }
 
-int Parse_Moves(string First, string Second, string PromotionType = "")
+int Parse_Moves(string First, string Second, string PromotionType)
 {
     Bitboard From = 0;
     Bitboard To = 0;

@@ -3,7 +3,7 @@
 #define NEW
 #define T41_INCLUDE
 #define T33_INCLUDE
-int IInitializeTb(char *pszPath);
+int IInitializeTb(const char *pszPath);
 int IDescFindFromCounters(int *); 
 int PfnIndCalcFun(int iTb, int side); 
 int TbtProbeTable(int iTb, int side, unsigned long indOffset);

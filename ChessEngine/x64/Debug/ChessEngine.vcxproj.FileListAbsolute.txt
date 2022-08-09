@@ -1,0 +1,1 @@
+C:\Users\cimba\OneDrive\Documents\C---Bitboard-Chess-Engine\ChessEngine\x64\Debug\ChessEngine.exe

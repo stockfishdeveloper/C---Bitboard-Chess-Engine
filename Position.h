@@ -1,7 +1,6 @@
 #ifndef Position_H_
 #define Position_H_
 #include "Bitboard.h"
-#include "Types.h"
 
 enum Piece { WP, WN, WB, WR, WQ, WK, BP, BN, BB, BR, BQ, BK, NONE };
 

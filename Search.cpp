@@ -19,7 +19,7 @@ Bitboard Search::Nodes = 0;
 int Search::Depth = 0;
 int Search::Seldepth = 0;
 bool Search::STOP_SEARCHING_NOW = false;
-Move Search::Think(int wtime, int btime, int winc, int binc, int Maxdepth = 60)
+Move Search::Think(int wtime, int btime, int winc, int binc, int Maxdepth)
 {
     Move Best;
     Best.Score = -INF;
