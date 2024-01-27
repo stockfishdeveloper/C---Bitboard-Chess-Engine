@@ -48,3 +48,6 @@ Temporary Items
 *.ipch
 *.suo
 *.db-shm
+*.json
+*.lock
+*.vsidx
