@@ -726,7 +726,7 @@ void Engine_Info()
     if (Version.empty())
     {
         date >> month >> day >> year;
-        cout << setw(2) << day << setw(2) << (1 + months.find(month) / 4) << year.substr(2);
+        cout << setw(2) << year.substr(2) << setw(2) << (1 + months.find(month) / 4) << day;
     }
 }
 void Uci_Pv(int depth, int seldepth, Move best, int* matemoves, int time, int nodes)
