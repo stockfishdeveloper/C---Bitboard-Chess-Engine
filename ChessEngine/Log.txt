@@ -1,6 +1,0 @@
->> position
->> startpos
->> perft
->> position
->> startpos
->> perft
