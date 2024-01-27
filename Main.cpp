@@ -8,7 +8,7 @@ int main()
 {
     initmagicmoves();//Thanks, Pradu
     InitCounterMove();
-    Engine_Info();
+    cout << Engine_Info();
     cout << "\nA chess engine by David Cimbalista\nCopyright (c) 2024" << endl;
     CheckUci(); //Main command loop
     return 0;

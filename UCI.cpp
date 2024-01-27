@@ -33,13 +33,9 @@ int CheckUci()
         Log << ">> " << UciCommand << endl;
         if(UciCommand == "uci")
         {
-            cout << "id name ";
-            Engine_Info();
-            cout << "\n";
-            cout << "id author David Cimbalista\n";
-            cout << "option name TimePerMove type spin default 3 min 1 max 5\n";
-            cout << "option name NalimovPath type string default NULL\n";
-            cout << "uciok\n";
+            string Uci_Out = "id name\n" + Engine_Info() + "\n" + "id author David Cimbalista\n" + "option name TimePerMove type spin default 3 min 1 max 5\n" + "option name NalimovPath type string default NULL\n" + "uciok\n";
+            cout << Uci_Out;
+            Log << Uci_Out;
         }
         else if(UciCommand == "isready")
             cout << "readyok" << endl;
@@ -716,18 +712,19 @@ int Parse_Moves(string First, string Second, string PromotionType)
 
 
 
-void Engine_Info()
+string Engine_Info()
 {
+    string result = "";
     string Version = "";
     const string months("Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec");
     string month, day, year;
     stringstream ss, date(__DATE__); // From compiler, format is "Sep 21 2008"
-    cout << "Chess " << Version << setfill('0');
-    if (Version.empty())
-    {
-        date >> month >> day >> year;
-        cout << setw(2) << year.substr(2) << setw(2) << (1 + months.find(month) / 4) << day;
-    }
+    result += "Chess ";
+    date >> month >> day >> year;
+    result += year.substr(2) + (to_string((1 + months.find(month) / 4)).length() < 2 ? "0" + to_string((1 + months.find(month) / 4)) : to_string((1 + months.find(month) / 4))) + day;
+
+    return result;
+
 }
 void Uci_Pv(int depth, int seldepth, Move best, int* matemoves, int time, int nodes)
 {
