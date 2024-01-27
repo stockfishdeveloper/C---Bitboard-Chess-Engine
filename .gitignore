@@ -43,3 +43,8 @@ Temporary Items
 .apdisk
 
 *.obj
+*.opendb
+*.db
+*.ipch
+*.suo
+*.db-shm
