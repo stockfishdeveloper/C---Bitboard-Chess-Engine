@@ -65,7 +65,6 @@ int Root_Perft(int depth)
 }
 int Perft(Position& posit, int depth)
 {
-	//if(depth == 0) return 1;
 	if (depth == 1)
 	{
 		Position position(posit);
