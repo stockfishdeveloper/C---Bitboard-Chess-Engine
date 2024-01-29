@@ -1,5 +1,6 @@
 #include "Bitboard.h"
 #include "UCI.h"
+#include <limits>
 #include <thread> //For multithreading--must be using C++11 compiler
 #include "Thread.h"//Threading header file
 #include "Search.h"
@@ -33,12 +34,14 @@ int CheckUci()
         Log << ">> " << UciCommand << endl;
         if(UciCommand == "uci")
         {
-            string Uci_Out = "id name\n" + Engine_Info() + "\n" + "id author David Cimbalista\n" + "option name TimePerMove type spin default 3 min 1 max 5\n" + "option name NalimovPath type string default NULL\n" + "uciok\n";
+            string Uci_Out = "id name " + Engine_Info() + "\n" + "id author David Cimbalista\n" + "option name TimePerMove type spin default 3 min 1 max 5\n" + "option name NalimovPath type string default NULL\n" + "uciok\n";
             cout << Uci_Out;
             Log << Uci_Out;
         }
-        else if(UciCommand == "isready")
+        else if (UciCommand == "isready") {
             cout << "readyok" << endl;
+            Log << "readyok" << endl;
+        }
 
         else if(UciCommand == "quit")
             exit(0);//Exit the program if called to quit
@@ -65,14 +68,14 @@ int CheckUci()
             Search::Clear();
             TT.clear();
             InitCounterMove();
-            //cout << Get_Current_Hash_Key() << endl;
-
         }
         else if(UciCommand == "mate")
         {
         	int depth = 0;
         	cin >> depth;
-        	cout << Search::MateSearch(&pos, -1, 1, depth) << endl;
+            int Mate_Search = Search::MateSearch(&pos, -1, 1, depth);
+        	cout << Mate_Search << endl;
+            Log << Mate_Search << endl;
 		}
 		else if(UciCommand == "see")
         {
@@ -234,12 +237,19 @@ int CheckUci()
         {
             string time_left_white = "";
             string time_left_black = "";
-            cin >> time_left_white >> wtime >> time_left_black >> btime;
+            cin >> time_left_white;
+            
+            if (time_left_white == "infinite") {
+                wtime = std::numeric_limits<int>::max();
+                btime = std::numeric_limits<int>::max();
+            }
+            else {
+               cin >> wtime >> time_left_black >> btime;
+            } 
             Log << ">> " << time_left_white << " >> " << wtime << " >> " << time_left_black << " >> " << btime << endl;
             if((time_left_white == "btime") || (time_left_black == "wtime"))
             {
-                int w;
-                w = wtime;
+                int w = wtime;
                 wtime = btime;
                 btime = w;
             }
