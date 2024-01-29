@@ -4,7 +4,7 @@ int Root_Perft(int depth)
 {
     if(depth == 0) return 1;
     Bitboard nodes = 0;
-    pos.Current_Turn ? Generate_White_Moves(false, &pos) : Generate_Black_Moves(false, &pos);
+    pos.Current_Turn ? Generate_White_Moves(false, pos) : Generate_Black_Moves(false, pos);
     for(int i = 0; i < pos.numlegalmoves; i++)
     {
         pos.Make_Move(pos.LegalMoves[i]);
@@ -65,16 +65,16 @@ int Root_Perft(int depth)
 }
 int Perft(Position& posit, int depth)
 {
-	if(depth == 0) return 1;
+	//if(depth == 0) return 1;
 	if (depth == 1)
 	{
 		Position position(posit);
-		position.Current_Turn ? Generate_White_Moves(false, &position) : Generate_Black_Moves(false, &position);
+		position.Current_Turn ? Generate_White_Moves(false, position) : Generate_Black_Moves(false, position);
 		return position.numlegalmoves;
 	} 
     Position position(posit);
     Bitboard nodes = 0;
-    position.Current_Turn ? Generate_White_Moves(false, &position) : Generate_Black_Moves(false, &position);
+    position.Current_Turn ? Generate_White_Moves(false, position) : Generate_Black_Moves(false, position);
     for(int i = 0; i < position.numlegalmoves; i++)
     {
         position.Make_Move(position.LegalMoves[i]);

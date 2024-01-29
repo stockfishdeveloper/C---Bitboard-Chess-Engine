@@ -43,7 +43,7 @@ Move Search::Think(int wtime, int btime, int winc, int binc, int Maxdepth)
 		output.unlock();
 		if(q == 1)
 		{
-			pos.Current_Turn ? Generate_White_Moves(false, &pos) : Generate_Black_Moves(false, &pos);
+			pos.Current_Turn ? Generate_White_Moves(false, pos) : Generate_Black_Moves(false, pos);
 			if(pos.numlegalmoves == 1)
             {
             	return pos.LegalMoves[0];
@@ -179,7 +179,7 @@ int Search::AlphaBeta(Position* posit, int alpha, int beta, int depth, LINE * pl
             }
         position.Current_Turn ^= 1;
     }
-    position.Current_Turn ? Generate_White_Moves(false, &position) : Generate_Black_Moves(false, &position);
+    position.Current_Turn ? Generate_White_Moves(false, position) : Generate_Black_Moves(false, position);
     if(position.numlegalmoves == 0)
     {
         alpha = inCheck * -MATE;
@@ -391,9 +391,9 @@ int Search::QuiescenceSearch(Position* posit, int alpha, int beta, int depth)
     Position position(posit);
     bool inCheck = Search::Is_Mate(&position) == -MATE;
     if(inCheck)
-    	position.Current_Turn ? Generate_White_Moves(false, &position) : Generate_Black_Moves(false, &position);
+    	position.Current_Turn ? Generate_White_Moves(false, position) : Generate_Black_Moves(false, position);
     else
-    	position.Current_Turn ? Generate_White_Moves(true, &position) : Generate_Black_Moves(true, &position);
+    	position.Current_Turn ? Generate_White_Moves(true, position) : Generate_Black_Moves(true, position);
 	if(position.numlegalmoves == 0)
     {
     	if(inCheck)
@@ -466,7 +466,7 @@ int Search::MateSearch(Position* posit, int alpha, int beta, int depth)
         return 0;
     }
     Position position(posit);
-    position.Current_Turn ? Generate_White_Moves(false, &position) : Generate_Black_Moves(false, &position);
+    position.Current_Turn ? Generate_White_Moves(false, position) : Generate_Black_Moves(false, position);
     if(position.numlegalmoves == 0)
     {
         return (Is_Mate(&position));

@@ -79,7 +79,7 @@ int CheckUci()
 		}
 		else if(UciCommand == "see")
         {
-        	pos.Current_Turn ? Generate_White_Moves(false, &pos) : Generate_Black_Moves(false, &pos);
+        	pos.Current_Turn ? Generate_White_Moves(false, pos) : Generate_Black_Moves(false, pos);
         	for(int i = 0; i < pos.numlegalmoves; i++)
         	{
         		if(pos.LegalMoves[i].C != NONE)
