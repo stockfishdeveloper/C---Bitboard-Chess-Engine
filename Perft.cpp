@@ -56,14 +56,14 @@ int Root_Perft(int depth)
             }
         }
         int f = nodes;
-        nodes += Perft(&pos, depth - 1);
+        nodes += Perft(pos, depth - 1);
         cout << nodes - f << endl;
         pos.Undo_Move(pos.LegalMoves[i]);
     }
     return nodes;
 
 }
-int Perft(Position* posit, int depth)
+int Perft(Position& posit, int depth)
 {
 	if(depth == 0) return 1;
 	if (depth == 1)
@@ -78,7 +78,7 @@ int Perft(Position* posit, int depth)
     for(int i = 0; i < position.numlegalmoves; i++)
     {
         position.Make_Move(position.LegalMoves[i]);
-        nodes += Perft(&position, depth - 1);
+        nodes += Perft(position, depth - 1);
         position.Undo_Move(position.LegalMoves[i]);
     }
     return nodes;
