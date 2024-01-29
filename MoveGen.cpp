@@ -24,7 +24,7 @@ void Generate_White_Moves(const bool caps, Position* position)
 						Move m(WP, NONE, GeneralBoard[i], GeneralBoard[i] << 8, false, false);
 						if(inCheck || (m.From & blockers))
 						{
-							if(White_Is_Legal(position, m))
+							if(White_Is_Legal(*position, m))
 								position->LegalMoves[position->numlegalmoves++] = m;
 						}
 						else
@@ -34,7 +34,7 @@ void Generate_White_Moves(const bool caps, Position* position)
 							Move m(WP, NONE, GeneralBoard[i], GeneralBoard[i] << 16, false, false);
 						if(inCheck || (m.From & blockers))
 						{
-							if(White_Is_Legal(position, m))
+							if(White_Is_Legal(*position, m))
 								position->LegalMoves[position->numlegalmoves++] = m;
 						}
 						else
@@ -49,7 +49,7 @@ void Generate_White_Moves(const bool caps, Position* position)
 						Move m(WP, NONE, GeneralBoard[i], GeneralBoard[i] << 8, false, false);
 						if(inCheck || (m.From & blockers))
 						{
-							if(White_Is_Legal(position, m))
+							if(White_Is_Legal(*position, m))
 								position->LegalMoves[position->numlegalmoves++] = m;
 						}
 						else
@@ -65,7 +65,7 @@ void Generate_White_Moves(const bool caps, Position* position)
 						m.PromotionType = Piece(int(WP) + p);
 						if(inCheck || (m.From & blockers))
 						{
-							if(White_Is_Legal(position, m))
+							if(White_Is_Legal(*position, m))
 								position->LegalMoves[position->numlegalmoves++] = m;
 						}
 						else
@@ -83,7 +83,7 @@ void Generate_White_Moves(const bool caps, Position* position)
 							m.PromotionType = Piece(int(WP) + p);
 							if(inCheck || (m.From & blockers))
 							{
-								if(White_Is_Legal(position, m))
+								if(White_Is_Legal(*position, m))
 									position->LegalMoves[position->numlegalmoves++] = m;
 							}
 							else
@@ -96,7 +96,7 @@ void Generate_White_Moves(const bool caps, Position* position)
 					Move m(WP, position->Get_Piece_From_Bitboard(GeneralBoard[i] << 7), GeneralBoard[i], GeneralBoard[i] << 7, false, false);
 					if(inCheck || (m.From & blockers))
 					{
-						if(White_Is_Legal(position, m))
+						if(White_Is_Legal(*position, m))
 							position->LegalMoves[position->numlegalmoves++] = m;
 					}
 					else
@@ -113,7 +113,7 @@ void Generate_White_Moves(const bool caps, Position* position)
 							m.PromotionType = Piece(int(WP) + p);
 						if(inCheck || (m.From & blockers))
 						{
-							if(White_Is_Legal(position, m))
+							if(White_Is_Legal(*position, m))
 								position->LegalMoves[position->numlegalmoves++] = m;
 						}
 						else
@@ -125,7 +125,7 @@ void Generate_White_Moves(const bool caps, Position* position)
 					Move m(WP, position->Get_Piece_From_Bitboard(GeneralBoard[i] << 9), GeneralBoard[i], GeneralBoard[i] << 9, false, false);
 					if(inCheck || (m.From & blockers))
 					{
-						if(White_Is_Legal(position, m))
+						if(White_Is_Legal(*position, m))
 							position->LegalMoves[position->numlegalmoves++] = m;
 					}
 					else
@@ -149,7 +149,7 @@ void Generate_White_Moves(const bool caps, Position* position)
 						Move m(WN, position->Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
 						if(inCheck || (m.From & blockers))
 						{
-							if(White_Is_Legal(position, m))
+							if(White_Is_Legal(*position, m))
 								position->LegalMoves[position->numlegalmoves++] = m;
 						}
 						else
@@ -162,7 +162,7 @@ void Generate_White_Moves(const bool caps, Position* position)
 						Move m(WN, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
 						if(inCheck || (m.From & blockers))
 						{
-							if(White_Is_Legal(position, m))
+							if(White_Is_Legal(*position, m))
 								position->LegalMoves[position->numlegalmoves++] = m;
 						}
 						else
@@ -187,7 +187,7 @@ void Generate_White_Moves(const bool caps, Position* position)
 						Move m(WB, position->Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
 						if(inCheck || (m.From & blockers))
 						{
-							if(White_Is_Legal(position, m))
+							if(White_Is_Legal(*position, m))
 								position->LegalMoves[position->numlegalmoves++] = m;
 						}
 						else
@@ -200,7 +200,7 @@ void Generate_White_Moves(const bool caps, Position* position)
 						Move m(WB, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
 						if(inCheck || (m.From & blockers))
 						{
-							if(White_Is_Legal(position, m))
+							if(White_Is_Legal(*position, m))
 								position->LegalMoves[position->numlegalmoves++] = m;
 						}
 						else
@@ -225,7 +225,7 @@ void Generate_White_Moves(const bool caps, Position* position)
 						Move m(WR, position->Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
 						if(inCheck || (m.From & blockers))
 						{
-							if(White_Is_Legal(position, m))
+							if(White_Is_Legal(*position, m))
 								position->LegalMoves[position->numlegalmoves++] = m;
 						}
 						else
@@ -238,7 +238,7 @@ void Generate_White_Moves(const bool caps, Position* position)
 						Move m(WR, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
 						if(inCheck || (m.From & blockers))
 						{
-							if(White_Is_Legal(position, m))
+							if(White_Is_Legal(*position, m))
 								position->LegalMoves[position->numlegalmoves++] = m;
 						}
 						else
@@ -263,7 +263,7 @@ void Generate_White_Moves(const bool caps, Position* position)
 						Move m(WQ, position->Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
 						if(inCheck || (m.From & blockers))
 						{
-							if(White_Is_Legal(position, m))
+							if(White_Is_Legal(*position, m))
 								position->LegalMoves[position->numlegalmoves++] = m;
 						}
 						else
@@ -276,7 +276,7 @@ void Generate_White_Moves(const bool caps, Position* position)
 						Move m(WQ, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
 						if(inCheck || (m.From & blockers))
 						{
-							if(White_Is_Legal(position, m))
+							if(White_Is_Legal(*position, m))
 								position->LegalMoves[position->numlegalmoves++] = m;
 						}
 						else
@@ -299,7 +299,7 @@ void Generate_White_Moves(const bool caps, Position* position)
 				if(GeneralBoard[j] & position->Black_Pieces)
 					{
 						Move m(WK, position->Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
-						if(White_Is_Legal(position, m))
+						if(White_Is_Legal(*position, m))
 							position->LegalMoves[position->numlegalmoves++] = m;
 					}
 				else
@@ -307,7 +307,7 @@ void Generate_White_Moves(const bool caps, Position* position)
 					if(!caps)
 					{
 						Move m(WK, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
-						if(White_Is_Legal(position, m))
+						if(White_Is_Legal(*position, m))
 							position->LegalMoves[position->numlegalmoves++] = m;
 					}
 				}	
@@ -322,9 +322,9 @@ void Generate_White_Moves(const bool caps, Position* position)
         		if(first && !second && Rookonh1)
         		{
         			Move m(WK, NONE, GeneralBoard[i], f1, false, false);
-        			bool safetomovetof1 = White_Is_Legal(position, m);
+        			bool safetomovetof1 = White_Is_Legal(*position, m);
         			Move m1(WK, NONE, GeneralBoard[i], g1, false, false);
-        			bool safetomovetog1 = White_Is_Legal(position, m1);
+        			bool safetomovetog1 = White_Is_Legal(*position, m1);
         			Move m2(WK, NONE, GeneralBoard[i], e1, false, false);
         			bool safetomovetoe1 = Search::Is_Mate(position) >= 0;
         			if(safetomovetof1 && safetomovetog1 && safetomovetoe1)
@@ -343,9 +343,9 @@ void Generate_White_Moves(const bool caps, Position* position)
         		if(first && !second && Rookona1)
         		{
         			Move m(WK, NONE, GeneralBoard[i], d1, false, false);
-        			bool safetomovetod1 = White_Is_Legal(position, m);
+        			bool safetomovetod1 = White_Is_Legal(*position, m);
         			Move m1(WK, NONE, GeneralBoard[i], c1, false, false);
-        			bool safetomovetoc1 = White_Is_Legal(position, m1);
+        			bool safetomovetoc1 = White_Is_Legal(*position, m1);
         			Move m2(WK, NONE, GeneralBoard[i], e1, false, false);
         			bool safetomovetoe1 = Search::Is_Mate(position) >= 0;
         			if(safetomovetoc1 && safetomovetod1 && safetomovetoe1)
@@ -377,7 +377,7 @@ void Generate_Black_Moves(const bool caps, Position* position)
 						Move m(BP, NONE, GeneralBoard[i], GeneralBoard[i] >> 8, false, false);
 						if(inCheck || (m.From & blockers))
 						{
-							if(Black_Is_Legal(position, m))
+							if(Black_Is_Legal(*position, m))
 							position->LegalMoves[position->numlegalmoves++] = m;
 						}
 						else
@@ -387,7 +387,7 @@ void Generate_Black_Moves(const bool caps, Position* position)
 							Move m(BP, NONE, GeneralBoard[i], GeneralBoard[i] >> 16, false, false);
 							if(inCheck || (m.From & blockers))
 							{
-								if(Black_Is_Legal(position, m))
+								if(Black_Is_Legal(*position, m))
 									position->LegalMoves[position->numlegalmoves++] = m;
 							}
 							else
@@ -402,7 +402,7 @@ void Generate_Black_Moves(const bool caps, Position* position)
 						Move m(BP, NONE, GeneralBoard[i], GeneralBoard[i] >> 8, false, false);
 						if(inCheck || (m.From & blockers))
 						{
-							if(Black_Is_Legal(position, m))
+							if(Black_Is_Legal(*position, m))
 								position->LegalMoves[position->numlegalmoves++] = m;
 						}
 						else
@@ -418,7 +418,7 @@ void Generate_Black_Moves(const bool caps, Position* position)
 						m.PromotionType = Piece(int(BP) + p);
 						if(inCheck || (m.From & blockers))
 						{
-							if(Black_Is_Legal(position, m))
+							if(Black_Is_Legal(*position, m))
 								position->LegalMoves[position->numlegalmoves++] = m;
 						}
 						else
@@ -435,7 +435,7 @@ void Generate_Black_Moves(const bool caps, Position* position)
 								m.PromotionType = Piece(int(BP) + p);
 								if(inCheck || (m.From & blockers))
 								{
-									if(Black_Is_Legal(position, m))
+									if(Black_Is_Legal(*position, m))
 									position->LegalMoves[position->numlegalmoves++] = m;
 								}
 								else
@@ -447,7 +447,7 @@ void Generate_Black_Moves(const bool caps, Position* position)
 					Move m(BP, position->Get_Piece_From_Bitboard(GeneralBoard[i] >> 7), GeneralBoard[i], GeneralBoard[i] >> 7, false, false);
 					if(inCheck || (m.From & blockers))
 					{
-						if(Black_Is_Legal(position, m))
+						if(Black_Is_Legal(*position, m))
 							position->LegalMoves[position->numlegalmoves++] = m;
 					}
 					else
@@ -464,7 +464,7 @@ void Generate_Black_Moves(const bool caps, Position* position)
 							m.PromotionType = Piece(int(BP) + p);
 							if(inCheck || (m.From & blockers))
 							{
-								if(Black_Is_Legal(position, m))
+								if(Black_Is_Legal(*position, m))
 									position->LegalMoves[position->numlegalmoves++] = m;
 							}
 							else
@@ -476,7 +476,7 @@ void Generate_Black_Moves(const bool caps, Position* position)
 					Move m(BP, position->Get_Piece_From_Bitboard(GeneralBoard[i] >> 9), GeneralBoard[i], GeneralBoard[i] >> 9, false, false);
 					if(inCheck || (m.From & blockers))
 					{
-						if(Black_Is_Legal(position, m))
+						if(Black_Is_Legal(*position, m))
 							position->LegalMoves[position->numlegalmoves++] = m;
 					}
 					else
@@ -500,7 +500,7 @@ void Generate_Black_Moves(const bool caps, Position* position)
 						Move m(BN, position->Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
 						if(inCheck || (m.From & blockers))
 						{
-							if(Black_Is_Legal(position, m))
+							if(Black_Is_Legal(*position, m))
 								position->LegalMoves[position->numlegalmoves++] = m;
 						}
 						else
@@ -513,7 +513,7 @@ void Generate_Black_Moves(const bool caps, Position* position)
 						Move m(BN, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
 						if(inCheck || (m.From & blockers))
 						{
-							if(Black_Is_Legal(position, m))
+							if(Black_Is_Legal(*position, m))
 								position->LegalMoves[position->numlegalmoves++] = m;
 						}
 						else
@@ -539,7 +539,7 @@ void Generate_Black_Moves(const bool caps, Position* position)
 						Move m(BB, position->Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
 						if(inCheck || (m.From & blockers))
 						{
-							if(Black_Is_Legal(position, m))
+							if(Black_Is_Legal(*position, m))
 								position->LegalMoves[position->numlegalmoves++] = m;
 						}
 						else
@@ -552,7 +552,7 @@ void Generate_Black_Moves(const bool caps, Position* position)
 						Move m(BB, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
 						if(inCheck || (m.From & blockers))
 						{
-							if(Black_Is_Legal(position, m))
+							if(Black_Is_Legal(*position, m))
 								position->LegalMoves[position->numlegalmoves++] = m;
 						}
 						else
@@ -577,7 +577,7 @@ void Generate_Black_Moves(const bool caps, Position* position)
 						Move m(BR, position->Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
 						if(inCheck || (m.From & blockers))
 						{
-							if(Black_Is_Legal(position, m))
+							if(Black_Is_Legal(*position, m))
 								position->LegalMoves[position->numlegalmoves++] = m;
 						}
 						else
@@ -590,7 +590,7 @@ void Generate_Black_Moves(const bool caps, Position* position)
 						Move m(BR, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
 						if(inCheck || (m.From & blockers))
 						{
-							if(Black_Is_Legal(position, m))
+							if(Black_Is_Legal(*position, m))
 								position->LegalMoves[position->numlegalmoves++] = m;
 						}
 						else
@@ -615,7 +615,7 @@ void Generate_Black_Moves(const bool caps, Position* position)
 						Move m(BQ, position->Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
 						if(inCheck || (m.From & blockers))
 						{
-							if(Black_Is_Legal(position, m))
+							if(Black_Is_Legal(*position, m))
 								position->LegalMoves[position->numlegalmoves++] = m;
 						}
 						else
@@ -628,7 +628,7 @@ void Generate_Black_Moves(const bool caps, Position* position)
 						Move m(BQ, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
 						if(inCheck || (m.From & blockers))
 						{
-							if(Black_Is_Legal(position, m))
+							if(Black_Is_Legal(*position, m))
 								position->LegalMoves[position->numlegalmoves++] = m;
 						}
 						else
@@ -651,7 +651,7 @@ void Generate_Black_Moves(const bool caps, Position* position)
 				if(GeneralBoard[j] & position->White_Pieces)
 					{
 						Move m(BK, position->Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
-						if(Black_Is_Legal(position, m))
+						if(Black_Is_Legal(*position, m))
 						{
 							position->LegalMoves[position->numlegalmoves++] = m;
 						}
@@ -661,7 +661,7 @@ void Generate_Black_Moves(const bool caps, Position* position)
 					if(!caps)
 					{
 						Move m(BK, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
-						if(Black_Is_Legal(position, m))
+						if(Black_Is_Legal(*position, m))
 							{
 								position->LegalMoves[position->numlegalmoves++] = m;
 							}
@@ -678,9 +678,9 @@ void Generate_Black_Moves(const bool caps, Position* position)
         		if(first && !second && Rookonh8)
         		{
         			Move m(BK, NONE, GeneralBoard[i], f8, false, false);
-        			bool safetomovetof8 = Black_Is_Legal(position, m);
+        			bool safetomovetof8 = Black_Is_Legal(*position, m);
         			Move m1(BK, NONE, GeneralBoard[i], g8, false, false);
-        			bool safetomovetog8 = Black_Is_Legal(position, m1);
+        			bool safetomovetog8 = Black_Is_Legal(*position, m1);
         			Move m2(BK, NONE, GeneralBoard[i], e8, false, false);
         			bool safetomovetoe8 = Search::Is_Mate(position) >= 0;
         			if(safetomovetof8 && safetomovetog8 && safetomovetoe8)
@@ -699,9 +699,9 @@ void Generate_Black_Moves(const bool caps, Position* position)
         		if(first && !second && Rookona8)
         		{
         			Move m(BK, NONE, GeneralBoard[i], d8, false, false);
-        			bool safetomovetod8 = Black_Is_Legal(position, m);
+        			bool safetomovetod8 = Black_Is_Legal(*position, m);
         			Move m1(BK, NONE, GeneralBoard[i], c8, false, false);
-        			bool safetomovetoc8 = Black_Is_Legal(position, m1);
+        			bool safetomovetoc8 = Black_Is_Legal(*position, m1);
         			Move m2(BK, NONE, GeneralBoard[i], e8, false, false);
         			bool safetomovetoe8 = Search::Is_Mate(position) >= 0;
         			if(safetomovetod8 && safetomovetoc8 && safetomovetoe8)
