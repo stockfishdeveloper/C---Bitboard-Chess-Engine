@@ -3,14 +3,9 @@
 
 int lsb(Bitboard bb)
 {
-	unsigned int t32;
-   	if(bb == 0) return 0;
-   	bb  ^= bb - 1;
-   	t32  = (int)bb ^ (int)(bb >> 32);
-   	t32 ^= 0x01C5FC81;
-   	t32 +=  t32 >> 16;
-   	t32 -= (t32 >> 8) + 51;
-   	return LSB_64_table [t32 & 255]; // 0..63
+	const Bitboard debruijn64 = 0x03f79d71b4cb0a89;
+	if (bb == 0) return 0;
+	return LSB_64_table[((bb ^ (bb - 1)) * debruijn64) >> 58];
 }
 Movetype Get_Move_Type(Move& m)
 {
