@@ -1,12 +1,12 @@
 #ifndef SEARCH_H_INCLUDED
 #define SEARCH_H_INCLUDED
-#include "Bitboard.h"
-#include "MoveGen.h"
-#include "Position.h"
 #include <cassert>
 #include <iostream>
 #include <chrono>
 #include <string>
+#include "Bitboard.h"
+#include "MoveGen.h"
+#include "Position.h"
 
 const int INF = 2147483647;
 const int MATE = 10000000;
@@ -15,8 +15,9 @@ typedef std::chrono::milliseconds::rep TimePoint; // A value in milliseconds
 class LINE {
 public:
 	int cmove;// Number of moves in the line.
-	Move argmove[20];  // The line.
 	int score;
+	Move argmove[20];  // The line.
+
 	LINE() {
 		cmove = 0;
 		score = 0;
@@ -96,22 +97,22 @@ public:
 };
 
 namespace Search {
-	Move Think(int wtime, int btime, int winc, int binc, int Maxdepth = 60);
+	extern bool Searching;
+	extern int Depth;
+	extern int Seldepth;
+	extern bool Output_Pv;
+	extern int Time_Allocation;
+	extern bool STOP_SEARCHING_NOW;
+	extern Bitboard Nodes;
+	extern LINE line;
+
+	void Clear();
 	int AlphaBeta(Position* position, int alpha, int beta, int depth, LINE* pline, bool PvNode, bool donullmove);
 	int QuiescenceSearch(Position* posit, int alpha, int beta, int depth);
 	int MateSearch(Position* posit, int alpha, int beta, int depth);
 	int Get_Move_Score(Move& m);
 	int SEE(Position* position, Bitboard square);
-	extern Bitboard Nodes;
-	extern bool Searching;
-	extern LINE line;
-	extern int Depth;
-	extern int Seldepth;
 	int Is_Mate(Position* position);
-	void Clear();
-	extern bool Output_Pv;
-	extern int Time_Allocation;
-	extern bool STOP_SEARCHING_NOW;
+	Move Think(int wtime, int btime, int winc, int binc, int Maxdepth = 60);
 }
-
 #endif

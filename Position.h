@@ -10,20 +10,27 @@ enum Piece {
 
 class Move {
 public:
+	int Score;
+	bool Castling;
+	bool Promotion;
 	Piece P;
 	Piece C;
 	Bitboard From;
 	Bitboard To;
-	int Score;
-	bool Castling;
-	bool Promotion;
 	Piece PromotionType;
 	Move();
-	void Output();
 	Move(Piece piece, Piece captured, Bitboard from, Bitboard to, bool castling, bool promotion);
+	void Output();
 };
+
 class Position {
 public:
+	bool WhiteCanCastleK;
+	bool WhiteCanCastleQ;
+	bool BlackCanCastleK;
+	bool BlackCanCastleQ;
+	bool Current_Turn;
+	int numlegalmoves;
 	Bitboard White_Pieces;
 	Bitboard Black_Pieces;
 	Bitboard White_King;
@@ -38,14 +45,7 @@ public:
 	Bitboard Black_Bishops;
 	Bitboard Black_Knights;
 	Bitboard Black_Pawns;
-	//Bitboard PLM;
-	bool WhiteCanCastleK;
-	bool WhiteCanCastleQ;
-	bool BlackCanCastleK;
-	bool BlackCanCastleQ;
-	bool Current_Turn;
 	Bitboard hashkey;
-	int numlegalmoves;
 	Bitboard WhiteAttacks;
 	Bitboard BlackAttacks;
 	Move LegalMoves[100];
@@ -55,15 +55,17 @@ public:
 	void Reset();
 	void Make_Move(Move m);
 	void Undo_Move(Move m);
+	int Non_Pawn_Material();
+	string GetTextBoard() const;
 	Bitboard Get_White_Attacks();
 	Bitboard GetLeastWhiteAttacker(Bitboard b);
 	Bitboard Get_Black_Attacks();
 	Bitboard GetLeastBlackAttacker(Bitboard board);
-	int Non_Pawn_Material();
 	Bitboard* Get_Bitboard_From_Piece(Piece p);
 	Piece Get_Piece_From_Bitboard(Bitboard b);
-	string GetTextBoard() const;
 };
-int Get_Cp_Value(Piece piece);
+
 extern Position pos;
+
+int Get_Cp_Value(Piece piece);
 #endif

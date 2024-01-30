@@ -2,14 +2,7 @@
 #define UTIL_H
 #include "Bitboard.h"
 #include "Search.h"
-int lsb(Bitboard b);
-enum Movetype {
-	Capture, Promotion, Normal
-};
-Movetype Get_Move_Type(Move& m);
-Bitboard Unconvert_Int(const int& number);
-void Benchmark();
-void Display_Move(Move m);
+
 const char LSB_64_table[154] =
 {
 #define __ 0
@@ -23,4 +16,14 @@ const char LSB_64_table[154] =
    13, 18,  8, 12,  7,  6,  5, 63
 #undef __
 };
+
+enum Movetype {
+	Capture, Promotion, Normal
+};
+
+void Benchmark();
+void Display_Move(Move m);
+int lsb(Bitboard b);
+Movetype Get_Move_Type(Move& m);
+Bitboard Unconvert_Int(const int& number);
 #endif
