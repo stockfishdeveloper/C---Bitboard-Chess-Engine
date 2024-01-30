@@ -3,10 +3,8 @@
 #include "Bitboard.h"
 #include "Position.h"
 
-class PawnEntry
-{
-	public:
-
+class PawnEntry {
+public:
 	PawnEntry() {
 		key = 0;
 		score_white = 0;
@@ -17,11 +15,10 @@ class PawnEntry
 	int score_black;
 };
 
-class PawnHash
-{
-	public:
+class PawnHash {
+public:
 	PawnEntry table[16777216];
-	PawnEntry * probe(const Bitboard key);
+	PawnEntry* probe(const Bitboard key);
 	void save(int scorewhite, int scoreblack, Bitboard haskkey);
 	void clear();
 };

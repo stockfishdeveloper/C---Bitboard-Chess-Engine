@@ -4,14 +4,13 @@ using namespace std;
 #include "UCI.h"
 #include "CounterMove.h"
 
-int main()
-{
-    initmagicmoves();//Thanks, Pradu
-    InitCounterMove();
-    cout << Engine_Info();
-    cout << "\nA chess engine by David Cimbalista\nCopyright (c) 2024" << endl;
-    CheckUci(); //Main command loop
-    return 0;
+int main() {
+	initmagicmoves();//Thanks, Pradu
+	InitCounterMove();
+	cout << Engine_Info();
+	cout << "\nA chess engine by David Cimbalista\nCopyright (c) 2024" << endl;
+	CheckUci(); //Main command loop
+	return 0;
 }
 
 

@@ -4,11 +4,12 @@
 #include <algorithm>
 #include "Bitboard.h"
 
-enum Piece { WP, WN, WB, WR, WQ, WK, BP, BN, BB, BR, BQ, BK, NONE };
+enum Piece {
+	WP, WN, WB, WR, WQ, WK, BP, BN, BB, BR, BQ, BK, NONE
+};
 
-class Move
-{
-	public:
+class Move {
+public:
 	Piece P;
 	Piece C;
 	Bitboard From;
@@ -21,9 +22,8 @@ class Move
 	void Output();
 	Move(Piece piece, Piece captured, Bitboard from, Bitboard to, bool castling, bool promotion);
 };
-class Position
-{
-	public:
+class Position {
+public:
 	Bitboard White_Pieces;
 	Bitboard Black_Pieces;
 	Bitboard White_King;

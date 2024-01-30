@@ -38,13 +38,12 @@ typedef int     piece;
 #define x_pieceKing             6
 
 square SqFindPiece
-        (
-        square  *psq,
-        piece   pi
-        )
-        {
-        return 0;
-        }
+(
+	square* psq,
+	piece   pi
+) {
+	return 0;
+}
 
 #define SqFindKing(psq)                 0
 #define SqFindOne(psq,pi)               0
@@ -203,7 +202,7 @@ typedef	int	piece;
 #define reflect_y(sq) ((sq) ^ 0x07)
 #define reflect_xy(sq) rgsqReflectXY[sq]
 
-static const square rgsqReflectXY [] =
+static const square rgsqReflectXY[] =
 {
   0,  8, 16, 24, 32, 40, 48, 56,
   1,  9, 17, 25, 33, 41, 49, 57,
@@ -215,7 +214,7 @@ static const square rgsqReflectXY [] =
   7, 15, 23, 31, 39, 47, 55, 63,
 };
 
-static const square rgsqReflectMaskY [] =
+static const square rgsqReflectMaskY[] =
 {
  0, 0, 0, 0, 7, 7, 7, 7,
  0, 0, 0, 0, 7, 7, 7, 7,
@@ -227,16 +226,16 @@ static const square rgsqReflectMaskY [] =
  0, 0, 0, 0, 7, 7, 7, 7,
 };
 
-static const square rgsqReflectMaskYandX [] =
+static const square rgsqReflectMaskYandX[] =
 {
  0, 0, 0, 0, 7, 7, 7, 7,
  0, 0, 0, 0, 7, 7, 7, 7,
  0, 0, 0, 0, 7, 7, 7, 7,
  0, 0, 0, 0, 7, 7, 7, 7,
- 0x38, 0x38, 0x38, 0x38, 0x38+7, 0x38+7, 0x38+7, 0x38+7,
- 0x38, 0x38, 0x38, 0x38, 0x38+7, 0x38+7, 0x38+7, 0x38+7,
- 0x38, 0x38, 0x38, 0x38, 0x38+7, 0x38+7, 0x38+7, 0x38+7,
- 0x38, 0x38, 0x38, 0x38, 0x38+7, 0x38+7, 0x38+7, 0x38+7,
+ 0x38, 0x38, 0x38, 0x38, 0x38 + 7, 0x38 + 7, 0x38 + 7, 0x38 + 7,
+ 0x38, 0x38, 0x38, 0x38, 0x38 + 7, 0x38 + 7, 0x38 + 7, 0x38 + 7,
+ 0x38, 0x38, 0x38, 0x38, 0x38 + 7, 0x38 + 7, 0x38 + 7, 0x38 + 7,
+ 0x38, 0x38, 0x38, 0x38, 0x38 + 7, 0x38 + 7, 0x38 + 7, 0x38 + 7,
 };
 
 static const square rgsqReflectInvertMask[] = { 0, 0x38 };
@@ -262,21 +261,19 @@ static bool		fVerbose = false;	// Print additional information
 static size_t	cbAllocated;
 
 static void* PvMalloc
-	(
+(
 	size_t cb
-	)
-	{
-	void	*pv;
+) {
+	void* pv;
 
-	pv = malloc (cb);
-	if (NULL == pv)
-		{
-		printf ("*** Cannot allocate %d bytes of memory\n", cb);
-		exit (1);
-		}
+	pv = malloc(cb);
+	if (NULL == pv) {
+		printf("*** Cannot allocate %d bytes of memory\n", cb);
+		exit(1);
+	}
 	cbAllocated += cb;
 	return pv;
-	}
+}
 
 #if defined (NEW)	// New index schema ----------------------------------------
 
@@ -289,7 +286,7 @@ static void* PvMalloc
 // a1-d1-d4 triangle; also, if it's at a1-d4 half-diagonal, then black king
 // must be in a1-h1-h8 triangle
 
-static const short rgsTriKings [64 * 64] =
+static const short rgsTriKings[64 * 64] =
 {
  INF, INF,   0,   1,   2,   3,   4,   5, INF, INF,   6,   7,   8,   9,  10,  11,
  INF, INF,  12,  13,  14,  15,  16,  17, INF, INF, INF,  18,  19,  20,  21,  22,
@@ -552,7 +549,7 @@ static const short rgsTriKings [64 * 64] =
 // Enumeration: all valid positions with 2 kings on board when white king
 // restricted to left half of the board
 
-static const short rgsHalfKings [64 * 64] =
+static const short rgsHalfKings[64 * 64] =
 {
  INF, INF,   0,   1,   2,   3,   4,   5, INF, INF,   6,   7,   8,   9,  10,  11,
   12,  13,  14,  15,  16,  17,  18,  19,  20,  21,  22,  23,  24,  25,  26,  27,
@@ -871,24 +868,24 @@ static const bool rgfInLargeTriangle[64] =
 
 // Enumaration tables
 
-static BYTE		*rgprgsqPiece[6];	// Enumeration for each piece (0 - black pawn)
-									// For each position of the King, all legal squares
-									// of the opposite piece enumerated
+static BYTE* rgprgsqPiece[6];	// Enumeration for each piece (0 - black pawn)
+// For each position of the King, all legal squares
+// of the opposite piece enumerated
 static BYTE		rgcLegal[6][64];	// # of enumerated positions for each piece and each
-									// location of enemy king
+// location of enemy king
 
 // Enumerations - indexed by [piece] and [kings enumeration].
 // In each table for each [piece] and [king enumeration] we store # of preceeding positions.
 
-static ULONG	*rgprgulSinglePawnless[6];
-static ULONG	*rgprgulPairPawnless[6][6];
+static ULONG* rgprgulSinglePawnless[6];
+static ULONG* rgprgulPairPawnless[6][6];
 #if defined (T41_INCLUDE)
-static ULONG	*rgprgulTriplePawnless[6][6][6];
+static ULONG* rgprgulTriplePawnless[6][6][6];
 #endif
-static ULONG	*rgprgulSinglePawnPresent[6];
-static ULONG	*rgprgulPairPawnPresent[6][6];
+static ULONG* rgprgulSinglePawnPresent[6];
+static ULONG* rgprgulPairPawnPresent[6][6];
 #if defined (T41_INCLUDE)
-static ULONG	*rgprgulTriplePawnPresent[6][6][6];
+static ULONG* rgprgulTriplePawnPresent[6][6][6];
 #endif
 
 // Total # of enumerated positions
@@ -913,204 +910,186 @@ static ULONG	rgcTriplePawnless[6][6][6];
 // Piece can be x_pieceNone - that means 'pawn of the wrong color', e.g. KPK BTM.
 
 static void VInitSquaresTable
-	(
+(
 	piece	pi,
-	BYTE	*prgsqPiece,
-	BYTE	*prgcLegal
-	)
-	{
+	BYTE* prgsqPiece,
+	BYTE* prgcLegal
+) {
 	int	sqLo, sqHi;
 
-	memset (prgsqPiece, -1, 64*64);
+	memset(prgsqPiece, -1, 64 * 64);
 	sqLo = 0;
 	sqHi = 64;
-	if (pi <= x_piecePawn)
-		{
+	if (pi <= x_piecePawn) {
 		sqLo = 8;
 		sqHi = 56;
-		}
-	for (int sqKing = 0; sqKing < 64; sqKing ++)
-		{
+	}
+	for (int sqKing = 0; sqKing < 64; sqKing++) {
 		int	iPiece;
 
 		iPiece = 0;
-		for (int sq = sqLo; sq < sqHi; sq ++)
-			{
+		for (int sq = sqLo; sq < sqHi; sq++) {
 			if (sq == sqKing)
 				continue;
-			switch (pi)
-				{
+			switch (pi) {
 			case x_piecePawn:
 				if (
-					0 != TbColumn (sq) && sqKing == sq+7 ||
-					7 != TbColumn (sq) && sqKing == sq+9
-				   )
-				   continue;
+					0 != TbColumn(sq) && sqKing == sq + 7 ||
+					7 != TbColumn(sq) && sqKing == sq + 9
+					)
+					continue;
 				break;
 			case x_pieceKnight:
 				if (
-					TbRow (sq) >= 2 && TbColumn (sq) >= 1 && sqKing == sq-17 ||
-					TbRow (sq) >= 2 && TbColumn (sq) <= 6 && sqKing == sq-15 ||
-					TbRow (sq) >= 1 && TbColumn (sq) >= 2 && sqKing == sq-10 ||
-					TbRow (sq) >= 1 && TbColumn (sq) <= 5 && sqKing == sq-6 ||
-					TbRow (sq) <= 6 && TbColumn (sq) >= 2 && sqKing == sq+6 ||
-					TbRow (sq) <= 6 && TbColumn (sq) <= 5 && sqKing == sq+10 ||
-					TbRow (sq) <= 5 && TbColumn (sq) >= 1 && sqKing == sq+15 ||
-					TbRow (sq) <= 5 && TbColumn (sq) <= 6 && sqKing == sq+17
-				   )
+					TbRow(sq) >= 2 && TbColumn(sq) >= 1 && sqKing == sq - 17 ||
+					TbRow(sq) >= 2 && TbColumn(sq) <= 6 && sqKing == sq - 15 ||
+					TbRow(sq) >= 1 && TbColumn(sq) >= 2 && sqKing == sq - 10 ||
+					TbRow(sq) >= 1 && TbColumn(sq) <= 5 && sqKing == sq - 6 ||
+					TbRow(sq) <= 6 && TbColumn(sq) >= 2 && sqKing == sq + 6 ||
+					TbRow(sq) <= 6 && TbColumn(sq) <= 5 && sqKing == sq + 10 ||
+					TbRow(sq) <= 5 && TbColumn(sq) >= 1 && sqKing == sq + 15 ||
+					TbRow(sq) <= 5 && TbColumn(sq) <= 6 && sqKing == sq + 17
+					)
 					continue;
 				break;
 			case x_pieceBishop:
 				if (
-					0 != TbRow (sq) && 0 != TbColumn (sq) && sqKing == sq-9 ||
-					0 != TbRow (sq) && 7 != TbColumn (sq) && sqKing == sq-7 ||
-					7 != TbRow (sq) && 0 != TbColumn (sq) && sqKing == sq+7 ||
-					7 != TbRow (sq) && 7 != TbColumn (sq) && sqKing == sq+9
-				   )
+					0 != TbRow(sq) && 0 != TbColumn(sq) && sqKing == sq - 9 ||
+					0 != TbRow(sq) && 7 != TbColumn(sq) && sqKing == sq - 7 ||
+					7 != TbRow(sq) && 0 != TbColumn(sq) && sqKing == sq + 7 ||
+					7 != TbRow(sq) && 7 != TbColumn(sq) && sqKing == sq + 9
+					)
 					continue;
 				break;
 			case x_pieceRook:
 				if (
-					0 != TbColumn (sq) && sqKing == sq-1 ||
-					7 != TbColumn (sq) && sqKing == sq+1 ||
-					0 != TbRow (sq) && sqKing == sq-8 ||
-					7 != TbRow (sq) && sqKing == sq+8
-				   )
+					0 != TbColumn(sq) && sqKing == sq - 1 ||
+					7 != TbColumn(sq) && sqKing == sq + 1 ||
+					0 != TbRow(sq) && sqKing == sq - 8 ||
+					7 != TbRow(sq) && sqKing == sq + 8
+					)
 					continue;
 				break;
 			case x_pieceQueen:
 				if (
-					0 != TbColumn (sq) && sqKing == sq-1 ||
-					7 != TbColumn (sq) && sqKing == sq+1 ||
-					0 != TbRow (sq) && sqKing == sq-8 ||
-					7 != TbRow (sq) && sqKing == sq+8 ||
-					0 != TbRow (sq) && 0 != TbColumn (sq) && sqKing == sq-9 ||
-					0 != TbRow (sq) && 7 != TbColumn (sq) && sqKing == sq-7 ||
-					7 != TbRow (sq) && 0 != TbColumn (sq) && sqKing == sq+7 ||
-					7 != TbRow (sq) && 7 != TbColumn (sq) && sqKing == sq+9
-				   )
+					0 != TbColumn(sq) && sqKing == sq - 1 ||
+					7 != TbColumn(sq) && sqKing == sq + 1 ||
+					0 != TbRow(sq) && sqKing == sq - 8 ||
+					7 != TbRow(sq) && sqKing == sq + 8 ||
+					0 != TbRow(sq) && 0 != TbColumn(sq) && sqKing == sq - 9 ||
+					0 != TbRow(sq) && 7 != TbColumn(sq) && sqKing == sq - 7 ||
+					7 != TbRow(sq) && 0 != TbColumn(sq) && sqKing == sq + 7 ||
+					7 != TbRow(sq) && 7 != TbColumn(sq) && sqKing == sq + 9
+					)
 					continue;
 				break;
-				}
-			prgsqPiece[sqKing*64+sq] = (BYTE) iPiece;
-			iPiece ++;
 			}
-		prgcLegal[sqKing] = (BYTE) iPiece;
+			prgsqPiece[sqKing * 64 + sq] = (BYTE)iPiece;
+			iPiece++;
 		}
+		prgcLegal[sqKing] = (BYTE)iPiece;
 	}
+}
 
 // Initialize enumeration table for single piece
 
 static void VInitSingle
-	(
-	ULONG		*prgIndex,
-	const short	*prgsKings,
-	const BYTE	*prgcLegal,
-	const BYTE	*prgsqPiece,
-	ULONG		*pcEnumeration
-	)
-	{
+(
+	ULONG* prgIndex,
+	const short* prgsKings,
+	const BYTE* prgcLegal,
+	const BYTE* prgsqPiece,
+	ULONG* pcEnumeration
+) {
 	ULONG iIndex;
 
 	iIndex = 0;
-	for (int sqKing1 = 0; sqKing1 < 64; sqKing1 ++)
-		for (int sqKing2 = 0; sqKing2 < 64; sqKing2 ++)
-			{
-			if (INF != prgsKings[sqKing1*64+sqKing2])
-				{
-				prgIndex[prgsKings[sqKing1*64+sqKing2]] = iIndex;
-				iIndex += prgcLegal[sqKing2] - ((BYTE) -1 != prgsqPiece[sqKing2*64+sqKing1]);
-				}
+	for (int sqKing1 = 0; sqKing1 < 64; sqKing1++)
+		for (int sqKing2 = 0; sqKing2 < 64; sqKing2++) {
+			if (INF != prgsKings[sqKing1 * 64 + sqKing2]) {
+				prgIndex[prgsKings[sqKing1 * 64 + sqKing2]] = iIndex;
+				iIndex += prgcLegal[sqKing2] - ((BYTE)-1 != prgsqPiece[sqKing2 * 64 + sqKing1]);
 			}
+		}
 	*pcEnumeration = iIndex;
-	}
+}
 
 // Initialize enumeration table for pair of pieces
 
 static void VInitPair
-	(
-	ULONG		*prgIndex,
-	const short	*prgsKings,
-	const BYTE	*prgcLegal1,
-	const BYTE	*prgsqPiece1,
-	const BYTE	*prgcLegal2,
-	const BYTE	*prgsqPiece2,
-	ULONG		*pcEnumeration
-	)
-	{
+(
+	ULONG* prgIndex,
+	const short* prgsKings,
+	const BYTE* prgcLegal1,
+	const BYTE* prgsqPiece1,
+	const BYTE* prgcLegal2,
+	const BYTE* prgsqPiece2,
+	ULONG* pcEnumeration
+) {
 	ULONG iIndex;
 	ULONG cPositions1, cPositions2;
 
 	iIndex = 0;
-	for (int sqKing1 = 0; sqKing1 < 64; sqKing1 ++)
-		for (int sqKing2 = 0; sqKing2 < 64; sqKing2 ++)
-			{
-			if (INF != prgsKings[sqKing1*64+sqKing2])
-				{
-				prgIndex[prgsKings[sqKing1*64+sqKing2]] = iIndex;
-				cPositions1 = prgcLegal1[sqKing2] - ((BYTE) -1 != prgsqPiece1[sqKing2*64+sqKing1]);
+	for (int sqKing1 = 0; sqKing1 < 64; sqKing1++)
+		for (int sqKing2 = 0; sqKing2 < 64; sqKing2++) {
+			if (INF != prgsKings[sqKing1 * 64 + sqKing2]) {
+				prgIndex[prgsKings[sqKing1 * 64 + sqKing2]] = iIndex;
+				cPositions1 = prgcLegal1[sqKing2] - ((BYTE)-1 != prgsqPiece1[sqKing2 * 64 + sqKing1]);
 				if (prgcLegal1 == prgcLegal2)
-					iIndex += cPositions1*(cPositions1-1)/2;
-				else
-					{
-					cPositions2 = prgcLegal2[sqKing2] - ((BYTE) -1 != prgsqPiece2[sqKing2*64+sqKing1]);
-					iIndex += cPositions1*cPositions2;
-					}
+					iIndex += cPositions1 * (cPositions1 - 1) / 2;
+				else {
+					cPositions2 = prgcLegal2[sqKing2] - ((BYTE)-1 != prgsqPiece2[sqKing2 * 64 + sqKing1]);
+					iIndex += cPositions1 * cPositions2;
 				}
 			}
+		}
 	*pcEnumeration = iIndex;
-	}
+}
 
 #if defined (T41_INCLUDE)
 
 // Initialize enumeration table for triple piece
 
 static void VInitTriple
-	(
-	ULONG		*prgIndex,
-	const short	*prgsKings,
-	const BYTE	*prgcLegal1,
-	const BYTE	*prgsqPiece1,
-	const BYTE	*prgcLegal2,
-	const BYTE	*prgsqPiece2,
-	const BYTE	*prgcLegal3,
-	const BYTE	*prgsqPiece3,
-	ULONG		*pcEnumeration
-	)
-	{
+(
+	ULONG* prgIndex,
+	const short* prgsKings,
+	const BYTE* prgcLegal1,
+	const BYTE* prgsqPiece1,
+	const BYTE* prgcLegal2,
+	const BYTE* prgsqPiece2,
+	const BYTE* prgcLegal3,
+	const BYTE* prgsqPiece3,
+	ULONG* pcEnumeration
+) {
 	ULONG iIndex;
 	ULONG cPositions1, cPositions2, cPositions3;
 
 	iIndex = 0;
-	for (int sqKing1 = 0; sqKing1 < 64; sqKing1 ++)
-		for (int sqKing2 = 0; sqKing2 < 64; sqKing2 ++)
-			{
-			if (INF != prgsKings[sqKing1*64+sqKing2])
-				{
-				prgIndex[prgsKings[sqKing1*64+sqKing2]] = iIndex;
-				cPositions1 = prgcLegal1[sqKing2] - ((BYTE) -1 != prgsqPiece1[sqKing2*64+sqKing1]);
+	for (int sqKing1 = 0; sqKing1 < 64; sqKing1++)
+		for (int sqKing2 = 0; sqKing2 < 64; sqKing2++) {
+			if (INF != prgsKings[sqKing1 * 64 + sqKing2]) {
+				prgIndex[prgsKings[sqKing1 * 64 + sqKing2]] = iIndex;
+				cPositions1 = prgcLegal1[sqKing2] - ((BYTE)-1 != prgsqPiece1[sqKing2 * 64 + sqKing1]);
 				if (prgcLegal1 == prgcLegal2 && prgcLegal2 == prgcLegal3)
-					iIndex += cPositions1*(cPositions1-1)*(cPositions1-2)/6;
-				else if (prgcLegal1 == prgcLegal2)
-					{
-					cPositions3 = prgcLegal3[sqKing2] - ((BYTE) -1 != prgsqPiece3[sqKing2*64+sqKing1]);
-					iIndex += cPositions1*(cPositions1-1)/2*cPositions3;
-					}
-				else if (prgcLegal2 == prgcLegal3)
-					{
-					cPositions2 = prgcLegal2[sqKing2] - ((BYTE) -1 != prgsqPiece2[sqKing2*64+sqKing1]);
-					iIndex += cPositions1*cPositions2*(cPositions2-1)/2;
-					}
-				else
-					{
-					cPositions2 = prgcLegal2[sqKing2] - ((BYTE) -1 != prgsqPiece2[sqKing2*64+sqKing1]);
-					cPositions3 = prgcLegal3[sqKing2] - ((BYTE) -1 != prgsqPiece3[sqKing2*64+sqKing1]);
-					iIndex += cPositions1*cPositions2*cPositions3;
-					}
+					iIndex += cPositions1 * (cPositions1 - 1) * (cPositions1 - 2) / 6;
+				else if (prgcLegal1 == prgcLegal2) {
+					cPositions3 = prgcLegal3[sqKing2] - ((BYTE)-1 != prgsqPiece3[sqKing2 * 64 + sqKing1]);
+					iIndex += cPositions1 * (cPositions1 - 1) / 2 * cPositions3;
+				}
+				else if (prgcLegal2 == prgcLegal3) {
+					cPositions2 = prgcLegal2[sqKing2] - ((BYTE)-1 != prgsqPiece2[sqKing2 * 64 + sqKing1]);
+					iIndex += cPositions1 * cPositions2 * (cPositions2 - 1) / 2;
+				}
+				else {
+					cPositions2 = prgcLegal2[sqKing2] - ((BYTE)-1 != prgsqPiece2[sqKing2 * 64 + sqKing1]);
+					cPositions3 = prgcLegal3[sqKing2] - ((BYTE)-1 != prgsqPiece3[sqKing2 * 64 + sqKing1]);
+					iIndex += cPositions1 * cPositions2 * cPositions3;
 				}
 			}
+		}
 	*pcEnumeration = iIndex;
-	}
+}
 
 #endif
 
@@ -1118,8 +1097,7 @@ static void VInitTriple
 
 static bool fEnumerationInitted = false;
 
-static void VInitEnumerations (void)
-	{
+static void VInitEnumerations(void) {
 	piece	pi1;
 	piece	pi2;
 #if defined (T41_INCLUDE)
@@ -1130,1206 +1108,1078 @@ static void VInitEnumerations (void)
 		return;
 	fEnumerationInitted = true;
 	// Initialize square tables
-	for (pi1 = x_pieceNone; pi1 <= x_pieceQueen; pi1 = (piece) (pi1 + 1))
-		{
-		rgprgsqPiece[pi1] = (BYTE *) PvMalloc (64*64);
-		VInitSquaresTable (pi1, rgprgsqPiece[pi1], rgcLegal[pi1]);
-		}
+	for (pi1 = x_pieceNone; pi1 <= x_pieceQueen; pi1 = (piece)(pi1 + 1)) {
+		rgprgsqPiece[pi1] = (BYTE*)PvMalloc(64 * 64);
+		VInitSquaresTable(pi1, rgprgsqPiece[pi1], rgcLegal[pi1]);
+	}
 
-	for (pi1 = x_pieceNone; pi1 <= x_pieceQueen; pi1 = (piece) (pi1 + 1))
-		{
+	for (pi1 = x_pieceNone; pi1 <= x_pieceQueen; pi1 = (piece)(pi1 + 1)) {
 		// Initialize enumeration tables for single piece
-		rgprgulSinglePawnPresent[pi1] = (ULONG *) PvMalloc (1806*sizeof (ULONG));
-		VInitSingle (rgprgulSinglePawnPresent[pi1], rgsHalfKings,
-					 rgcLegal[pi1], rgprgsqPiece[pi1], &rgcSinglePawnPresent[pi1]);
-		if (pi1 > x_piecePawn)
-			{
-			rgprgulSinglePawnless[pi1] = (ULONG *) PvMalloc (462*sizeof (ULONG));
-			VInitSingle (rgprgulSinglePawnless[pi1], rgsTriKings,
-						 rgcLegal[pi1], rgprgsqPiece[pi1], &rgcSinglePawnless[pi1]);
-			}
+		rgprgulSinglePawnPresent[pi1] = (ULONG*)PvMalloc(1806 * sizeof(ULONG));
+		VInitSingle(rgprgulSinglePawnPresent[pi1], rgsHalfKings,
+			rgcLegal[pi1], rgprgsqPiece[pi1], &rgcSinglePawnPresent[pi1]);
+		if (pi1 > x_piecePawn) {
+			rgprgulSinglePawnless[pi1] = (ULONG*)PvMalloc(462 * sizeof(ULONG));
+			VInitSingle(rgprgulSinglePawnless[pi1], rgsTriKings,
+				rgcLegal[pi1], rgprgsqPiece[pi1], &rgcSinglePawnless[pi1]);
+		}
 		// Initialize enumeration tables for pair of pieces
-		for (pi2 = (x_pieceNone == pi1 ? x_pieceNone : x_piecePawn); pi2 <= pi1; pi2 = (piece) (pi2 + 1))
-			{
-			rgprgulPairPawnPresent[pi1][pi2] = (ULONG *) PvMalloc (1806*sizeof (ULONG));
-			VInitPair (rgprgulPairPawnPresent[pi1][pi2], rgsHalfKings,
-					   rgcLegal[pi1], rgprgsqPiece[pi1], rgcLegal[pi2], rgprgsqPiece[pi2],
-					   &rgcPairPawnPresent[pi1][pi2]);
-			if (pi1 > x_piecePawn && pi2 > x_piecePawn)
-				{
-				rgprgulPairPawnless[pi1][pi2] = (ULONG *) PvMalloc (462*sizeof (ULONG));
-				VInitPair (rgprgulPairPawnless[pi1][pi2], rgsTriKings,
-						   rgcLegal[pi1], rgprgsqPiece[pi1], rgcLegal[pi2], rgprgsqPiece[pi2],
-						   &rgcPairPawnless[pi1][pi2]);
-				}
+		for (pi2 = (x_pieceNone == pi1 ? x_pieceNone : x_piecePawn); pi2 <= pi1; pi2 = (piece)(pi2 + 1)) {
+			rgprgulPairPawnPresent[pi1][pi2] = (ULONG*)PvMalloc(1806 * sizeof(ULONG));
+			VInitPair(rgprgulPairPawnPresent[pi1][pi2], rgsHalfKings,
+				rgcLegal[pi1], rgprgsqPiece[pi1], rgcLegal[pi2], rgprgsqPiece[pi2],
+				&rgcPairPawnPresent[pi1][pi2]);
+			if (pi1 > x_piecePawn && pi2 > x_piecePawn) {
+				rgprgulPairPawnless[pi1][pi2] = (ULONG*)PvMalloc(462 * sizeof(ULONG));
+				VInitPair(rgprgulPairPawnless[pi1][pi2], rgsTriKings,
+					rgcLegal[pi1], rgprgsqPiece[pi1], rgcLegal[pi2], rgprgsqPiece[pi2],
+					&rgcPairPawnless[pi1][pi2]);
+			}
 #if defined (T41_INCLUDE)
 			// Initialize enumeration tables for three pieces
-			for (pi3 = (x_pieceNone == pi1 ? x_pieceNone : x_piecePawn); pi3 <= pi2; pi3 = (piece) (pi3 + 1))
-				{
-				if (pi1 <= x_piecePawn || pi2 <= x_piecePawn || pi3 <= x_piecePawn)
-					{
-					rgprgulTriplePawnPresent[pi1][pi2][pi3] = (ULONG *) PvMalloc (1806*sizeof (ULONG));
-					VInitTriple (rgprgulTriplePawnPresent[pi1][pi2][pi3], rgsHalfKings,
-								 rgcLegal[pi1], rgprgsqPiece[pi1],
-								 rgcLegal[pi2], rgprgsqPiece[pi2],
-								 rgcLegal[pi3], rgprgsqPiece[pi3],
-								 &rgcTriplePawnPresent[pi1][pi2][pi3]);
-					}
-				else
-					{
-					rgprgulTriplePawnless[pi1][pi2][pi3] = (ULONG *) PvMalloc (462*sizeof (ULONG));
-					VInitTriple (rgprgulTriplePawnless[pi1][pi2][pi3], rgsTriKings,
+			for (pi3 = (x_pieceNone == pi1 ? x_pieceNone : x_piecePawn); pi3 <= pi2; pi3 = (piece)(pi3 + 1)) {
+				if (pi1 <= x_piecePawn || pi2 <= x_piecePawn || pi3 <= x_piecePawn) {
+					rgprgulTriplePawnPresent[pi1][pi2][pi3] = (ULONG*)PvMalloc(1806 * sizeof(ULONG));
+					VInitTriple(rgprgulTriplePawnPresent[pi1][pi2][pi3], rgsHalfKings,
+						rgcLegal[pi1], rgprgsqPiece[pi1],
+						rgcLegal[pi2], rgprgsqPiece[pi2],
+						rgcLegal[pi3], rgprgsqPiece[pi3],
+						&rgcTriplePawnPresent[pi1][pi2][pi3]);
+				}
+				else {
+					rgprgulTriplePawnless[pi1][pi2][pi3] = (ULONG*)PvMalloc(462 * sizeof(ULONG));
+					VInitTriple(rgprgulTriplePawnless[pi1][pi2][pi3], rgsTriKings,
 						rgcLegal[pi1], rgprgsqPiece[pi1],
 						rgcLegal[pi2], rgprgsqPiece[pi2],
 						rgcLegal[pi3], rgprgsqPiece[pi3],
 						&rgcTriplePawnless[pi1][pi2][pi3]);
-					}
 				}
-#endif
 			}
-		}
-
-	// All done!
-	if (fPrint)
-		{
-		for (pi1 = x_pieceNone; pi1 <= x_pieceQueen; pi1 = (piece) (pi1 + 1))
-			printf ("%c - %d enumerated positions\n", "pPNBRQ"[pi1], rgcSinglePawnPresent[pi1]);
-		for (pi1 = x_pieceNone; pi1 <= x_pieceQueen; pi1 = (piece) (pi1 + 1))
-			{
-			if (0 != rgcSinglePawnless[pi1])
-				printf ("pawnless %c - %d enumerated positions\n", "pPNBRQ"[pi1], rgcSinglePawnless[pi1]);
-			}
-		for (pi1 = x_pieceNone; pi1 <= x_pieceQueen; pi1 = (piece) (pi1 + 1))
-			for (pi2 = x_pieceNone; pi2 <= pi1; pi2 = (piece) (pi2 + 1))
-				{
-				if (0 != rgcPairPawnPresent[pi1][pi2])
-					printf ("%c%c - %d enumerated positions\n", "pPNBRQ"[pi1], "pPNBRQ"[pi2],
-							rgcPairPawnPresent[pi1][pi2]);
-				}
-		for (pi1 = x_pieceNone; pi1 <= x_pieceQueen; pi1 = (piece) (pi1 + 1))
-			for (pi2 = x_pieceNone; pi2 <= pi1; pi2 = (piece) (pi2 + 1))
-				{
-				if (0 != rgcPairPawnless[pi1][pi2])
-					printf ("pawnless %c%c - %d enumerated positions\n", "pPNBRQ"[pi1], "pPNBRQ"[pi2],
-							rgcPairPawnless[pi1][pi2]);
-				}
-#if defined (T41_INCLUDE)
-		for (pi1 = x_pieceNone; pi1 <= x_pieceQueen; pi1 = (piece) (pi1 + 1))
-			for (pi2 = x_pieceNone; pi2 <= pi1; pi2 = (piece) (pi2 + 1))
-				for (pi3 = x_pieceNone; pi3 <= pi2; pi3 = (piece) (pi3 + 1))
-					{
-					if (0 != rgcTriplePawnPresent[pi1][pi2][pi3])
-						printf ("%c%c%c - %d enumerated positions\n",
-								"pPNBRQ"[pi1], "pPNBRQ"[pi2], "pPNBRQ"[pi3],
-								rgcTriplePawnPresent[pi1][pi2][pi3]);
-					}
-		for (pi1 = x_pieceNone; pi1 <= x_pieceQueen; pi1 = (piece) (pi1 + 1))
-			for (pi2 = x_pieceNone; pi2 <= pi1; pi2 = (piece) (pi2 + 1))
-				for (pi3 = x_pieceNone; pi3 <= pi2; pi3 = (piece) (pi3 + 1))
-					{
-					if (0 != rgcTriplePawnless[pi1][pi2][pi3])
-						printf ("pawnless %c%c%c - %d enumerated positions\n",
-								"pPNBRQ"[pi1], "pPNBRQ"[pi2], "pPNBRQ"[pi3],
-								rgcTriplePawnless[pi1][pi2][pi3]);
-					}
 #endif
-		printf ("\nAllocated %dk\n\n", (cbAllocated + 1023)/1024);
 		}
 	}
 
+	// All done!
+	if (fPrint) {
+		for (pi1 = x_pieceNone; pi1 <= x_pieceQueen; pi1 = (piece)(pi1 + 1))
+			printf("%c - %d enumerated positions\n", "pPNBRQ"[pi1], rgcSinglePawnPresent[pi1]);
+		for (pi1 = x_pieceNone; pi1 <= x_pieceQueen; pi1 = (piece)(pi1 + 1)) {
+			if (0 != rgcSinglePawnless[pi1])
+				printf("pawnless %c - %d enumerated positions\n", "pPNBRQ"[pi1], rgcSinglePawnless[pi1]);
+		}
+		for (pi1 = x_pieceNone; pi1 <= x_pieceQueen; pi1 = (piece)(pi1 + 1))
+			for (pi2 = x_pieceNone; pi2 <= pi1; pi2 = (piece)(pi2 + 1)) {
+				if (0 != rgcPairPawnPresent[pi1][pi2])
+					printf("%c%c - %d enumerated positions\n", "pPNBRQ"[pi1], "pPNBRQ"[pi2],
+						rgcPairPawnPresent[pi1][pi2]);
+			}
+		for (pi1 = x_pieceNone; pi1 <= x_pieceQueen; pi1 = (piece)(pi1 + 1))
+			for (pi2 = x_pieceNone; pi2 <= pi1; pi2 = (piece)(pi2 + 1)) {
+				if (0 != rgcPairPawnless[pi1][pi2])
+					printf("pawnless %c%c - %d enumerated positions\n", "pPNBRQ"[pi1], "pPNBRQ"[pi2],
+						rgcPairPawnless[pi1][pi2]);
+			}
+#if defined (T41_INCLUDE)
+		for (pi1 = x_pieceNone; pi1 <= x_pieceQueen; pi1 = (piece)(pi1 + 1))
+			for (pi2 = x_pieceNone; pi2 <= pi1; pi2 = (piece)(pi2 + 1))
+				for (pi3 = x_pieceNone; pi3 <= pi2; pi3 = (piece)(pi3 + 1)) {
+					if (0 != rgcTriplePawnPresent[pi1][pi2][pi3])
+						printf("%c%c%c - %d enumerated positions\n",
+							"pPNBRQ"[pi1], "pPNBRQ"[pi2], "pPNBRQ"[pi3],
+							rgcTriplePawnPresent[pi1][pi2][pi3]);
+				}
+		for (pi1 = x_pieceNone; pi1 <= x_pieceQueen; pi1 = (piece)(pi1 + 1))
+			for (pi2 = x_pieceNone; pi2 <= pi1; pi2 = (piece)(pi2 + 1))
+				for (pi3 = x_pieceNone; pi3 <= pi2; pi3 = (piece)(pi3 + 1)) {
+					if (0 != rgcTriplePawnless[pi1][pi2][pi3])
+						printf("pawnless %c%c%c - %d enumerated positions\n",
+							"pPNBRQ"[pi1], "pPNBRQ"[pi2], "pPNBRQ"[pi3],
+							rgcTriplePawnless[pi1][pi2][pi3]);
+				}
+#endif
+		printf("\nAllocated %dk\n\n", (cbAllocated + 1023) / 1024);
+	}
+}
+
 // Return enumeration of 2 kings and single piece
 
-template <int piw1, bool fPawns, bool fInvert> class TEnumerate1
-	{
+template <int piw1, bool fPawns, bool fInvert> class TEnumerate1 {
 public:
 	static INLINE INDEX TB_FASTCALL Index
-		(
+	(
 		square	sqwk,
 		square	sqw1,
 		square	sqbk
-		)
-		{
+	) {
 		INDEX	ind;
 		ULONG	ulKings;
 
 		// For black pawn invert the board
-		if (piw1 <= x_piecePawn && fInvert)
-			{
+		if (piw1 <= x_piecePawn && fInvert) {
 			sqwk = reflect_x(sqwk);
 			sqw1 = reflect_x(sqw1);
 			sqbk = reflect_x(sqbk);
-			}
-		
+		}
+
 		// Get enumerated square
-		ind = rgprgsqPiece[piw1][sqbk*64+sqw1];
+		ind = rgprgsqPiece[piw1][sqbk * 64 + sqw1];
 #if defined (ILLEGAL_POSSIBLE)
-		if ((BYTE) -1 == ind)
+		if ((BYTE)-1 == ind)
 			return INF_SINGLE;
 #endif
 		// Get enumerated position of both kings
 		if (fPawns)
-			ulKings = rgsHalfKings[sqwk*64+sqbk];	// 0..1805
+			ulKings = rgsHalfKings[sqwk * 64 + sqbk];	// 0..1805
 		else
-			ulKings = rgsTriKings[sqwk*64+sqbk];	// 0..461
+			ulKings = rgsTriKings[sqwk * 64 + sqbk];	// 0..461
 #if defined (ILLEGAL_POSSIBLE)
 		if (INF == ulKings)
 			return INF_SINGLE;
 #endif
 		// Can we remove one extra square?
-		if ((piw1>x_pieceKnight) || ((BYTE)-1 != rgprgsqPiece[piw1][sqbk*64+sqwk]))
+		if ((piw1 > x_pieceKnight) || ((BYTE)-1 != rgprgsqPiece[piw1][sqbk * 64 + sqwk]))
 			ind -= (sqw1 > sqwk);
 		// Add enumerated square to the # of the preceeding positions
 		return ind + (fPawns ? rgprgulSinglePawnPresent[piw1][ulKings] : rgprgulSinglePawnless[piw1][ulKings]);
-		}
-	};
+	}
+};
 
 // Return enumeration of 2 kings and 2 pieces
 
-template <int piw1, int piw2, bool fPawns, bool fInvert> class TEnumerate2
-	{
+template <int piw1, int piw2, bool fPawns, bool fInvert> class TEnumerate2 {
 public:
 	static INLINE INDEX TB_FASTCALL Index
-		(
+	(
 		square	sqwk,
 		square	sqw1,
 		square	sqw2,
 		square	sqbk
-		)
-		{
+	) {
 		INDEX	ind1, ind2, cInd2;
 		ULONG	ulKings;
 
 		// For black pawn invert the board
-		if (piw2 <= x_piecePawn && fInvert)
-			{
+		if (piw2 <= x_piecePawn && fInvert) {
 			sqwk = reflect_x(sqwk);
 			sqw1 = reflect_x(sqw1);
 			sqw2 = reflect_x(sqw2);
 			sqbk = reflect_x(sqbk);
-			}
-		
+		}
+
 		// Get enumerated squares for both pieces
 		if (piw1 == piw2)
-			SORT (sqw1, sqw2);
-		ind1 = rgprgsqPiece[piw1][sqbk*64+sqw1];
-		ind2 = rgprgsqPiece[piw2][sqbk*64+sqw2];
+			SORT(sqw1, sqw2);
+		ind1 = rgprgsqPiece[piw1][sqbk * 64 + sqw1];
+		ind2 = rgprgsqPiece[piw2][sqbk * 64 + sqw2];
 #if defined (ILLEGAL_POSSIBLE)
-		if ((BYTE) -1 == ind1 || (BYTE) -1 == ind2)
+		if ((BYTE)-1 == ind1 || (BYTE)-1 == ind2)
 			return INF_PAIR;
 #endif
 		// Get enumerated position of both kings
 		if (fPawns)
-			ulKings = rgsHalfKings[sqwk*64+sqbk];	// 0..1805
+			ulKings = rgsHalfKings[sqwk * 64 + sqbk];	// 0..1805
 		else
-			ulKings = rgsTriKings[sqwk*64+sqbk];	// 0..461
+			ulKings = rgsTriKings[sqwk * 64 + sqbk];	// 0..461
 #if defined (ILLEGAL_POSSIBLE)
 		if (INF == ulKings)
 			return INF_PAIR;
 #endif
-		if (piw1 == piw2)
-			{
+		if (piw1 == piw2) {
 			// Can we remove one extra square?
-			if ((piw1>x_pieceKnight) || ((BYTE)-1 != rgprgsqPiece[piw1][sqbk*64+sqwk]))
-				{
+			if ((piw1 > x_pieceKnight) || ((BYTE)-1 != rgprgsqPiece[piw1][sqbk * 64 + sqwk])) {
 				ind1 -= (sqw1 > sqwk);
 				ind2 -= (sqw2 > sqwk);
-				}
-			// Add enumerated squares to the # of the preceeding positions
-			return	ind2*(ind2-1)/2 + ind1 +
-					(fPawns ? rgprgulPairPawnPresent[piw1][piw2][ulKings] : rgprgulPairPawnless[piw1][piw2][ulKings]);
 			}
-		else
-			{
+			// Add enumerated squares to the # of the preceeding positions
+			return	ind2 * (ind2 - 1) / 2 + ind1 +
+				(fPawns ? rgprgulPairPawnPresent[piw1][piw2][ulKings] : rgprgulPairPawnless[piw1][piw2][ulKings]);
+		}
+		else {
 			// Can we remove WK square from 1st piece enumaration?
-			if ((piw1>x_pieceKnight) || ((BYTE)-1 != rgprgsqPiece[piw1][sqbk*64+sqwk]))
+			if ((piw1 > x_pieceKnight) || ((BYTE)-1 != rgprgsqPiece[piw1][sqbk * 64 + sqwk]))
 				ind1 -= (sqw1 > sqwk);
 			// Get # of enumerated positions of 2nd piece
 			cInd2 = rgcLegal[piw2][sqbk];
 			// Can we remove WK square from 2nd piece enumaration?
-			if ((piw2>x_pieceKnight) || ((BYTE)-1 != rgprgsqPiece[piw2][sqbk*64+sqwk]))
-				{
-				cInd2 --;
+			if ((piw2 > x_pieceKnight) || ((BYTE)-1 != rgprgsqPiece[piw2][sqbk * 64 + sqwk])) {
+				cInd2--;
 				ind2 -= (sqw2 > sqwk);
-				}
-			// Add enumerated square to the # of the preceeding positions
-			return cInd2*ind1 + ind2 + (fPawns ? rgprgulPairPawnPresent[piw1][piw2][ulKings] : rgprgulPairPawnless[piw1][piw2][ulKings]);
 			}
+			// Add enumerated square to the # of the preceeding positions
+			return cInd2 * ind1 + ind2 + (fPawns ? rgprgulPairPawnPresent[piw1][piw2][ulKings] : rgprgulPairPawnless[piw1][piw2][ulKings]);
 		}
-	};
+	}
+};
 
 #if defined (T41_INCLUDE)
 
 // Return enumeration of 2 kings and 3 pieces
 
-template <int piw1, int piw2, int piw3, bool fPawns, bool fInvert> class TEnumerate3
-	{
+template <int piw1, int piw2, int piw3, bool fPawns, bool fInvert> class TEnumerate3 {
 public:
 	static INLINE INDEX TB_FASTCALL Index
-		(
+	(
 		square	sqwk,
 		square	sqw1,
 		square	sqw2,
 		square	sqw3,
 		square	sqbk
-		)
-		{
+	) {
 		INDEX	ind1, ind2, ind3, cInd1, cInd2, cInd3;
 		ULONG	ulKings;
 
 		// For black pawn invert the board
-		if (piw3 <= x_piecePawn && fInvert)
-			{
+		if (piw3 <= x_piecePawn && fInvert) {
 			sqwk = reflect_x(sqwk);
 			sqw1 = reflect_x(sqw1);
 			sqw2 = reflect_x(sqw2);
 			sqw3 = reflect_x(sqw3);
 			sqbk = reflect_x(sqbk);
-			}
-		
+		}
+
 		// Get enumerated squares for all pieces
-		if (piw1 == piw2 && piw1 == piw3)
-			{
-			SORT (sqw1, sqw2);
-			SORT (sqw2, sqw3);
-			SORT (sqw1, sqw2);
-			}
-		else if (piw1 == piw2)
-			{
-			SORT (sqw1, sqw2);
-			}
-		else if (piw2 == piw3)
-			{
-			SORT (sqw2, sqw3);
-			}
-		ind1 = rgprgsqPiece[piw1][sqbk*64+sqw1];
-		ind2 = rgprgsqPiece[piw2][sqbk*64+sqw2];
-		ind3 = rgprgsqPiece[piw3][sqbk*64+sqw3];
+		if (piw1 == piw2 && piw1 == piw3) {
+			SORT(sqw1, sqw2);
+			SORT(sqw2, sqw3);
+			SORT(sqw1, sqw2);
+		}
+		else if (piw1 == piw2) {
+			SORT(sqw1, sqw2);
+		}
+		else if (piw2 == piw3) {
+			SORT(sqw2, sqw3);
+		}
+		ind1 = rgprgsqPiece[piw1][sqbk * 64 + sqw1];
+		ind2 = rgprgsqPiece[piw2][sqbk * 64 + sqw2];
+		ind3 = rgprgsqPiece[piw3][sqbk * 64 + sqw3];
 #if defined (ILLEGAL_POSSIBLE)
-		if ((BYTE) -1 == ind1 || (BYTE) -1 == ind2 || (BYTE) -1 == ind3)
+		if ((BYTE)-1 == ind1 || (BYTE)-1 == ind2 || (BYTE)-1 == ind3)
 			return INF_TRIPLE;
 #endif
 		// Get enumerated position of both kings
 		if (fPawns)
-			ulKings = rgsHalfKings[sqwk*64+sqbk];	// 0..1805
+			ulKings = rgsHalfKings[sqwk * 64 + sqbk];	// 0..1805
 		else
-			ulKings = rgsTriKings[sqwk*64+sqbk];	// 0..461
+			ulKings = rgsTriKings[sqwk * 64 + sqbk];	// 0..461
 #if defined (ILLEGAL_POSSIBLE)
 		if (INF == ulKings)
 			return INF_TRIPLE;
 #endif
-		if (piw1 == piw2 && piw2 == piw3)
-			{
+		if (piw1 == piw2 && piw2 == piw3) {
 			// Can we remove one extra square?
-			if ((piw1>x_pieceKnight) || ((BYTE)-1 != rgprgsqPiece[piw1][sqbk*64+sqwk]))
-				{
+			if ((piw1 > x_pieceKnight) || ((BYTE)-1 != rgprgsqPiece[piw1][sqbk * 64 + sqwk])) {
 				ind1 -= (sqw1 > sqwk);
 				ind2 -= (sqw2 > sqwk);
 				ind3 -= (sqw3 > sqwk);
-				}
-			// Add enumerated squares to the # of the preceeding positions
-			return	ind3*(ind3-1)*(ind3-2)/6 + ind2*(ind2-1)/2 + ind1 +
-					(fPawns ? rgprgulTriplePawnPresent[piw1][piw2][piw3][ulKings] :
-							  rgprgulTriplePawnless[piw1][piw2][piw3][ulKings]);
 			}
-		else if (piw1 == piw2)
-			{
+			// Add enumerated squares to the # of the preceeding positions
+			return	ind3 * (ind3 - 1) * (ind3 - 2) / 6 + ind2 * (ind2 - 1) / 2 + ind1 +
+				(fPawns ? rgprgulTriplePawnPresent[piw1][piw2][piw3][ulKings] :
+					rgprgulTriplePawnless[piw1][piw2][piw3][ulKings]);
+		}
+		else if (piw1 == piw2) {
 			// Can we remove one extra square?
-			if ((piw1>x_pieceKnight) || ((BYTE)-1 != rgprgsqPiece[piw1][sqbk*64+sqwk]))
-				{
+			if ((piw1 > x_pieceKnight) || ((BYTE)-1 != rgprgsqPiece[piw1][sqbk * 64 + sqwk])) {
 				ind1 -= (sqw1 > sqwk);
 				ind2 -= (sqw2 > sqwk);
-				}
+			}
 			// Get # of enumerated positions of 3rd piece
 			cInd3 = rgcLegal[piw3][sqbk];
 			// Can we remove WK square from 3rd piece enumaration?
-			if ((piw3>x_pieceKnight) || ((BYTE)-1 != rgprgsqPiece[piw3][sqbk*64+sqwk]))
-				{
-				cInd3 --;
+			if ((piw3 > x_pieceKnight) || ((BYTE)-1 != rgprgsqPiece[piw3][sqbk * 64 + sqwk])) {
+				cInd3--;
 				ind3 -= (sqw3 > sqwk);
-				}
-			// Add enumerated squares to the # of the preceeding positions
-			return	(ind2*(ind2-1)/2 + ind1)*cInd3 + ind3 +
-					(fPawns ? rgprgulTriplePawnPresent[piw1][piw2][piw3][ulKings] :
-							  rgprgulTriplePawnless[piw1][piw2][piw3][ulKings]);
 			}
-		else if (piw2 == piw3)
-			{
+			// Add enumerated squares to the # of the preceeding positions
+			return	(ind2 * (ind2 - 1) / 2 + ind1) * cInd3 + ind3 +
+				(fPawns ? rgprgulTriplePawnPresent[piw1][piw2][piw3][ulKings] :
+					rgprgulTriplePawnless[piw1][piw2][piw3][ulKings]);
+		}
+		else if (piw2 == piw3) {
 			// Can we remove one extra square?
-			if ((piw2>x_pieceKnight) || ((BYTE)-1 != rgprgsqPiece[piw2][sqbk*64+sqwk]))
-				{
+			if ((piw2 > x_pieceKnight) || ((BYTE)-1 != rgprgsqPiece[piw2][sqbk * 64 + sqwk])) {
 				ind2 -= (sqw2 > sqwk);
 				ind3 -= (sqw3 > sqwk);
-				}
+			}
 			// Get # of enumerated positions of 1st piece
 			cInd1 = rgcLegal[piw1][sqbk];
 			// Can we remove WK square from 3rd piece enumaration?
-			if ((piw1>x_pieceKnight) || ((BYTE)-1 != rgprgsqPiece[piw1][sqbk*64+sqwk]))
-				{
-				cInd1 --;
+			if ((piw1 > x_pieceKnight) || ((BYTE)-1 != rgprgsqPiece[piw1][sqbk * 64 + sqwk])) {
+				cInd1--;
 				ind1 -= (sqw1 > sqwk);
-				}
-			// Add enumerated squares to the # of the preceeding positions
-			return	(ind3*(ind3-1)/2 + ind2)*cInd1 + ind1 +
-					(fPawns ? rgprgulTriplePawnPresent[piw1][piw2][piw3][ulKings] :
-							  rgprgulTriplePawnless[piw1][piw2][piw3][ulKings]);
 			}
-		else
-			{
+			// Add enumerated squares to the # of the preceeding positions
+			return	(ind3 * (ind3 - 1) / 2 + ind2) * cInd1 + ind1 +
+				(fPawns ? rgprgulTriplePawnPresent[piw1][piw2][piw3][ulKings] :
+					rgprgulTriplePawnless[piw1][piw2][piw3][ulKings]);
+		}
+		else {
 			// Can we remove WK square from 1st piece enumaration?
-			if ((piw1>x_pieceKnight) || ((BYTE)-1 != rgprgsqPiece[piw1][sqbk*64+sqwk]))
+			if ((piw1 > x_pieceKnight) || ((BYTE)-1 != rgprgsqPiece[piw1][sqbk * 64 + sqwk]))
 				ind1 -= (sqw1 > sqwk);
 			// Get # of enumerated positions of 2nd piece
 			cInd2 = rgcLegal[piw2][sqbk];
 			// Can we remove WK square from 2nd piece enumaration?
-			if ((piw2>x_pieceKnight) || ((BYTE)-1 != rgprgsqPiece[piw2][sqbk*64+sqwk]))
-				{
-				cInd2 --;
+			if ((piw2 > x_pieceKnight) || ((BYTE)-1 != rgprgsqPiece[piw2][sqbk * 64 + sqwk])) {
+				cInd2--;
 				ind2 -= (sqw2 > sqwk);
-				}
+			}
 			// Get # of enumerated positions of 3rd piece
 			cInd3 = rgcLegal[piw3][sqbk];
 			// Can we remove WK square from 3rd piece enumaration?
-			if ((piw3>x_pieceKnight) || ((BYTE)-1 != rgprgsqPiece[piw3][sqbk*64+sqwk]))
-				{
-				cInd3 --;
+			if ((piw3 > x_pieceKnight) || ((BYTE)-1 != rgprgsqPiece[piw3][sqbk * 64 + sqwk])) {
+				cInd3--;
 				ind3 -= (sqw3 > sqwk);
-				}
-			// Add enumerated square to the # of the preceeding positions
-			return	cInd3*(cInd2*ind1 + ind2) + ind3 +
-					(fPawns ? rgprgulTriplePawnPresent[piw1][piw2][piw3][ulKings] :
-							  rgprgulTriplePawnless[piw1][piw2][piw3][ulKings]);
 			}
+			// Add enumerated square to the # of the preceeding positions
+			return	cInd3 * (cInd2 * ind1 + ind2) + ind3 +
+				(fPawns ? rgprgulTriplePawnPresent[piw1][piw2][piw3][ulKings] :
+					rgprgulTriplePawnless[piw1][piw2][piw3][ulKings]);
 		}
-	};
+	}
+};
 
 #endif
 
 // Enumerate en passant captures
 
 static INLINE INDEX TB_FASTCALL IndEnPassant11W
-	(
+(
 	square	sqw,
 	square	sqb,
 	square	sqEnP
-	)
-	{
-	assert (sqb+8 == sqEnP);
-	if (sqw+7 == sqEnP)
+) {
+	assert(sqb + 8 == sqEnP);
+	if (sqw + 7 == sqEnP)
 		// Capture to the left
-		return	(sqw&7)-1;
-	else
-		{
+		return	(sqw & 7) - 1;
+	else {
 		// Capture to the right
-		assert (sqw+9 == sqEnP);
-		return	(sqw&7)+7;
-		}
+		assert(sqw + 9 == sqEnP);
+		return	(sqw & 7) + 7;
 	}
+}
 
 static INLINE INDEX TB_FASTCALL IndEnPassant11B
-	(
+(
 	square	sqw,
 	square	sqb,
 	square	sqEnP
-	)
-	{
-	assert (sqw-8 == sqEnP);
-	if (sqb-9 == sqEnP)
+) {
+	assert(sqw - 8 == sqEnP);
+	if (sqb - 9 == sqEnP)
 		// Capture to the left
-		return (sqb&7)-1;
-	else
-		{
+		return (sqb & 7) - 1;
+	else {
 		// Capture to the right
-		assert (sqb-7 == sqEnP);
-		return (sqb&7)+7;
-		}
+		assert(sqb - 7 == sqEnP);
+		return (sqb & 7) + 7;
 	}
+}
 
 static INLINE INDEX TB_FASTCALL IndEnPassant21W
-	(
+(
 	square	sqw1,
 	square	sqw2,
 	square	sqb,
 	square	sqEnP
-	)
-	{
-	assert (sqb+8 == sqEnP);
-	SORT (sqw1, sqw2);
-	if (sqw1+7 == sqEnP && 0 != TbColumn(sqw1))
+) {
+	assert(sqb + 8 == sqEnP);
+	SORT(sqw1, sqw2);
+	if (sqw1 + 7 == sqEnP && 0 != TbColumn(sqw1))
 		// Capture to the left
-		return (sqw1&7)-1+(EXCLUDE3(sqw2,sqb,sqEnP,sqEnP+8)-i8-1)*i14;
-	else if (sqw1+9 == sqEnP && 7 != TbColumn(sqw1))
+		return (sqw1 & 7) - 1 + (EXCLUDE3(sqw2, sqb, sqEnP, sqEnP + 8) - i8 - 1) * i14;
+	else if (sqw1 + 9 == sqEnP && 7 != TbColumn(sqw1))
 		// Capture to the right
-		return (sqw1&7)+7+(EXCLUDE3(sqw2,sqb,sqEnP,sqEnP+8)-i8-1)*i14;
-	else if (sqw2+7 == sqEnP && 0 != TbColumn(sqw2))
+		return (sqw1 & 7) + 7 + (EXCLUDE3(sqw2, sqb, sqEnP, sqEnP + 8) - i8 - 1) * i14;
+	else if (sqw2 + 7 == sqEnP && 0 != TbColumn(sqw2))
 		// Capture to the left
-		return (sqw2&7)-1+(EXCLUDE3(sqw1,sqb,sqEnP,sqEnP+8)-i8)*i14;
-	else
-		{
+		return (sqw2 & 7) - 1 + (EXCLUDE3(sqw1, sqb, sqEnP, sqEnP + 8) - i8) * i14;
+	else {
 		// Capture to the right
-		assert (sqw2+9 == sqEnP && 7 != TbColumn(sqw2));
-		return (sqw2&7)+7+(EXCLUDE3(sqw1,sqb,sqEnP,sqEnP+8)-i8)*i14;
-		}
+		assert(sqw2 + 9 == sqEnP && 7 != TbColumn(sqw2));
+		return (sqw2 & 7) + 7 + (EXCLUDE3(sqw1, sqb, sqEnP, sqEnP + 8) - i8) * i14;
 	}
+}
 
 static INLINE INDEX TB_FASTCALL IndEnPassant21B
-	(
+(
 	square	sqw1,
 	square	sqw2,
 	square	sqb,
 	square	sqEnP
-	)
-	{
-	assert (sqw1 < sqw2);	// Must be already sorted
-	if (sqb-9 == sqEnP && 0 != TbColumn(sqb))
+) {
+	assert(sqw1 < sqw2);	// Must be already sorted
+	if (sqb - 9 == sqEnP && 0 != TbColumn(sqb))
 		// Capture to the left
-		if (sqw1-8 == sqEnP)
-			return (sqb&7)-1+(EXCLUDE3(sqw2,sqb,sqEnP,sqEnP-8)-i8-1)*i14;
-		else
-			{
-			assert (sqw2-8 == sqEnP);
-			return (sqb&7)-1+(EXCLUDE3(sqw1,sqb,sqEnP,sqEnP-8)-i8)*i14;
-			}
-	else
-		{
+		if (sqw1 - 8 == sqEnP)
+			return (sqb & 7) - 1 + (EXCLUDE3(sqw2, sqb, sqEnP, sqEnP - 8) - i8 - 1) * i14;
+		else {
+			assert(sqw2 - 8 == sqEnP);
+			return (sqb & 7) - 1 + (EXCLUDE3(sqw1, sqb, sqEnP, sqEnP - 8) - i8) * i14;
+		}
+	else {
 		// Capture to the right
-		assert (sqb-7 == sqEnP && 7 != TbColumn(sqb));
-		if (sqw1-8 == sqEnP)
-			return (sqb&7)+7+(EXCLUDE3(sqw2,sqb,sqEnP,sqEnP-8)-i8-1)*i14;
-		else
-			{
-			assert (sqw2-8 == sqEnP);
-			return (sqb&7)+7+(EXCLUDE3(sqw1,sqb,sqEnP,sqEnP-8)-i8)*i14;
-			}
+		assert(sqb - 7 == sqEnP && 7 != TbColumn(sqb));
+		if (sqw1 - 8 == sqEnP)
+			return (sqb & 7) + 7 + (EXCLUDE3(sqw2, sqb, sqEnP, sqEnP - 8) - i8 - 1) * i14;
+		else {
+			assert(sqw2 - 8 == sqEnP);
+			return (sqb & 7) + 7 + (EXCLUDE3(sqw1, sqb, sqEnP, sqEnP - 8) - i8) * i14;
 		}
 	}
+}
 
 // Index calculation functions for different endgame classes
 
-template <int piw1> class T21
-	{
+template <int piw1> class T21 {
 public:
 	static INDEX TB_FASTCALL IndCalcW
-		(
-		square	*psqW,
-		square	*psqB,
+	(
+		square* psqW,
+		square* psqB,
 		square	sqEnP,
 		int		fInvert
-		)
-		{
+	) {
 		square sqwk, sqw1, sqbk, sqMask;
 
-		sqwk = SqFindKing (psqW);
-		sqw1 = SqFindOne  (psqW, piw1);
-		sqbk = SqFindKing (psqB);
+		sqwk = SqFindKing(psqW);
+		sqw1 = SqFindOne(psqW, piw1);
+		sqbk = SqFindKing(psqB);
 
 		if (x_piecePawn == piw1)
-			sqMask = rgsqReflectMaskY [sqwk] ^ rgsqReflectInvertMask [fInvert];
+			sqMask = rgsqReflectMaskY[sqwk] ^ rgsqReflectInvertMask[fInvert];
 		else
-			sqMask = rgsqReflectMaskYandX [sqwk];
+			sqMask = rgsqReflectMaskYandX[sqwk];
 		sqwk ^= sqMask;
 		sqbk ^= sqMask;
 		sqw1 ^= sqMask;
 
-		if (x_piecePawn != piw1)
-			{
+		if (x_piecePawn != piw1) {
 			// No pawn
-			if (! FInTriangle (sqwk, sqbk))
-				{
+			if (!FInTriangle(sqwk, sqbk)) {
 				sqwk = reflect_xy(sqwk);
 				sqbk = reflect_xy(sqbk);
 				sqw1 = reflect_xy(sqw1);
-				};
-			}
-		return TEnumerate1<piw1,x_piecePawn==piw1 ? true : false,false>::Index(sqwk,sqw1,sqbk);
+			};
 		}
+		return TEnumerate1<piw1, x_piecePawn == piw1 ? true : false, false>::Index(sqwk, sqw1, sqbk);
+	}
 
 	static INDEX TB_FASTCALL IndCalcB
-		(
-		square	*psqW,
-		square	*psqB,
+	(
+		square* psqW,
+		square* psqB,
 		square	sqEnP,
 		int		fInvert
-		)
-		{
+	) {
 		square sqwk, sqw1, sqbk, sqMask;
 
-		sqwk = SqFindKing (psqW);
-		sqw1 = SqFindOne  (psqW, piw1);
-		sqbk = SqFindKing (psqB);
+		sqwk = SqFindKing(psqW);
+		sqw1 = SqFindOne(psqW, piw1);
+		sqbk = SqFindKing(psqB);
 
 		if (x_piecePawn == piw1)
-			sqMask = rgsqReflectMaskY [sqbk] ^ rgsqReflectInvertMask [fInvert];
+			sqMask = rgsqReflectMaskY[sqbk] ^ rgsqReflectInvertMask[fInvert];
 		else
-			sqMask = rgsqReflectMaskYandX [sqbk];
+			sqMask = rgsqReflectMaskYandX[sqbk];
 		sqwk ^= sqMask;
 		sqbk ^= sqMask;
 		sqw1 ^= sqMask;
 
 		if (x_piecePawn == piw1)
-			return TEnumerate1<x_pieceNone,true,true>::Index(sqbk,sqw1,sqwk);
-		else
-			{
+			return TEnumerate1<x_pieceNone, true, true>::Index(sqbk, sqw1, sqwk);
+		else {
 			// No pawn
-			if (! FInTriangle (sqbk, sqwk))
-				{
+			if (!FInTriangle(sqbk, sqwk)) {
 				sqwk = reflect_xy(sqwk);
 				sqbk = reflect_xy(sqbk);
 				sqw1 = reflect_xy(sqw1);
-				};
-			return IndTriKings(sqbk,sqwk)*i62 + EXCLUDE2(sqw1,sqwk,sqbk);
-			}
+			};
+			return IndTriKings(sqbk, sqwk) * i62 + EXCLUDE2(sqw1, sqwk, sqbk);
 		}
-	};
+	}
+};
 
-template <int piw1, int pib1> class T22
-	{
+template <int piw1, int pib1> class T22 {
 public:
 	static INDEX TB_FASTCALL IndCalcW
-		(
-		square	*psqW,
-		square	*psqB,
+	(
+		square* psqW,
+		square* psqB,
 		square	sqEnP,
 		int		fInvert
-		)
-		{
+	) {
 		square sqwk, sqw1, sqbk, sqb1, sqMask;
 
-		sqwk = SqFindKing (psqW);
-		sqw1 = SqFindOne  (psqW, piw1);
-		sqbk = SqFindKing (psqB);
-		sqb1 = SqFindOne  (psqB, pib1);
+		sqwk = SqFindKing(psqW);
+		sqw1 = SqFindOne(psqW, piw1);
+		sqbk = SqFindKing(psqB);
+		sqb1 = SqFindOne(psqB, pib1);
 
 		if (x_piecePawn == pib1)
-			sqMask = rgsqReflectMaskY [sqwk] ^ rgsqReflectInvertMask [fInvert];
+			sqMask = rgsqReflectMaskY[sqwk] ^ rgsqReflectInvertMask[fInvert];
 		else
-			sqMask = rgsqReflectMaskYandX [sqwk];
+			sqMask = rgsqReflectMaskYandX[sqwk];
 		sqwk ^= sqMask;
 		sqbk ^= sqMask;
 		sqw1 ^= sqMask;
 		sqb1 ^= sqMask;
 
-		if (x_piecePawn == pib1)
-			{
+		if (x_piecePawn == pib1) {
 			// There are pawns on the board
-			if (x_piecePawn == piw1)
-				{
+			if (x_piecePawn == piw1) {
 				// One white and one black pawn
 				if (XX == sqEnP)
-					return	TEnumerate1<x_piecePawn,true,false>::Index(sqwk,sqw1,sqbk)*i47 + 
-							EXCLUDE1(sqb1,sqw1)-i8;	// 47
+					return	TEnumerate1<x_piecePawn, true, false>::Index(sqwk, sqw1, sqbk)* i47 +
+					EXCLUDE1(sqb1, sqw1) - i8;	// 47
 				else
-					return	rgcSinglePawnPresent[x_piecePawn]*i47 +
-							IndHalfKings(sqwk,sqbk)*i14 +
-							IndEnPassant11W (sqw1, sqb1, sqEnP ^ sqMask);
-				}
+					return	rgcSinglePawnPresent[x_piecePawn] * i47 +
+					IndHalfKings(sqwk, sqbk) * i14 +
+					IndEnPassant11W(sqw1, sqb1, sqEnP ^ sqMask);
+			}
 			else
 				// Only black pawn
-				return	TEnumerate1<piw1,true,false>::Index(sqwk,sqw1,sqbk)*i48 + sqb1-i8;
-			}
-		else
-			{
+				return	TEnumerate1<piw1, true, false>::Index(sqwk, sqw1, sqbk)* i48 + sqb1 - i8;
+		}
+		else {
 			// No pawns at all
-			if (!FInTriangle (sqwk, sqbk))
-				{
+			if (!FInTriangle(sqwk, sqbk)) {
 				sqwk = reflect_xy(sqwk);
 				sqbk = reflect_xy(sqbk);
 				sqw1 = reflect_xy(sqw1);
 				sqb1 = reflect_xy(sqb1);
-				};
-			return	TEnumerate1<piw1,false,false>::Index(sqwk,sqw1,sqbk)*i61 +
-					EXCLUDE3(sqb1,sqwk,sqbk,sqw1);	// 61
-			}
+			};
+			return	TEnumerate1<piw1, false, false>::Index(sqwk, sqw1, sqbk)* i61 +
+				EXCLUDE3(sqb1, sqwk, sqbk, sqw1);	// 61
 		}
+	}
 
 	static INDEX TB_FASTCALL IndCalcB
-		(
-		square	*psqW,
-		square	*psqB,
+	(
+		square* psqW,
+		square* psqB,
 		square	sqEnP,
 		int		fInvert
-		)
-		{
+	) {
 		square sqwk, sqw1, sqbk, sqb1, sqMask;
 
-		sqwk = SqFindKing (psqW);
-		sqw1 = SqFindOne  (psqW, piw1);
-		sqbk = SqFindKing (psqB);
-		sqb1 = SqFindOne  (psqB, pib1);
+		sqwk = SqFindKing(psqW);
+		sqw1 = SqFindOne(psqW, piw1);
+		sqbk = SqFindKing(psqB);
+		sqb1 = SqFindOne(psqB, pib1);
 
 		if (x_piecePawn == pib1)
-			sqMask = rgsqReflectMaskY [sqbk] ^ rgsqReflectInvertMask [fInvert];
+			sqMask = rgsqReflectMaskY[sqbk] ^ rgsqReflectInvertMask[fInvert];
 		else
-			sqMask = rgsqReflectMaskYandX [sqbk];
+			sqMask = rgsqReflectMaskYandX[sqbk];
 		sqwk ^= sqMask;
 		sqbk ^= sqMask;
 		sqw1 ^= sqMask;
 		sqb1 ^= sqMask;
 
-		if (x_piecePawn == pib1)
-			{
+		if (x_piecePawn == pib1) {
 			// There are pawns on the board
-			if (x_piecePawn == piw1)
-				{
+			if (x_piecePawn == piw1) {
 				// One white and one black pawn
 				if (XX == sqEnP)
-					return	TEnumerate1<x_piecePawn,true,true>::Index(sqbk,sqb1,sqwk)*i47 + 
-							EXCLUDE1(sqw1,sqb1)-i8;	// 47
+					return	TEnumerate1<x_piecePawn, true, true>::Index(sqbk, sqb1, sqwk)* i47 +
+					EXCLUDE1(sqw1, sqb1) - i8;	// 47
 				else
-					return	rgcSinglePawnPresent[x_piecePawn]*i47 +
-							IndHalfKings(sqbk,sqwk)*i14 +
-							IndEnPassant11B (sqw1, sqb1, sqEnP ^ sqMask);
-				}
+					return	rgcSinglePawnPresent[x_piecePawn] * i47 +
+					IndHalfKings(sqbk, sqwk) * i14 +
+					IndEnPassant11B(sqw1, sqb1, sqEnP ^ sqMask);
 			}
-		else
-			{
+		}
+		else {
 			// No pawns at all
-			if (!FInTriangle (sqbk, sqwk))
-				{
+			if (!FInTriangle(sqbk, sqwk)) {
 				sqwk = reflect_xy(sqwk);
 				sqbk = reflect_xy(sqbk);
 				sqw1 = reflect_xy(sqw1);
 				sqb1 = reflect_xy(sqb1);
-				};
-			}
-		return	(x_piecePawn == pib1 ?	TEnumerate1<pib1,true,true>::Index(sqbk,sqb1,sqwk) :
-										TEnumerate1<pib1,false,false>::Index(sqbk,sqb1,sqwk))*i61 +
-				EXCLUDE3(sqw1,sqwk,sqbk,sqb1);	// 61
+			};
 		}
-	};
+		return	(x_piecePawn == pib1 ? TEnumerate1<pib1, true, true>::Index(sqbk, sqb1, sqwk) :
+			TEnumerate1<pib1, false, false>::Index(sqbk, sqb1, sqwk)) * i61 +
+			EXCLUDE3(sqw1, sqwk, sqbk, sqb1);	// 61
+	}
+};
 
-template <int piw1, int piw2> class T31
-	{
+template <int piw1, int piw2> class T31 {
 public:
 	static INDEX TB_FASTCALL IndCalcW
-		(
-		square	*psqW,
-		square	*psqB,
+	(
+		square* psqW,
+		square* psqB,
 		square	sqEnP,
 		int		fInvert
-		)
-		{
+	) {
 		square sqwk, sqw1, sqw2, sqbk, sqMask;
 
-		sqwk = SqFindKing (psqW);
-		if (piw1 == piw2)
-			{
-			sqw1 = SqFindFirst  (psqW, piw1);
-			sqw2 = SqFindSecond (psqW, piw2);
-			}
-		else
-			{
-			SqFind2 (psqW, piw1, sqw1, piw2, sqw2);
-			}
-		sqbk = SqFindKing (psqB);
+		sqwk = SqFindKing(psqW);
+		if (piw1 == piw2) {
+			sqw1 = SqFindFirst(psqW, piw1);
+			sqw2 = SqFindSecond(psqW, piw2);
+		}
+		else {
+			SqFind2(psqW, piw1, sqw1, piw2, sqw2);
+		}
+		sqbk = SqFindKing(psqB);
 
 		if (x_piecePawn == piw2)
-			sqMask = rgsqReflectMaskY [sqwk] ^ rgsqReflectInvertMask [fInvert];
+			sqMask = rgsqReflectMaskY[sqwk] ^ rgsqReflectInvertMask[fInvert];
 		else
-			sqMask = rgsqReflectMaskYandX [sqwk];
+			sqMask = rgsqReflectMaskYandX[sqwk];
 		sqwk ^= sqMask;
 		sqbk ^= sqMask;
 		sqw1 ^= sqMask;
 		sqw2 ^= sqMask;
 
-		if (x_piecePawn != piw2)
-			{
+		if (x_piecePawn != piw2) {
 			// There are no pawns on the board
-			if (!FInTriangle (sqwk, sqbk))
-				{
+			if (!FInTriangle(sqwk, sqbk)) {
 				sqwk = reflect_xy(sqwk);
 				sqw1 = reflect_xy(sqw1);
 				sqw2 = reflect_xy(sqw2);
 				sqbk = reflect_xy(sqbk);
-				};
-			}
-		return TEnumerate2<piw1, piw2, x_piecePawn==piw2 ? true : false, false>::Index(sqwk, sqw1, sqw2, sqbk);
+			};
 		}
+		return TEnumerate2<piw1, piw2, x_piecePawn == piw2 ? true : false, false>::Index(sqwk, sqw1, sqw2, sqbk);
+	}
 
 	static INDEX TB_FASTCALL IndCalcB
-		(
-		square	*psqW,
-		square	*psqB,
+	(
+		square* psqW,
+		square* psqB,
 		square	sqEnP,
 		int		fInvert
-		)
-		{
+	) {
 		square sqwk, sqw1, sqw2, sqbk, sqMask;
 
-		sqwk = SqFindKing (psqW);
-		if (piw1 == piw2)
-			{
-			sqw1 = SqFindFirst (psqW, piw1);
-			sqw2 = SqFindSecond (psqW, piw2);
-			}
-		else
-			{
-			SqFind2 (psqW, piw1, sqw1, piw2, sqw2);
-			}
-		sqbk = SqFindKing (psqB);
+		sqwk = SqFindKing(psqW);
+		if (piw1 == piw2) {
+			sqw1 = SqFindFirst(psqW, piw1);
+			sqw2 = SqFindSecond(psqW, piw2);
+		}
+		else {
+			SqFind2(psqW, piw1, sqw1, piw2, sqw2);
+		}
+		sqbk = SqFindKing(psqB);
 
 		if (x_piecePawn == piw2)
-			sqMask = rgsqReflectMaskY [sqbk] ^ rgsqReflectInvertMask [fInvert];
+			sqMask = rgsqReflectMaskY[sqbk] ^ rgsqReflectInvertMask[fInvert];
 		else
-			sqMask = rgsqReflectMaskYandX [sqbk];
+			sqMask = rgsqReflectMaskYandX[sqbk];
 		sqwk ^= sqMask;
 		sqbk ^= sqMask;
 		sqw1 ^= sqMask;
 		sqw2 ^= sqMask;
 
-		if (x_piecePawn == piw2)
-			{
+		if (x_piecePawn == piw2) {
 			// There are pawns on the board
 			if (x_piecePawn == piw1)
 				// Two white pawns
-				return	TEnumerate2<x_pieceNone,x_pieceNone,true,true>::Index(sqbk,sqw1,sqw2,sqwk);
+				return	TEnumerate2<x_pieceNone, x_pieceNone, true, true>::Index(sqbk, sqw1, sqw2, sqwk);
 			else
 				// Only one white pawn
-				return	TEnumerate1<x_pieceNone,true,true>::Index(sqbk,sqw2,sqwk)*i61 +
-						EXCLUDE3(sqw1,sqwk,sqbk,sqw2);	// 61
-			}
-		else
-			{
+				return	TEnumerate1<x_pieceNone, true, true>::Index(sqbk, sqw2, sqwk)* i61 +
+				EXCLUDE3(sqw1, sqwk, sqbk, sqw2);	// 61
+		}
+		else {
 			// No pawns
-			if (!FInTriangle (sqbk, sqwk))
-				{
+			if (!FInTriangle(sqbk, sqwk)) {
 				sqwk = reflect_xy(sqwk);
 				sqw1 = reflect_xy(sqw1);
 				sqw2 = reflect_xy(sqw2);
 				sqbk = reflect_xy(sqbk);
-				};
-			if (piw1 == piw2)
-				{
-				SORT (sqw1, sqw2);
-				sqw2 = EXCLUDE2(sqw2,sqwk,sqbk);					// 62
-				return	IndTriKings(sqbk,sqwk)*(i62*i61/2) +
-						sqw2*(sqw2-1)/2+EXCLUDE2(sqw1,sqwk,sqbk);	// 62*61/2
-				}
-			else
-				return	IndTriKings(sqbk,sqwk)*(i62*i61) +
-						EXCLUDE2(sqw1,sqwk,sqbk)*i61 +	// 62
-						EXCLUDE3(sqw2,sqwk,sqbk,sqw1);	// 61
+			};
+			if (piw1 == piw2) {
+				SORT(sqw1, sqw2);
+				sqw2 = EXCLUDE2(sqw2, sqwk, sqbk);					// 62
+				return	IndTriKings(sqbk, sqwk) * (i62 * i61 / 2) +
+					sqw2 * (sqw2 - 1) / 2 + EXCLUDE2(sqw1, sqwk, sqbk);	// 62*61/2
 			}
+			else
+				return	IndTriKings(sqbk, sqwk) * (i62 * i61) +
+				EXCLUDE2(sqw1, sqwk, sqbk) * i61 +	// 62
+				EXCLUDE3(sqw2, sqwk, sqbk, sqw1);	// 61
 		}
-	};
+	}
+};
 
-template <int piw1, int piw2, int pib1> class T32
-	{
+template <int piw1, int piw2, int pib1> class T32 {
 public:
 	static INDEX TB_FASTCALL IndCalcW
-		(
-		square	*psqW,
-		square	*psqB,
+	(
+		square* psqW,
+		square* psqB,
 		square	sqEnP,
 		int		fInvert
-		)
-		{
+	) {
 		square sqwk, sqw1, sqw2, sqbk, sqb1, sqMask;
 
-		sqwk = SqFindKing (psqW);
-		if (piw1 == piw2)
-			{
-			sqw1 = SqFindFirst  (psqW, piw1);
-			sqw2 = SqFindSecond (psqW, piw2);
-			}
-		else
-			{
-			SqFind2 (psqW, piw1, sqw1, piw2, sqw2);
-			}
-		sqbk = SqFindKing (psqB);
-		sqb1 = SqFindOne  (psqB, pib1);
+		sqwk = SqFindKing(psqW);
+		if (piw1 == piw2) {
+			sqw1 = SqFindFirst(psqW, piw1);
+			sqw2 = SqFindSecond(psqW, piw2);
+		}
+		else {
+			SqFind2(psqW, piw1, sqw1, piw2, sqw2);
+		}
+		sqbk = SqFindKing(psqB);
+		sqb1 = SqFindOne(psqB, pib1);
 
 		if (x_piecePawn == piw2 || x_piecePawn == pib1)
-			sqMask = rgsqReflectMaskY [sqwk] ^ rgsqReflectInvertMask [fInvert];
+			sqMask = rgsqReflectMaskY[sqwk] ^ rgsqReflectInvertMask[fInvert];
 		else
-			sqMask = rgsqReflectMaskYandX [sqwk];
+			sqMask = rgsqReflectMaskYandX[sqwk];
 		sqwk ^= sqMask;
 		sqbk ^= sqMask;
 		sqw1 ^= sqMask;
 		sqw2 ^= sqMask;
 		sqb1 ^= sqMask;
 
-		if (x_piecePawn == piw2 || x_piecePawn == pib1)
-			{
+		if (x_piecePawn == piw2 || x_piecePawn == pib1) {
 			// There are pawns on the board
-			if (x_piecePawn == pib1)
-				{
+			if (x_piecePawn == pib1) {
 				// Black pawn
-				if (x_piecePawn == piw1 && x_piecePawn == piw2)
-					{
+				if (x_piecePawn == piw1 && x_piecePawn == piw2) {
 					// All 3 pieces are pawns
 					if (XX == sqEnP)
-						return	TEnumerate2<x_piecePawn,x_piecePawn,true,false>::
-									Index(sqwk,sqw1,sqw2,sqbk)*i46+
-								EXCLUDE2(sqb1,sqw1,sqw2)-i8;	// 46
+						return	TEnumerate2<x_piecePawn, x_piecePawn, true, false>::
+						Index(sqwk, sqw1, sqw2, sqbk)* i46 +
+						EXCLUDE2(sqb1, sqw1, sqw2) - i8;	// 46
 					else
 						// En passant capture
-						return	rgcPairPawnPresent[x_piecePawn][x_piecePawn]*i46 +
-								IndHalfKings(sqwk,sqbk)*(i14*i44) +
-								IndEnPassant21W (sqw1, sqw2, sqb1, sqEnP ^ sqMask);
-					}
-				else if (x_piecePawn == piw2)
-					{
+						return	rgcPairPawnPresent[x_piecePawn][x_piecePawn] * i46 +
+						IndHalfKings(sqwk, sqbk) * (i14 * i44) +
+						IndEnPassant21W(sqw1, sqw2, sqb1, sqEnP ^ sqMask);
+				}
+				else if (x_piecePawn == piw2) {
 					// One white pawn, one black pawn
 					if (XX == sqEnP)
-						return	TEnumerate2<piw1,x_piecePawn,true,false>::
-									Index(sqwk,sqw1,sqw2,sqbk)*i47 +
-								EXCLUDE1(sqb1,sqw2)-i8;	// 47
+						return	TEnumerate2<piw1, x_piecePawn, true, false>::
+						Index(sqwk, sqw1, sqw2, sqbk)* i47 +
+						EXCLUDE1(sqb1, sqw2) - i8;	// 47
 					else
 						// En passant capture
-						return	rgcPairPawnPresent[piw1][x_piecePawn]*i47 +
-								TEnumerate1<piw1,true,false>::Index(sqwk,sqw1,sqbk)*i14 +
-								IndEnPassant11W (sqw2, sqb1, sqEnP ^ sqMask);
-					}
+						return	rgcPairPawnPresent[piw1][x_piecePawn] * i47 +
+						TEnumerate1<piw1, true, false>::Index(sqwk, sqw1, sqbk)* i14 +
+						IndEnPassant11W(sqw2, sqb1, sqEnP ^ sqMask);
+				}
 				else
 					// Only black pawn
-					return	TEnumerate2<piw1,piw2,true,false>::
-								Index(sqwk,sqw1,sqw2,sqbk)*i48 +
-							sqb1-i8;	// 48
-				}
+					return	TEnumerate2<piw1, piw2, true, false>::
+					Index(sqwk, sqw1, sqw2, sqbk)* i48 +
+					sqb1 - i8;	// 48
 			}
-		else
-			{
+		}
+		else {
 			// No pawns
-			if (!FInTriangle (sqwk, sqbk))
-				{
+			if (!FInTriangle(sqwk, sqbk)) {
 				sqwk = reflect_xy(sqwk);
 				sqw1 = reflect_xy(sqw1);
 				sqw2 = reflect_xy(sqw2);
 				sqbk = reflect_xy(sqbk);
 				sqb1 = reflect_xy(sqb1);
-				};
-			}
-		return	TEnumerate2<piw1,piw2,(x_piecePawn==piw2||x_piecePawn==pib1) ? true : false,false>::
-					Index(sqwk,sqw1,sqw2,sqbk)*i60 +
-				EXCLUDE4(sqb1,sqwk,sqbk,sqw1,sqw2);	// 60
+			};
 		}
+		return	TEnumerate2<piw1, piw2, (x_piecePawn == piw2 || x_piecePawn == pib1) ? true : false, false>::
+			Index(sqwk, sqw1, sqw2, sqbk)* i60 +
+			EXCLUDE4(sqb1, sqwk, sqbk, sqw1, sqw2);	// 60
+	}
 
 	static INDEX TB_FASTCALL IndCalcB
-		(
-		square	*psqW,
-		square	*psqB,
+	(
+		square* psqW,
+		square* psqB,
 		square	sqEnP,
 		int		fInvert
-		)
-		{
+	) {
 		square sqwk, sqw1, sqw2, sqbk, sqb1, sqMask;
 
-		sqwk = SqFindKing (psqW);
-		if (piw1 == piw2)
-			{
-			sqw1 = SqFindFirst  (psqW, piw1);
-			sqw2 = SqFindSecond (psqW, piw2);
-			}
-		else
-			{
-			SqFind2 (psqW, piw1, sqw1, piw2, sqw2);
-			}
-		sqbk = SqFindKing (psqB);
-		sqb1 = SqFindOne  (psqB, pib1);
+		sqwk = SqFindKing(psqW);
+		if (piw1 == piw2) {
+			sqw1 = SqFindFirst(psqW, piw1);
+			sqw2 = SqFindSecond(psqW, piw2);
+		}
+		else {
+			SqFind2(psqW, piw1, sqw1, piw2, sqw2);
+		}
+		sqbk = SqFindKing(psqB);
+		sqb1 = SqFindOne(psqB, pib1);
 
 		if (x_piecePawn == piw2 || x_piecePawn == pib1)
-			sqMask = rgsqReflectMaskY [sqbk] ^ rgsqReflectInvertMask [fInvert];
+			sqMask = rgsqReflectMaskY[sqbk] ^ rgsqReflectInvertMask[fInvert];
 		else
-			sqMask = rgsqReflectMaskYandX [sqbk];
+			sqMask = rgsqReflectMaskYandX[sqbk];
 		sqwk ^= sqMask;
 		sqbk ^= sqMask;
 		sqw1 ^= sqMask;
 		sqw2 ^= sqMask;
 		sqb1 ^= sqMask;
 
-		if (x_piecePawn == piw2 || x_piecePawn == pib1)
-			{
+		if (x_piecePawn == piw2 || x_piecePawn == pib1) {
 			// There are pawns on the board
-			if (x_piecePawn == pib1)
-				{
+			if (x_piecePawn == pib1) {
 				// Black pawn
-				if (x_piecePawn == piw1 && x_piecePawn == piw2)
-					{
+				if (x_piecePawn == piw1 && x_piecePawn == piw2) {
 					// All 3 pieces are pawns
-					SORT (sqw1, sqw2);
-					if (XX == sqEnP)
-						{
-						sqw2 = EXCLUDE1(sqw2,sqb1)-i8;					// 47
-						return	TEnumerate1<x_piecePawn,true,true>::
-									Index(sqbk,sqb1,sqwk)*(i47*i46/2) +
-								sqw2*(sqw2-1)/2+EXCLUDE1(sqw1,sqb1)-i8;	// 47*46/2
-						}
+					SORT(sqw1, sqw2);
+					if (XX == sqEnP) {
+						sqw2 = EXCLUDE1(sqw2, sqb1) - i8;					// 47
+						return	TEnumerate1<x_piecePawn, true, true>::
+							Index(sqbk, sqb1, sqwk)* (i47 * i46 / 2) +
+							sqw2 * (sqw2 - 1) / 2 + EXCLUDE1(sqw1, sqb1) - i8;	// 47*46/2
+					}
 					else
 						// En passant capture
-						return	rgcSinglePawnPresent[x_piecePawn]*(i47*i46/2) +
-								IndHalfKings(sqbk,sqwk)*(i44*i14) +
-								IndEnPassant21B (sqw1, sqw2, sqb1, sqEnP ^ sqMask);
-					}
-				else if (x_piecePawn == piw2)
-					{
+						return	rgcSinglePawnPresent[x_piecePawn] * (i47 * i46 / 2) +
+						IndHalfKings(sqbk, sqwk) * (i44 * i14) +
+						IndEnPassant21B(sqw1, sqw2, sqb1, sqEnP ^ sqMask);
+				}
+				else if (x_piecePawn == piw2) {
 					// One white pawn, one black pawn
 					if (XX == sqEnP)
-						return	TEnumerate1<x_piecePawn,true,true>::
-									Index(sqbk,sqb1,sqwk)*(i60*i47) +
-								EXCLUDE4(sqw1,sqwk,sqbk,sqw2,sqb1)*i47 +	// 60
-								EXCLUDE1(sqw2,sqb1)-i8;						// 47
-					else
-						{
+						return	TEnumerate1<x_piecePawn, true, true>::
+						Index(sqbk, sqb1, sqwk)* (i60 * i47) +
+						EXCLUDE4(sqw1, sqwk, sqbk, sqw2, sqb1) * i47 +	// 60
+						EXCLUDE1(sqw2, sqb1) - i8;						// 47
+					else {
 						// En passant capture
 						sqEnP ^= sqMask;
-						return	rgcSinglePawnPresent[x_piecePawn]*(i60*i47) +
-								IndHalfKings(sqbk,sqwk)*(i58*i14) +
-								EXCLUDE6(sqw1,sqwk,sqbk,sqw2,sqb1,sqEnP,sqEnP-8)*i14 +	// 58
-								IndEnPassant11B (sqw2, sqb1, sqEnP);
-						}
-					}
-				else
-					{
-					// Only black pawn
-					if (piw1 == piw2)
-						{
-						// 2 identical white pieces
-						SORT (sqw1, sqw2);
-						sqw2 = EXCLUDE3(sqw2,sqwk,sqbk,sqb1);						// 61
-						return	TEnumerate1<x_piecePawn,true,true>::
-									Index(sqbk,sqb1,sqwk)*(i61*i60/2) +
-								sqw2*(sqw2-1)/2 + EXCLUDE3(sqw1,sqwk,sqbk,sqb1);	// 61*60/2
-						}
-					return	TEnumerate1<x_piecePawn,true,true>::
-								Index(sqbk,sqb1,sqwk)*(i61*i60) +
-							EXCLUDE3(sqw1,sqwk,sqbk,sqb1)*i60 +	// 61
-							EXCLUDE4(sqw2,sqwk,sqbk,sqw1,sqb1);	// 60
+						return	rgcSinglePawnPresent[x_piecePawn] * (i60 * i47) +
+							IndHalfKings(sqbk, sqwk) * (i58 * i14) +
+							EXCLUDE6(sqw1, sqwk, sqbk, sqw2, sqb1, sqEnP, sqEnP - 8) * i14 +	// 58
+							IndEnPassant11B(sqw2, sqb1, sqEnP);
 					}
 				}
-			else
-				{
-				// No black pawn
-				if (x_piecePawn == piw1)
-					{
-					// Only 2 white pawns
-					SORT (sqw1, sqw2);
-					sqw2 -= i8;
-					return	TEnumerate1<pib1,true,true>::
-								Index(sqbk,sqb1,sqwk)*(i48*47/2) +
-							sqw2*(sqw2-1)/2+sqw1-i8;			// 48*47/2
+				else {
+					// Only black pawn
+					if (piw1 == piw2) {
+						// 2 identical white pieces
+						SORT(sqw1, sqw2);
+						sqw2 = EXCLUDE3(sqw2, sqwk, sqbk, sqb1);						// 61
+						return	TEnumerate1<x_piecePawn, true, true>::
+							Index(sqbk, sqb1, sqwk)* (i61 * i60 / 2) +
+							sqw2 * (sqw2 - 1) / 2 + EXCLUDE3(sqw1, sqwk, sqbk, sqb1);	// 61*60/2
 					}
-				else
-					// Only one white pawn
-					return	TEnumerate1<pib1,true,true>::
-								Index(sqbk,sqb1,sqwk)*(i60*i48) +
-							EXCLUDE4(sqw1,sqwk,sqbk,sqw2,sqb1)*i48 +	// 60
-							sqw2-i8;									// 48
+					return	TEnumerate1<x_piecePawn, true, true>::
+						Index(sqbk, sqb1, sqwk)* (i61 * i60) +
+						EXCLUDE3(sqw1, sqwk, sqbk, sqb1) * i60 +	// 61
+						EXCLUDE4(sqw2, sqwk, sqbk, sqw1, sqb1);	// 60
 				}
 			}
-		else
-			{
+			else {
+				// No black pawn
+				if (x_piecePawn == piw1) {
+					// Only 2 white pawns
+					SORT(sqw1, sqw2);
+					sqw2 -= i8;
+					return	TEnumerate1<pib1, true, true>::
+						Index(sqbk, sqb1, sqwk)* (i48 * 47 / 2) +
+						sqw2 * (sqw2 - 1) / 2 + sqw1 - i8;			// 48*47/2
+				}
+				else
+					// Only one white pawn
+					return	TEnumerate1<pib1, true, true>::
+					Index(sqbk, sqb1, sqwk)* (i60 * i48) +
+					EXCLUDE4(sqw1, sqwk, sqbk, sqw2, sqb1) * i48 +	// 60
+					sqw2 - i8;									// 48
+			}
+		}
+		else {
 			// No pawns
-			if (!FInTriangle (sqbk, sqwk))
-				{
+			if (!FInTriangle(sqbk, sqwk)) {
 				sqwk = reflect_xy(sqwk);
 				sqw1 = reflect_xy(sqw1);
 				sqw2 = reflect_xy(sqw2);
 				sqbk = reflect_xy(sqbk);
 				sqb1 = reflect_xy(sqb1);
-				};
-			if (piw1 == piw2)
-				{
+			};
+			if (piw1 == piw2) {
 				// 2 identical white pieces
-				SORT (sqw1, sqw2);
-				sqw2 = EXCLUDE3(sqw2,sqwk,sqbk,sqb1);					// 61
-				return	TEnumerate1<pib1,false,false>::
-							Index(sqbk,sqb1,sqwk)*(i61*i60/2) +
-						sqw2*(sqw2-1)/2+EXCLUDE3(sqw1,sqwk,sqbk,sqb1);	// 61*60/2
-				}
-			else
-				return	TEnumerate1<pib1,false,false>::
-							Index(sqbk,sqb1,sqwk)*(i61*i60) +
-						EXCLUDE3(sqw1,sqwk,sqbk,sqb1)*i60 +	// 61
-						EXCLUDE4(sqw2,sqwk,sqbk,sqw1,sqb1);	// 60
+				SORT(sqw1, sqw2);
+				sqw2 = EXCLUDE3(sqw2, sqwk, sqbk, sqb1);					// 61
+				return	TEnumerate1<pib1, false, false>::
+					Index(sqbk, sqb1, sqwk)* (i61 * i60 / 2) +
+					sqw2 * (sqw2 - 1) / 2 + EXCLUDE3(sqw1, sqwk, sqbk, sqb1);	// 61*60/2
 			}
+			else
+				return	TEnumerate1<pib1, false, false>::
+				Index(sqbk, sqb1, sqwk)* (i61 * i60) +
+				EXCLUDE3(sqw1, sqwk, sqbk, sqb1) * i60 +	// 61
+				EXCLUDE4(sqw2, sqwk, sqbk, sqw1, sqb1);	// 60
 		}
-	};
+	}
+};
 
 #if defined (T41_INCLUDE)
 
-template <int piw1, int piw2, int piw3> class T41
-	{
+template <int piw1, int piw2, int piw3> class T41 {
 public:
 	static INDEX TB_FASTCALL IndCalcW
-		(
-		square	*psqW,
-		square	*psqB,
+	(
+		square* psqW,
+		square* psqB,
 		square	sqEnP,
 		int		fInvert
-		)
-		{
+	) {
 		square sqwk, sqw1, sqw2, sqw3, sqbk, sqMask;
 
-		sqwk = SqFindKing (psqW);
-		sqw1 = SqFindFirst (psqW, piw1);
-		if (piw1 == piw2 && piw2 == piw3)
-			{
-			sqw2 = SqFindSecond (psqW, piw2);
-			sqw3 = SqFindThird (psqW, piw3);
-			}
-		else if (piw1 == piw2)
-			{
-			sqw2 = SqFindSecond (psqW, piw2);
-			sqw3 = SqFindFirst (psqW, piw3);
-			}
-		else if (piw2 == piw3)
-			{
-			sqw2 = SqFindFirst (psqW, piw2);
-			sqw3 = SqFindSecond (psqW, piw3);
-			}
-		else
-			{
-			sqw2 = SqFindFirst (psqW, piw2);
-			sqw3 = SqFindFirst (psqW, piw3);
-			}
-		sqbk = SqFindKing (psqB);
+		sqwk = SqFindKing(psqW);
+		sqw1 = SqFindFirst(psqW, piw1);
+		if (piw1 == piw2 && piw2 == piw3) {
+			sqw2 = SqFindSecond(psqW, piw2);
+			sqw3 = SqFindThird(psqW, piw3);
+		}
+		else if (piw1 == piw2) {
+			sqw2 = SqFindSecond(psqW, piw2);
+			sqw3 = SqFindFirst(psqW, piw3);
+		}
+		else if (piw2 == piw3) {
+			sqw2 = SqFindFirst(psqW, piw2);
+			sqw3 = SqFindSecond(psqW, piw3);
+		}
+		else {
+			sqw2 = SqFindFirst(psqW, piw2);
+			sqw3 = SqFindFirst(psqW, piw3);
+		}
+		sqbk = SqFindKing(psqB);
 
 		if (x_piecePawn == piw3)
-			sqMask = rgsqReflectMaskY [sqwk] ^ rgsqReflectInvertMask [fInvert];
+			sqMask = rgsqReflectMaskY[sqwk] ^ rgsqReflectInvertMask[fInvert];
 		else
-			sqMask = rgsqReflectMaskYandX [sqwk];
+			sqMask = rgsqReflectMaskYandX[sqwk];
 		sqwk ^= sqMask;
 		sqbk ^= sqMask;
 		sqw1 ^= sqMask;
 		sqw2 ^= sqMask;
 		sqw3 ^= sqMask;
 
-		if (x_piecePawn != piw3)
-			{
+		if (x_piecePawn != piw3) {
 			// No pawns
-			if (!FInTriangle (sqwk, sqbk))
-				{
+			if (!FInTriangle(sqwk, sqbk)) {
 				sqwk = reflect_xy(sqwk);
 				sqw1 = reflect_xy(sqw1);
 				sqw2 = reflect_xy(sqw2);
 				sqw3 = reflect_xy(sqw3);
 				sqbk = reflect_xy(sqbk);
-				};
-			}
-		return	TEnumerate3<piw1,piw2,piw3,x_piecePawn == piw3,false>::Index(sqwk,sqw1,sqw2,sqw3,sqbk);
+			};
 		}
+		return	TEnumerate3<piw1, piw2, piw3, x_piecePawn == piw3, false>::Index(sqwk, sqw1, sqw2, sqw3, sqbk);
+	}
 
 	static INDEX TB_FASTCALL IndCalcB
-		(
-		square	*psqW,
-		square	*psqB,
+	(
+		square* psqW,
+		square* psqB,
 		square	sqEnP,
 		int		fInvert
-		)
-		{
+	) {
 		square sqwk, sqw1, sqw2, sqw3, sqbk, sqMask;
 
-		sqwk = SqFindKing (psqW);
-		sqw1 = SqFindFirst (psqW, piw1);
-		if (piw1 == piw2 && piw2 == piw3)
-			{
-			sqw2 = SqFindSecond (psqW, piw2);
-			sqw3 = SqFindThird (psqW, piw3);
-			}
-		else if (piw1 == piw2)
-			{
-			sqw2 = SqFindSecond (psqW, piw2);
-			sqw3 = SqFindFirst (psqW, piw3);
-			}
-		else if (piw2 == piw3)
-			{
-			sqw2 = SqFindFirst (psqW, piw2);
-			sqw3 = SqFindSecond (psqW, piw3);
-			}
-		else
-			{
-			sqw2 = SqFindFirst (psqW, piw2);
-			sqw3 = SqFindFirst (psqW, piw3);
-			}
-		sqbk = SqFindKing (psqB);
+		sqwk = SqFindKing(psqW);
+		sqw1 = SqFindFirst(psqW, piw1);
+		if (piw1 == piw2 && piw2 == piw3) {
+			sqw2 = SqFindSecond(psqW, piw2);
+			sqw3 = SqFindThird(psqW, piw3);
+		}
+		else if (piw1 == piw2) {
+			sqw2 = SqFindSecond(psqW, piw2);
+			sqw3 = SqFindFirst(psqW, piw3);
+		}
+		else if (piw2 == piw3) {
+			sqw2 = SqFindFirst(psqW, piw2);
+			sqw3 = SqFindSecond(psqW, piw3);
+		}
+		else {
+			sqw2 = SqFindFirst(psqW, piw2);
+			sqw3 = SqFindFirst(psqW, piw3);
+		}
+		sqbk = SqFindKing(psqB);
 
 		if (x_piecePawn == piw3)
-			sqMask = rgsqReflectMaskY [sqbk] ^ rgsqReflectInvertMask [fInvert];
+			sqMask = rgsqReflectMaskY[sqbk] ^ rgsqReflectInvertMask[fInvert];
 		else
-			sqMask = rgsqReflectMaskYandX [sqbk];
+			sqMask = rgsqReflectMaskYandX[sqbk];
 		sqwk ^= sqMask;
 		sqbk ^= sqMask;
 		sqw1 ^= sqMask;
 		sqw2 ^= sqMask;
 		sqw3 ^= sqMask;
 
-		if (x_piecePawn == piw3)
-			{
+		if (x_piecePawn == piw3) {
 			// There are pawns on the board
 			if (x_piecePawn == piw1)
 				// 3 white pawns
-				return	TEnumerate3<x_pieceNone,x_pieceNone,x_pieceNone,true,true>::
-							Index(sqbk,sqw1,sqw2,sqw3,sqwk);
+				return	TEnumerate3<x_pieceNone, x_pieceNone, x_pieceNone, true, true>::
+				Index(sqbk, sqw1, sqw2, sqw3, sqwk);
 			else if (x_piecePawn == piw2)
 				// 2 white pawns
-				return	TEnumerate2<x_pieceNone,x_pieceNone,true,true>::
-							Index(sqbk,sqw2,sqw3,sqwk)*i60 +
-						EXCLUDE4(sqw1,sqwk,sqbk,sqw2,sqw3);	// 60
-			else if (piw1 == piw2)
-				{
+				return	TEnumerate2<x_pieceNone, x_pieceNone, true, true>::
+				Index(sqbk, sqw2, sqw3, sqwk)* i60 +
+				EXCLUDE4(sqw1, sqwk, sqbk, sqw2, sqw3);	// 60
+			else if (piw1 == piw2) {
 				// 1 pawn, 2 pieces equal
-				SORT (sqw1, sqw2);
-				sqw2 = EXCLUDE3(sqw2,sqwk,sqbk,sqw3);					// 61
-				return	TEnumerate1<x_pieceNone,true,true>::
-							Index(sqbk,sqw3,sqwk)*(i61*i60/2) +
-						sqw2*(sqw2-1)/2+EXCLUDE3(sqw1,sqwk,sqbk,sqw3);	// 61*60/2
-				}
+				SORT(sqw1, sqw2);
+				sqw2 = EXCLUDE3(sqw2, sqwk, sqbk, sqw3);					// 61
+				return	TEnumerate1<x_pieceNone, true, true>::
+					Index(sqbk, sqw3, sqwk)* (i61 * i60 / 2) +
+					sqw2 * (sqw2 - 1) / 2 + EXCLUDE3(sqw1, sqwk, sqbk, sqw3);	// 61*60/2
+			}
 			else
 				// Only one white pawn
-				return	TEnumerate1<x_pieceNone,true,true>::Index(sqbk,sqw3,sqwk)*i61*i60 +
-						EXCLUDE3(sqw1,sqwk,sqbk,sqw3)*i60 +	// 61
-						EXCLUDE4(sqw2,sqwk,sqbk,sqw1,sqw3);	// 60
-			}
-		else
-			{
+				return	TEnumerate1<x_pieceNone, true, true>::Index(sqbk, sqw3, sqwk)* i61* i60 +
+				EXCLUDE3(sqw1, sqwk, sqbk, sqw3) * i60 +	// 61
+				EXCLUDE4(sqw2, sqwk, sqbk, sqw1, sqw3);	// 60
+		}
+		else {
 			// No pawns
-			if (!FInTriangle (sqbk, sqwk))
-				{
+			if (!FInTriangle(sqbk, sqwk)) {
 				sqwk = reflect_xy(sqwk);
 				sqw1 = reflect_xy(sqw1);
 				sqw2 = reflect_xy(sqw2);
 				sqw3 = reflect_xy(sqw3);
 				sqbk = reflect_xy(sqbk);
-				};
-			if (piw1 == piw2 && piw2 == piw3)
-				{
+			};
+			if (piw1 == piw2 && piw2 == piw3) {
 				// All 3 pieces equal
-				SORT (sqw1, sqw2);
-				SORT (sqw2, sqw3);
-				SORT (sqw1, sqw2);
-				sqw3 = EXCLUDE2(sqw3,sqwk,sqbk);	// 62
-				sqw2 = EXCLUDE2(sqw2,sqwk,sqbk);
-				return	IndTriKings(sqbk,sqwk)*(i62*i61*i60/6) +
-						sqw3*(sqw3-1)*(sqw3-2)/6+
-						sqw2*(sqw2-1)/2+
-						EXCLUDE2(sqw1,sqwk,sqbk);	// 62*61*60/6
-				}
-			else if (piw1 == piw2)
-				{
-				// 2 major pieces equal
-				SORT (sqw1, sqw2);
-				sqw2 = EXCLUDE3(sqw2,sqwk,sqbk,sqw3);							// 61
-				return	IndTriKings(sqbk,sqwk)*(i61*i60/2*i62) +
-						(sqw2*(sqw2-1)/2+EXCLUDE3(sqw1,sqwk,sqbk,sqw3))*i62 +	// 61*60/2
-						EXCLUDE2(sqw3,sqwk,sqbk);								// 62
-				}
-			else if (piw2 == piw3)
-				{
-				// 2 minor pieces equal
-				SORT (sqw2, sqw3);
-				sqw3 = EXCLUDE3(sqw3,sqwk,sqbk,sqw1);					// 61
-				return	IndTriKings(sqbk,sqwk)*(i62*i61*i60/2) +
-						EXCLUDE2(sqw1,sqwk,sqbk)*(i61*i60/2) +			// 62
-						sqw3*(sqw3-1)/2+EXCLUDE3(sqw2,sqwk,sqbk,sqw1);	// 61*60/2
-				}
-			else
-				return	IndTriKings(sqbk,sqwk)*(i62*i61*i60) +
-						EXCLUDE2(sqw1,sqwk,sqbk)*(i61*i60) +	// 62
-						EXCLUDE3(sqw2,sqwk,sqbk,sqw1)*i60 +		// 61
-						EXCLUDE4(sqw3,sqwk,sqbk,sqw1,sqw2);		// 60
+				SORT(sqw1, sqw2);
+				SORT(sqw2, sqw3);
+				SORT(sqw1, sqw2);
+				sqw3 = EXCLUDE2(sqw3, sqwk, sqbk);	// 62
+				sqw2 = EXCLUDE2(sqw2, sqwk, sqbk);
+				return	IndTriKings(sqbk, sqwk) * (i62 * i61 * i60 / 6) +
+					sqw3 * (sqw3 - 1) * (sqw3 - 2) / 6 +
+					sqw2 * (sqw2 - 1) / 2 +
+					EXCLUDE2(sqw1, sqwk, sqbk);	// 62*61*60/6
 			}
+			else if (piw1 == piw2) {
+				// 2 major pieces equal
+				SORT(sqw1, sqw2);
+				sqw2 = EXCLUDE3(sqw2, sqwk, sqbk, sqw3);							// 61
+				return	IndTriKings(sqbk, sqwk) * (i61 * i60 / 2 * i62) +
+					(sqw2 * (sqw2 - 1) / 2 + EXCLUDE3(sqw1, sqwk, sqbk, sqw3)) * i62 +	// 61*60/2
+					EXCLUDE2(sqw3, sqwk, sqbk);								// 62
+			}
+			else if (piw2 == piw3) {
+				// 2 minor pieces equal
+				SORT(sqw2, sqw3);
+				sqw3 = EXCLUDE3(sqw3, sqwk, sqbk, sqw1);					// 61
+				return	IndTriKings(sqbk, sqwk) * (i62 * i61 * i60 / 2) +
+					EXCLUDE2(sqw1, sqwk, sqbk) * (i61 * i60 / 2) +			// 62
+					sqw3 * (sqw3 - 1) / 2 + EXCLUDE3(sqw2, sqwk, sqbk, sqw1);	// 61*60/2
+			}
+			else
+				return	IndTriKings(sqbk, sqwk) * (i62 * i61 * i60) +
+				EXCLUDE2(sqw1, sqwk, sqbk) * (i61 * i60) +	// 62
+				EXCLUDE3(sqw2, sqwk, sqbk, sqw1) * i60 +		// 61
+				EXCLUDE4(sqw3, sqwk, sqbk, sqw1, sqw2);		// 60
 		}
-	};
+	}
+};
 
 #endif	// T41
 
@@ -2337,526 +2187,482 @@ public:
 
 /* scanning pattern: triangle encoding */
 
-static const INDEX sptriv[] = 
-	{
-	 0,  1,  2,  3, -1, -1, -1, -1,
-	-1,  4,  5,  6, -1, -1, -1, -1,
-	-1, -1,  7,  8, -1, -1, -1, -1,
-	-1, -1, -1,  9, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1, -1, -1,
-	};
+static const INDEX sptriv[] =
+{
+ 0,  1,  2,  3, -1, -1, -1, -1,
+-1,  4,  5,  6, -1, -1, -1, -1,
+-1, -1,  7,  8, -1, -1, -1, -1,
+-1, -1, -1,  9, -1, -1, -1, -1,
+-1, -1, -1, -1, -1, -1, -1, -1,
+-1, -1, -1, -1, -1, -1, -1, -1,
+-1, -1, -1, -1, -1, -1, -1, -1,
+-1, -1, -1, -1, -1, -1, -1, -1,
+};
 
 /* scanning pattern: queenside flank encoding */
 
-static const INDEX spqsfv[] = 
-	{
-	 0,  1,  2,  3, -1, -1, -1, -1,
-	 4,  5,  6,  7, -1, -1, -1, -1,
-	 8,  9, 10, 11, -1, -1, -1, -1,
-	12, 13, 14, 15, -1, -1, -1, -1,
-	16, 17, 18, 19, -1, -1, -1, -1,
-	20, 21, 22, 23, -1, -1, -1, -1,
-	24, 25, 26, 27, -1, -1, -1, -1,
-	28, 29, 30, 31, -1, -1, -1, -1,
-	};
+static const INDEX spqsfv[] =
+{
+ 0,  1,  2,  3, -1, -1, -1, -1,
+ 4,  5,  6,  7, -1, -1, -1, -1,
+ 8,  9, 10, 11, -1, -1, -1, -1,
+12, 13, 14, 15, -1, -1, -1, -1,
+16, 17, 18, 19, -1, -1, -1, -1,
+20, 21, 22, 23, -1, -1, -1, -1,
+24, 25, 26, 27, -1, -1, -1, -1,
+28, 29, 30, 31, -1, -1, -1, -1,
+};
 
 /*--> CalcIndex3A: calculate index, mode 3A */
 INLINE INDEX CalcIndex3A
-	(
+(
 	square sq0,
 	square sq1,
 	square sq2
-	)
-	{
+) {
 	INDEX index;
 
-	if (TbRow(sq2) > x_row_4)
-		{
+	if (TbRow(sq2) > x_row_4) {
 		sq0 = reflect_x(sq0);
 		sq1 = reflect_x(sq1);
 		sq2 = reflect_x(sq2);
-		};
+	};
 
-	if (TbColumn(sq2) > x_column_d)
-		{
+	if (TbColumn(sq2) > x_column_d) {
 		sq0 = reflect_y(sq0);
 		sq1 = reflect_y(sq1);
 		sq2 = reflect_y(sq2);
-		};
+	};
 
-	if (TbRow(sq2) > TbColumn(sq2))
-		{
+	if (TbRow(sq2) > TbColumn(sq2)) {
 		sq0 = reflect_xy(sq0);
 		sq1 = reflect_xy(sq1);
 		sq2 = reflect_xy(sq2);
-		};
+	};
 
 	index =
 		sq0 +
 		sq1 * i64 +
-		sptriv [sq2] * i64 * i64;
+		sptriv[sq2] * i64 * i64;
 
 	return (index);
-	}
+}
 
 /*--> CalcIndex3B: calculate index, mode 3B */
 INLINE INDEX CalcIndex3B
-	(
+(
 	square sq0,
 	square sq1,
 	square sq2
-	)
-	{
+) {
 	INDEX index;
 
-	if (TbColumn(sq1) > x_column_d)
-		{
+	if (TbColumn(sq1) > x_column_d) {
 		sq0 = reflect_y(sq0);
 		sq1 = reflect_y(sq1);
 		sq2 = reflect_y(sq2);
-		};
+	};
 
 	index =
 		sq0 +
-		spqsfv [sq1] * i64 +
+		spqsfv[sq1] * i64 +
 		sq2 * (i64 / 2) * i64;
 
 	return (index);
-	}
+}
 
 /*--> CalcIndex4A: calculate index, mode 4A */
 INLINE INDEX CalcIndex4A
-	(
+(
 	square sq0,
 	square sq1,
 	square sq2,
 	square sq3
-	)
-	{
+) {
 	INDEX index;
 
-	if (TbRow(sq3) > x_row_4)
-		{
+	if (TbRow(sq3) > x_row_4) {
 		sq0 = reflect_x(sq0);
 		sq1 = reflect_x(sq1);
 		sq2 = reflect_x(sq2);
 		sq3 = reflect_x(sq3);
-		};
+	};
 
-	if (TbColumn(sq3) > x_column_d)
-		{
+	if (TbColumn(sq3) > x_column_d) {
 		sq0 = reflect_y(sq0);
 		sq1 = reflect_y(sq1);
 		sq2 = reflect_y(sq2);
 		sq3 = reflect_y(sq3);
-		};
+	};
 
-	if (TbRow(sq3) > TbColumn(sq3))
-		{
+	if (TbRow(sq3) > TbColumn(sq3)) {
 		sq0 = reflect_xy(sq0);
 		sq1 = reflect_xy(sq1);
 		sq2 = reflect_xy(sq2);
 		sq3 = reflect_xy(sq3);
-		};
+	};
 
 	index =
 		sq0 +
 		sq1 * i64 +
 		sq2 * i64 * i64 +
-		sptriv [sq3] * i64 * i64 * i64;
+		sptriv[sq3] * i64 * i64 * i64;
 
 	return (index);
-	}
+}
 
 /*--> CalcIndex4B: calculate index, mode 4B */
 INLINE INDEX CalcIndex4B
-	(
+(
 	square sq0,
 	square sq1,
 	square sq2,
 	square sq3
-	)
-	{
+) {
 	INDEX index;
 
-	if (TbColumn(sq3) > x_column_d)
-		{
+	if (TbColumn(sq3) > x_column_d) {
 		sq0 = reflect_y(sq0);
 		sq1 = reflect_y(sq1);
 		sq2 = reflect_y(sq2);
 		sq3 = reflect_y(sq3);
-		};
+	};
 
 	index =
 		sq0 +
 		sq1 * i64 +
 		sq2 * i64 * i64 +
-		spqsfv [sq3] * i64 * i64 * i64;
+		spqsfv[sq3] * i64 * i64 * i64;
 
 	return (index);
-	}
+}
 
 /*--> CalcIndex4C: calculate index, mode 4C */
 INLINE INDEX CalcIndex4C
-	(
+(
 	square sq0,
 	square sq1,
 	square sq2,
 	square sq3
-	)
-	{
+) {
 	INDEX index;
 
-	if (TbColumn(sq2) > x_column_d)
-		{
+	if (TbColumn(sq2) > x_column_d) {
 		sq0 = reflect_y(sq0);
 		sq1 = reflect_y(sq1);
 		sq2 = reflect_y(sq2);
 		sq3 = reflect_y(sq3);
-		};
+	};
 
 	index =
 		sq0 +
 		sq1 * i64 +
-		spqsfv [sq2] * i64 * i64 +
+		spqsfv[sq2] * i64 * i64 +
 		sq3 * (i64 / 2) * i64 * i64;
 
 	return (index);
-	}
+}
 
 /*--> CalcIndex5A: calculate index, mode 5A */
 INLINE INDEX CalcIndex5A
-	(
+(
 	square sq0,
 	square sq1,
 	square sq2,
 	square sq3,
 	square sq4
-	)
-	{
+) {
 	INDEX index;
 
-	if (TbRow(sq4) > x_row_4)
-		{
+	if (TbRow(sq4) > x_row_4) {
 		sq0 = reflect_x(sq0);
 		sq1 = reflect_x(sq1);
 		sq2 = reflect_x(sq2);
 		sq3 = reflect_x(sq3);
 		sq4 = reflect_x(sq4);
-		};
+	};
 
-	if (TbColumn(sq4) > x_column_d)
-		{
+	if (TbColumn(sq4) > x_column_d) {
 		sq0 = reflect_y(sq0);
 		sq1 = reflect_y(sq1);
 		sq2 = reflect_y(sq2);
 		sq3 = reflect_y(sq3);
 		sq4 = reflect_y(sq4);
-		};
+	};
 
-	if (TbRow(sq4) > TbColumn(sq4))
-		{
+	if (TbRow(sq4) > TbColumn(sq4)) {
 		sq0 = reflect_xy(sq0);
 		sq1 = reflect_xy(sq1);
 		sq2 = reflect_xy(sq2);
 		sq3 = reflect_xy(sq3);
 		sq4 = reflect_xy(sq4);
-		};
+	};
 
 	index =
 		sq0 +
 		sq1 * i64 +
 		sq2 * i64 * i64 +
 		sq3 * i64 * i64 * i64 +
-		sptriv [sq4] * i64 * i64 * i64 * i64;
+		sptriv[sq4] * i64 * i64 * i64 * i64;
 
 	return (index);
-	}
+}
 
 /*--> CalcIndex5B: calculate index, mode 5B */
 INLINE INDEX CalcIndex5B
-	(
+(
 	square sq0,
 	square sq1,
 	square sq2,
 	square sq3,
 	square sq4
-	)
-	{
+) {
 	INDEX index;
 
-	if (TbColumn(sq4) > x_column_d)
-		{
+	if (TbColumn(sq4) > x_column_d) {
 		sq0 = reflect_y(sq0);
 		sq1 = reflect_y(sq1);
 		sq2 = reflect_y(sq2);
 		sq3 = reflect_y(sq3);
 		sq4 = reflect_y(sq4);
-		};
+	};
 
 	index =
 		sq0 +
 		sq1 * i64 +
 		sq2 * i64 * i64 +
 		sq3 * i64 * i64 * i64 +
-		spqsfv [sq4] * i64 * i64 * i64 * i64;
+		spqsfv[sq4] * i64 * i64 * i64 * i64;
 
 	return (index);
-	}
+}
 
 /*--> CalcIndex5C: calculate index, mode 5C */
 INLINE INDEX CalcIndex5C
-	(
+(
 	square sq0,
 	square sq1,
 	square sq2,
 	square sq3,
 	square sq4
-	)
-	{
+) {
 	INDEX index;
 
-	if (TbColumn(sq3) > x_column_d)
-		{
+	if (TbColumn(sq3) > x_column_d) {
 		sq0 = reflect_y(sq0);
 		sq1 = reflect_y(sq1);
 		sq2 = reflect_y(sq2);
 		sq3 = reflect_y(sq3);
 		sq4 = reflect_y(sq4);
-		};
+	};
 
 	index =
 		sq0 +
 		sq1 * i64 +
 		sq2 * i64 * i64 +
-		spqsfv [sq3] * i64 * i64 * i64 +
+		spqsfv[sq3] * i64 * i64 * i64 +
 		sq4 * (i64 / 2) * i64 * i64 * i64;
 
 	return (index);
-	}
+}
 
 /*--> CalcIndex5D: calculate index, mode 5D */
 INLINE INDEX CalcIndex5D
-	(
+(
 	square sq0,
 	square sq1,
 	square sq2,
 	square sq3,
 	square sq4
-	)
-	{
+) {
 	INDEX index;
 
-	if (TbColumn(sq2) > x_column_d)
-		{
+	if (TbColumn(sq2) > x_column_d) {
 		sq0 = reflect_y(sq0);
 		sq1 = reflect_y(sq1);
 		sq2 = reflect_y(sq2);
 		sq3 = reflect_y(sq3);
 		sq4 = reflect_y(sq4);
-		};
+	};
 
 	index =
 		sq0 +
 		sq1 * i64 +
-		spqsfv [sq2] * i64 * i64 +
+		spqsfv[sq2] * i64 * i64 +
 		sq3 * (i64 / 2) * i64 * i64 +
 		sq4 * (i64 / 2) * i64 * i64 * i64;
 
 	return (index);
-	}
+}
 
 // Calculate index - a lot of functions...
 
 #define	IndCalcW	IndCalc
 #define	IndCalcB	IndCalc
 
-template <int pi> class T21
-	{
+template <int pi> class T21 {
 public:
 	static INDEX TB_FASTCALL IndCalc
-		(
-		square	*psqW,
-		square	*psqB,
+	(
+		square* psqW,
+		square* psqB,
 		square	sqEnP,
 		int		fInvert
-		)
-		{
+	) {
 		square sq0, sq1, sq2;
 
-		sq0 = SqFindKing (psqW);
-		sq1 = SqFindOne  (psqW, pi);
-		sq2 = SqFindKing (psqB);
+		sq0 = SqFindKing(psqW);
+		sq1 = SqFindOne(psqW, pi);
+		sq2 = SqFindKing(psqB);
 
-		if (x_piecePawn == pi)
-			{
-			if (fInvert)
-				{
-				sq0 = reflect_x (sq0);
-				sq1 = reflect_x (sq1);
-				sq2 = reflect_x (sq2);
-				}
-			return CalcIndex3B (sq0, sq1, sq2);
+		if (x_piecePawn == pi) {
+			if (fInvert) {
+				sq0 = reflect_x(sq0);
+				sq1 = reflect_x(sq1);
+				sq2 = reflect_x(sq2);
 			}
-		else
-			return CalcIndex3A (sq0, sq1, sq2);
+			return CalcIndex3B(sq0, sq1, sq2);
 		}
-	};
+		else
+			return CalcIndex3A(sq0, sq1, sq2);
+	}
+};
 
-template <int pi1, int pi2> class T22
-	{
+template <int pi1, int pi2> class T22 {
 public:
 	static INDEX TB_FASTCALL IndCalc
-		(
-		square	*psqW,
-		square	*psqB,
+	(
+		square* psqW,
+		square* psqB,
 		square	sqEnP,
 		int		fInvert
-		)
-		{
+	) {
 		square sq0, sq1, sq2, sq3;
 
-		sq0 = SqFindKing (psqW);
-		sq1 = SqFindOne  (psqW, pi1);
-		sq2 = SqFindKing (psqB);
-		sq3 = SqFindOne  (psqB, pi2);
+		sq0 = SqFindKing(psqW);
+		sq1 = SqFindOne(psqW, pi1);
+		sq2 = SqFindKing(psqB);
+		sq3 = SqFindOne(psqB, pi2);
 
-		if (x_piecePawn == pi1 || x_piecePawn == pi2)
-			{
-			if (fInvert)
-				{
-				sq0 = reflect_x (sq0);
-				sq1 = reflect_x (sq1);
-				sq2 = reflect_x (sq2);
-				sq3 = reflect_x (sq3);
-				}
-			return CalcIndex4B (sq0, sq1, sq2, sq3);
+		if (x_piecePawn == pi1 || x_piecePawn == pi2) {
+			if (fInvert) {
+				sq0 = reflect_x(sq0);
+				sq1 = reflect_x(sq1);
+				sq2 = reflect_x(sq2);
+				sq3 = reflect_x(sq3);
 			}
-		else
-			return CalcIndex4A (sq0, sq1, sq2, sq3);
+			return CalcIndex4B(sq0, sq1, sq2, sq3);
 		}
-	};
+		else
+			return CalcIndex4A(sq0, sq1, sq2, sq3);
+	}
+};
 
-template <int pi1, int pi2> class T31
-	{
+template <int pi1, int pi2> class T31 {
 public:
 	static INDEX TB_FASTCALL IndCalc
-		(
-		square	*psqW,
-		square	*psqB,
+	(
+		square* psqW,
+		square* psqB,
 		square	sqEnP,
 		int		fInvert
-		)
-		{
+	) {
 		square sq0, sq1, sq2, sq3;
 
-		sq0 = SqFindKing (psqW);
-		sq1 = SqFindFirst (psqW, pi1);
+		sq0 = SqFindKing(psqW);
+		sq1 = SqFindFirst(psqW, pi1);
 		if (pi1 == pi2)
-			sq2 = SqFindSecond (psqW, pi2);
+			sq2 = SqFindSecond(psqW, pi2);
 		else
-			sq2 = SqFindFirst (psqW, pi2);
-		sq3 = SqFindKing (psqB);
+			sq2 = SqFindFirst(psqW, pi2);
+		sq3 = SqFindKing(psqB);
 
-		if (x_piecePawn == pi1 || x_piecePawn == pi2)
-			{
-			if (fInvert)
-				{
-				sq0 = reflect_x (sq0);
-				sq1 = reflect_x (sq1);
-				sq2 = reflect_x (sq2);
-				sq3 = reflect_x (sq3);
-				}
-			return CalcIndex4C (sq0, sq1, sq2, sq3);
+		if (x_piecePawn == pi1 || x_piecePawn == pi2) {
+			if (fInvert) {
+				sq0 = reflect_x(sq0);
+				sq1 = reflect_x(sq1);
+				sq2 = reflect_x(sq2);
+				sq3 = reflect_x(sq3);
 			}
-		else
-			return CalcIndex4A (sq0, sq1, sq2, sq3);
+			return CalcIndex4C(sq0, sq1, sq2, sq3);
 		}
-	};
+		else
+			return CalcIndex4A(sq0, sq1, sq2, sq3);
+	}
+};
 
-template <int pi1, int pi2, int pi3> class T32
-	{
+template <int pi1, int pi2, int pi3> class T32 {
 public:
 	static INDEX TB_FASTCALL IndCalc
-		(
-		square	*psqW,
-		square	*psqB,
+	(
+		square* psqW,
+		square* psqB,
 		square	sqEnP,
 		int		fInvert
-		)
-		{
+	) {
 		square sq0, sq1, sq2, sq3, sq4;
 
-		sq0 = SqFindKing (psqW);
-		sq1 = SqFindFirst (psqW, pi1);
+		sq0 = SqFindKing(psqW);
+		sq1 = SqFindFirst(psqW, pi1);
 		if (pi1 == pi2)
-			sq2 = SqFindSecond (psqW, pi2);
+			sq2 = SqFindSecond(psqW, pi2);
 		else
-			sq2 = SqFindFirst (psqW, pi2);
-		sq3 = SqFindKing (psqB);
-		sq4 = SqFindOne  (psqB, pi3);
+			sq2 = SqFindFirst(psqW, pi2);
+		sq3 = SqFindKing(psqB);
+		sq4 = SqFindOne(psqB, pi3);
 
-		if (x_piecePawn == pi1 || x_piecePawn == pi2 || x_piecePawn == pi3)
-			{
-			if (fInvert)
-				{
-				sq0 = reflect_x (sq0);
-				sq1 = reflect_x (sq1);
-				sq2 = reflect_x (sq2);
-				sq3 = reflect_x (sq3);
-				sq4 = reflect_x (sq4);
-				}
-			if (x_piecePawn == pi3)
-				return CalcIndex5B (sq0, sq1, sq2, sq3, sq4);
-			else
-				return CalcIndex5D (sq0, sq1, sq2, sq3, sq4);
+		if (x_piecePawn == pi1 || x_piecePawn == pi2 || x_piecePawn == pi3) {
+			if (fInvert) {
+				sq0 = reflect_x(sq0);
+				sq1 = reflect_x(sq1);
+				sq2 = reflect_x(sq2);
+				sq3 = reflect_x(sq3);
+				sq4 = reflect_x(sq4);
 			}
-		else
-			return CalcIndex5A (sq0, sq1, sq2, sq3, sq4);
+			if (x_piecePawn == pi3)
+				return CalcIndex5B(sq0, sq1, sq2, sq3, sq4);
+			else
+				return CalcIndex5D(sq0, sq1, sq2, sq3, sq4);
 		}
-	};
+		else
+			return CalcIndex5A(sq0, sq1, sq2, sq3, sq4);
+	}
+};
 
 #if defined (T41_INCLUDE)
 
-template <int pi1, int pi2, int pi3> class T41
-	{
+template <int pi1, int pi2, int pi3> class T41 {
 public:
 	static INDEX TB_FASTCALL IndCalc
-		(
-		square	*psqW,
-		square	*psqB,
+	(
+		square* psqW,
+		square* psqB,
 		square	sqEnP,
 		int		fInvert
-		)
-		{
+	) {
 		square sq0, sq1, sq2, sq3, sq4;
 
-		sq0 = SqFindKing (psqW);
-		sq1 = SqFindFirst (psqW, pi1);
-		sq2 = SqFindFirst (psqW, pi2);
-		sq3 = SqFindFirst (psqW, pi3);
-		sq4 = SqFindKing (psqB);
+		sq0 = SqFindKing(psqW);
+		sq1 = SqFindFirst(psqW, pi1);
+		sq2 = SqFindFirst(psqW, pi2);
+		sq3 = SqFindFirst(psqW, pi3);
+		sq4 = SqFindKing(psqB);
 
-		if (x_piecePawn == pi1 || x_piecePawn == pi2 || x_piecePawn == pi3)
-			{
+		if (x_piecePawn == pi1 || x_piecePawn == pi2 || x_piecePawn == pi3) {
 			// There are pawns on the board
-			if (fInvert)
-				{
-				sq0 = reflect_x (sq0);
-				sq1 = reflect_x (sq1);
-				sq2 = reflect_x (sq2);
-				sq3 = reflect_x (sq3);
-				sq4 = reflect_x (sq4);
-				}
-			return CalcIndex5C (sq0, sq1, sq2, sq3, sq4);
+			if (fInvert) {
+				sq0 = reflect_x(sq0);
+				sq1 = reflect_x(sq1);
+				sq2 = reflect_x(sq2);
+				sq3 = reflect_x(sq3);
+				sq4 = reflect_x(sq4);
 			}
-		else	// No pawns
-			return CalcIndex5A (sq0, sq1, sq2, sq3, sq4);
+			return CalcIndex5C(sq0, sq1, sq2, sq3, sq4);
 		}
-	};
+		else	// No pawns
+			return CalcIndex5A(sq0, sq1, sq2, sq3, sq4);
+	}
+};
 
 #endif
 
@@ -3029,34 +2835,34 @@ public:
 #define	TB_DIRECTORY_SIZE		32	/* # of cache buckets */
 #endif
 
-typedef INDEX (TB_FASTCALL * PfnCalcIndex) (square *psqW, square *psqB,
-										 square sqEnP, int fInverse);
+typedef INDEX(TB_FASTCALL* PfnCalcIndex) (square* psqW, square* psqB,
+	square sqEnP, int fInverse);
 struct CTbCache;
 
 typedef struct		// Hungarian: tbcb
-	{
+{
 #if defined (SMP)
 	lock_t				m_lock;			// Lock on this cache bucket list
 #endif
-	volatile CTbCache  *m_ptbcFirst;	// Cached file chunks in LRU order
-	}
-	CTbCacheBucket;
+	volatile CTbCache* m_ptbcFirst;	// Cached file chunks in LRU order
+}
+CTbCacheBucket;
 
 typedef struct		// Hungarian: tbd
-	{
+{
 	int				m_iTbId;
 	PfnCalcIndex	m_rgpfnCalcIndex[2];
-	char			m_rgchName[MAX_TOTAL_PIECES+1];
+	char			m_rgchName[MAX_TOTAL_PIECES + 1];
 	INDEX			m_rgcbLength[2];
-	char			*m_rgpchFileName[2];
+	char* m_rgpchFileName[2];
 #if defined (SMP)
 	lock_t			m_rglockFiles[2];
 #endif
-	FILE			*m_rgfpFiles[2];
-	CTbCacheBucket	*m_prgtbcbBuckets[2];	// Cached file chunks in LRU order
-	BYTE			*m_rgpbRead[2];
-	}
-	CTbDesc;
+	FILE* m_rgfpFiles[2];
+	CTbCacheBucket* m_prgtbcbBuckets[2];	// Cached file chunks in LRU order
+	BYTE* m_rgpbRead[2];
+}
+CTbDesc;
 
 #define	TB(name, funW, funB, cbW, cbB)	{ tbid_##name, funW, funB, #name, { cbW, cbB } },
 
@@ -3067,163 +2873,163 @@ typedef struct		// Hungarian: tbd
 #define	Q	x_pieceQueen
 
 CTbDesc	rgtbdDesc[cTb] =
-	{
-	TB (kk, NULL, NULL, 0, 0)
-	TB (kpk, (T21<P>::IndCalcW), (T21<P>::IndCalcB), 81664, 84012)
-	TB (knk, (T21<N>::IndCalcW), (T21<N>::IndCalcB), 26282, 28644)
-	TB (kbk, (T21<B>::IndCalcW), (T21<B>::IndCalcB), 27243, 28644)
-	TB (krk, (T21<R>::IndCalcW), (T21<R>::IndCalcB), 27030, 28644)
-	TB (kqk, (T21<Q>::IndCalcW), (T21<Q>::IndCalcB), 25629, 28644)
+{
+TB(kk, NULL, NULL, 0, 0)
+TB(kpk, (T21<P>::IndCalcW), (T21<P>::IndCalcB), 81664, 84012)
+TB(knk, (T21<N>::IndCalcW), (T21<N>::IndCalcB), 26282, 28644)
+TB(kbk, (T21<B>::IndCalcW), (T21<B>::IndCalcB), 27243, 28644)
+TB(krk, (T21<R>::IndCalcW), (T21<R>::IndCalcB), 27030, 28644)
+TB(kqk, (T21<Q>::IndCalcW), (T21<Q>::IndCalcB), 25629, 28644)
 
-	TB (kpkp, (T22<P, P>::IndCalcW), (T22<P, P>::IndCalcB), 3863492, 3863492)
-	TB (knkp, (T22<N, P>::IndCalcW), (T22<N, P>::IndCalcB), 4931904, 4981504)
-	TB (knkn, (T22<N, N>::IndCalcW), (T22<N, N>::IndCalcB), 1603202, 1603202)
-	TB (kbkp, (T22<B, P>::IndCalcW), (T22<B, P>::IndCalcB), 5112000, 4981504)
-	TB (kbkn, (T22<B, N>::IndCalcW), (T22<B, N>::IndCalcB), 1661823, 1603202)
-	TB (kbkb, (T22<B, B>::IndCalcW), (T22<B, B>::IndCalcB), 1661823, 1661823)
-	TB (krkp, (T22<R, P>::IndCalcW), (T22<R, P>::IndCalcB), 5072736, 4981504)
-	TB (krkn, (T22<R, N>::IndCalcW), (T22<R, N>::IndCalcB), 1649196, 1603202)
-	TB (krkb, (T22<R, B>::IndCalcW), (T22<R, B>::IndCalcB), 1649196, 1661823)
-	TB (krkr, (T22<R, R>::IndCalcW), (T22<R, R>::IndCalcB), 1649196, 1649196)
-	TB (kqkp, (T22<Q, P>::IndCalcW), (T22<Q, P>::IndCalcB), 4810080, 4981504)
-	TB (kqkn, (T22<Q, N>::IndCalcW), (T22<Q, N>::IndCalcB), 1563735, 1603202)
-	TB (kqkb, (T22<Q, B>::IndCalcW), (T22<Q, B>::IndCalcB), 1563735, 1661823)
-	TB (kqkr, (T22<Q, R>::IndCalcW), (T22<Q, R>::IndCalcB), 1563735, 1649196)
-	TB (kqkq, (T22<Q, Q>::IndCalcW), (T22<Q, Q>::IndCalcB), 1563735, 1563735)
-	TB (kppk, (T31<P, P>::IndCalcW), (T31<P, P>::IndCalcB), 1806671, 1912372)
-	TB (knpk, (T31<N, P>::IndCalcW), (T31<N, P>::IndCalcB), 4648581, 5124732)
-	TB (knnk, (T31<N, N>::IndCalcW), (T31<N, N>::IndCalcB),  735304,  873642)
-	TB (kbpk, (T31<B, P>::IndCalcW), (T31<B, P>::IndCalcB), 4817128, 5124732)
-	TB (kbnk, (T31<B, N>::IndCalcW), (T31<B, N>::IndCalcB), 1550620, 1747284)
-	TB (kbbk, (T31<B, B>::IndCalcW), (T31<B, B>::IndCalcB),  789885,  873642)
-	TB (krpk, (T31<R, P>::IndCalcW), (T31<R, P>::IndCalcB), 4779530, 5124732)
-	TB (krnk, (T31<R, N>::IndCalcW), (T31<R, N>::IndCalcB), 1538479, 1747284)
-	TB (krbk, (T31<R, B>::IndCalcW), (T31<R, B>::IndCalcB), 1594560, 1747284)
-	TB (krrk, (T31<R, R>::IndCalcW), (T31<R, R>::IndCalcB),  777300,  873642)
-	TB (kqpk, (T31<Q, P>::IndCalcW), (T31<Q, P>::IndCalcB), 4533490, 5124732)
-	TB (kqnk, (T31<Q, N>::IndCalcW), (T31<Q, N>::IndCalcB), 1459616, 1747284)
-	TB (kqbk, (T31<Q, B>::IndCalcW), (T31<Q, B>::IndCalcB), 1512507, 1747284)
-	TB (kqrk, (T31<Q, R>::IndCalcW), (T31<Q, R>::IndCalcB), 1500276, 1747284)
-	TB (kqqk, (T31<Q, Q>::IndCalcW), (T31<Q, Q>::IndCalcB),  698739,  873642)
+TB(kpkp, (T22<P, P>::IndCalcW), (T22<P, P>::IndCalcB), 3863492, 3863492)
+TB(knkp, (T22<N, P>::IndCalcW), (T22<N, P>::IndCalcB), 4931904, 4981504)
+TB(knkn, (T22<N, N>::IndCalcW), (T22<N, N>::IndCalcB), 1603202, 1603202)
+TB(kbkp, (T22<B, P>::IndCalcW), (T22<B, P>::IndCalcB), 5112000, 4981504)
+TB(kbkn, (T22<B, N>::IndCalcW), (T22<B, N>::IndCalcB), 1661823, 1603202)
+TB(kbkb, (T22<B, B>::IndCalcW), (T22<B, B>::IndCalcB), 1661823, 1661823)
+TB(krkp, (T22<R, P>::IndCalcW), (T22<R, P>::IndCalcB), 5072736, 4981504)
+TB(krkn, (T22<R, N>::IndCalcW), (T22<R, N>::IndCalcB), 1649196, 1603202)
+TB(krkb, (T22<R, B>::IndCalcW), (T22<R, B>::IndCalcB), 1649196, 1661823)
+TB(krkr, (T22<R, R>::IndCalcW), (T22<R, R>::IndCalcB), 1649196, 1649196)
+TB(kqkp, (T22<Q, P>::IndCalcW), (T22<Q, P>::IndCalcB), 4810080, 4981504)
+TB(kqkn, (T22<Q, N>::IndCalcW), (T22<Q, N>::IndCalcB), 1563735, 1603202)
+TB(kqkb, (T22<Q, B>::IndCalcW), (T22<Q, B>::IndCalcB), 1563735, 1661823)
+TB(kqkr, (T22<Q, R>::IndCalcW), (T22<Q, R>::IndCalcB), 1563735, 1649196)
+TB(kqkq, (T22<Q, Q>::IndCalcW), (T22<Q, Q>::IndCalcB), 1563735, 1563735)
+TB(kppk, (T31<P, P>::IndCalcW), (T31<P, P>::IndCalcB), 1806671, 1912372)
+TB(knpk, (T31<N, P>::IndCalcW), (T31<N, P>::IndCalcB), 4648581, 5124732)
+TB(knnk, (T31<N, N>::IndCalcW), (T31<N, N>::IndCalcB),  735304,  873642)
+TB(kbpk, (T31<B, P>::IndCalcW), (T31<B, P>::IndCalcB), 4817128, 5124732)
+TB(kbnk, (T31<B, N>::IndCalcW), (T31<B, N>::IndCalcB), 1550620, 1747284)
+TB(kbbk, (T31<B, B>::IndCalcW), (T31<B, B>::IndCalcB),  789885,  873642)
+TB(krpk, (T31<R, P>::IndCalcW), (T31<R, P>::IndCalcB), 4779530, 5124732)
+TB(krnk, (T31<R, N>::IndCalcW), (T31<R, N>::IndCalcB), 1538479, 1747284)
+TB(krbk, (T31<R, B>::IndCalcW), (T31<R, B>::IndCalcB), 1594560, 1747284)
+TB(krrk, (T31<R, R>::IndCalcW), (T31<R, R>::IndCalcB),  777300,  873642)
+TB(kqpk, (T31<Q, P>::IndCalcW), (T31<Q, P>::IndCalcB), 4533490, 5124732)
+TB(kqnk, (T31<Q, N>::IndCalcW), (T31<Q, N>::IndCalcB), 1459616, 1747284)
+TB(kqbk, (T31<Q, B>::IndCalcW), (T31<Q, B>::IndCalcB), 1512507, 1747284)
+TB(kqrk, (T31<Q, R>::IndCalcW), (T31<Q, R>::IndCalcB), 1500276, 1747284)
+TB(kqqk, (T31<Q, Q>::IndCalcW), (T31<Q, Q>::IndCalcB),  698739,  873642)
 
 #if !defined (KPPKP_16BIT)
-	TB (kppkp, (T32<P, P, P>::IndCalcW), (T32<P, P, P>::IndCalcB),  84219361,  89391280)
+	TB(kppkp, (T32<P, P, P>::IndCalcW), (T32<P, P, P>::IndCalcB),  84219361,  89391280)
 #else
-	TB (kppkp, (T32<P, P, P>::IndCalcW), (T32<P, P, P>::IndCalcB), 2*84219361, 2*89391280)
+	TB(kppkp, (T32<P, P, P>::IndCalcW), (T32<P, P, P>::IndCalcB), 2 * 84219361, 2 * 89391280)
 #endif
-	TB (kppkn, (T32<P, P, N>::IndCalcW), (T32<P, P, N>::IndCalcB), 108400260, 115899744)
-	TB (kppkb, (T32<P, P, B>::IndCalcW), (T32<P, P, B>::IndCalcB), 108400260, 120132000)
-	TB (kppkr, (T32<P, P, R>::IndCalcW), (T32<P, P, R>::IndCalcB), 108400260, 119209296)
-	TB (kppkq, (T32<P, P, Q>::IndCalcW), (T32<P, P, Q>::IndCalcB), 108400260, 113036880)
-	TB (knpkp, (T32<N, P, P>::IndCalcW), (T32<N, P, P>::IndCalcB), 219921779, 231758952)
-	TB (knpkn, (T32<N, P, N>::IndCalcW), (T32<N, P, N>::IndCalcB), 278914860, 295914240)
-	TB (knpkb, (T32<N, P, B>::IndCalcW), (T32<N, P, B>::IndCalcB), 278914860, 306720000)
-	TB (knpkr, (T32<N, P, R>::IndCalcW), (T32<N, P, R>::IndCalcB), 278914860, 304369920)
-	TB (knpkq, (T32<N, P, Q>::IndCalcW), (T32<N, P, Q>::IndCalcB), 278914860, 288610560)
-	TB (knnkp, (T32<N, N, P>::IndCalcW), (T32<N, N, P>::IndCalcB), 137991648, 149445120)
-	TB (knnkn, (T32<N, N, N>::IndCalcW), (T32<N, N, N>::IndCalcB),  44118240,  48096060)
-	TB (knnkb, (T32<N, N, B>::IndCalcW), (T32<N, N, B>::IndCalcB),  44118240,  49854690)
-	TB (knnkr, (T32<N, N, R>::IndCalcW), (T32<N, N, R>::IndCalcB),  44118240,  49475880)
-	TB (knnkq, (T32<N, N, Q>::IndCalcW), (T32<N, N, Q>::IndCalcB),  44118240,  46912050)
-	TB (kbpkp, (T32<B, P, P>::IndCalcW), (T32<B, P, P>::IndCalcB), 227896016, 231758952)
-	TB (kbpkn, (T32<B, P, N>::IndCalcW), (T32<B, P, N>::IndCalcB), 289027680, 295914240)
-	TB (kbpkb, (T32<B, P, B>::IndCalcW), (T32<B, P, B>::IndCalcB), 289027680, 306720000)
-	TB (kbpkr, (T32<B, P, R>::IndCalcW), (T32<B, P, R>::IndCalcB), 289027680, 304369920)
-	TB (kbpkq, (T32<B, P, Q>::IndCalcW), (T32<B, P, Q>::IndCalcB), 289027680, 288610560)
-	TB (kbnkp, (T32<B, N, P>::IndCalcW), (T32<B, N, P>::IndCalcB), 290989584, 298890240)
-	TB (kbnkn, (T32<B, N, N>::IndCalcW), (T32<B, N, N>::IndCalcB),  93037200,  96192120)
-	TB (kbnkb, (T32<B, N, B>::IndCalcW), (T32<B, N, B>::IndCalcB),  93037200,  99709380)
-	TB (kbnkr, (T32<B, N, R>::IndCalcW), (T32<B, N, R>::IndCalcB),  93037200,  98951760)
-	TB (kbnkq, (T32<B, N, Q>::IndCalcW), (T32<B, N, Q>::IndCalcB),  93037200,  93824100)
-	TB (kbbkp, (T32<B, B, P>::IndCalcW), (T32<B, B, P>::IndCalcB), 148223520, 149445120)
-	TB (kbbkn, (T32<B, B, N>::IndCalcW), (T32<B, B, N>::IndCalcB),  47393100,  48096060)
-	TB (kbbkb, (T32<B, B, B>::IndCalcW), (T32<B, B, B>::IndCalcB),  47393100,  49854690)
-	TB (kbbkr, (T32<B, B, R>::IndCalcW), (T32<B, B, R>::IndCalcB),  47393100,  49475880)
-	TB (kbbkq, (T32<B, B, Q>::IndCalcW), (T32<B, B, Q>::IndCalcB),  47393100,  46912050)
-	TB (krpkp, (T32<R, P, P>::IndCalcW), (T32<R, P, P>::IndCalcB), 226121876, 231758952)
-	TB (krpkn, (T32<R, P, N>::IndCalcW), (T32<R, P, N>::IndCalcB), 286777440, 295914240)
-	TB (krpkb, (T32<R, P, B>::IndCalcW), (T32<R, P, B>::IndCalcB), 286777440, 306720000)
-	TB (krpkr, (T32<R, P, R>::IndCalcW), (T32<R, P, R>::IndCalcB), 286777440, 304369920)
-	TB (krpkq, (T32<R, P, Q>::IndCalcW), (T32<R, P, Q>::IndCalcB), 286777440, 288610560)
-	TB (krnkp, (T32<R, N, P>::IndCalcW), (T32<R, N, P>::IndCalcB), 288692928, 298890240)
-	TB (krnkn, (T32<R, N, N>::IndCalcW), (T32<R, N, N>::IndCalcB),  92308740,  96192120)
-	TB (krnkb, (T32<R, N, B>::IndCalcW), (T32<R, N, B>::IndCalcB),  92308740,  99709380)
-	TB (krnkr, (T32<R, N, R>::IndCalcW), (T32<R, N, R>::IndCalcB),  92308740,  98951760)
-	TB (krnkq, (T32<R, N, Q>::IndCalcW), (T32<R, N, Q>::IndCalcB),  92308740,  93824100)
-	TB (krbkp, (T32<R, B, P>::IndCalcW), (T32<R, B, P>::IndCalcB), 299203200, 298890240)
-	TB (krbkn, (T32<R, B, N>::IndCalcW), (T32<R, B, N>::IndCalcB),  95673600,  96192120)
-	TB (krbkb, (T32<R, B, B>::IndCalcW), (T32<R, B, B>::IndCalcB),  95673600,  99709380)
-	TB (krbkr, (T32<R, B, R>::IndCalcW), (T32<R, B, R>::IndCalcB),  95673600,  98951760)
-	TB (krbkq, (T32<R, B, Q>::IndCalcW), (T32<R, B, Q>::IndCalcB),  95673600,  93824100)
-	TB (krrkp, (T32<R, R, P>::IndCalcW), (T32<R, R, P>::IndCalcB), 145901232, 149445120)
-	TB (krrkn, (T32<R, R, N>::IndCalcW), (T32<R, R, N>::IndCalcB),  46658340,  48096060)
-	TB (krrkb, (T32<R, R, B>::IndCalcW), (T32<R, R, B>::IndCalcB),  46658340,  49854690)
-	TB (krrkr, (T32<R, R, R>::IndCalcW), (T32<R, R, R>::IndCalcB),  46658340,  49475880)
-	TB (krrkq, (T32<R, R, Q>::IndCalcW), (T32<R, R, Q>::IndCalcB),  46658340,  46912050)
-	TB (kqpkp, (T32<Q, P, P>::IndCalcW), (T32<Q, P, P>::IndCalcB), 214481388, 231758952)
-	TB (kqpkn, (T32<Q, P, N>::IndCalcW), (T32<Q, P, N>::IndCalcB), 272015040, 295914240)
-	TB (kqpkb, (T32<Q, P, B>::IndCalcW), (T32<Q, P, B>::IndCalcB), 272015040, 306720000)
-	TB (kqpkr, (T32<Q, P, R>::IndCalcW), (T32<Q, P, R>::IndCalcB), 272015040, 304369920)
-	TB (kqpkq, (T32<Q, P, Q>::IndCalcW), (T32<Q, P, Q>::IndCalcB), 272015040, 288610560)
-	TB (kqnkp, (T32<Q, N, P>::IndCalcW), (T32<Q, N, P>::IndCalcB), 273904512, 298890240)
-	TB (kqnkn, (T32<Q, N, N>::IndCalcW), (T32<Q, N, N>::IndCalcB),  87576960,  96192120)
-	TB (kqnkb, (T32<Q, N, B>::IndCalcW), (T32<Q, N, B>::IndCalcB),  87576960,  99709380)
-	TB (kqnkr, (T32<Q, N, R>::IndCalcW), (T32<Q, N, R>::IndCalcB),  87576960,  98951760)
-	TB (kqnkq, (T32<Q, N, Q>::IndCalcW), (T32<Q, N, Q>::IndCalcB),  87576960,  93824100)
-	TB (kqbkp, (T32<Q, B, P>::IndCalcW), (T32<Q, B, P>::IndCalcB), 283818240, 298890240)
-	TB (kqbkn, (T32<Q, B, N>::IndCalcW), (T32<Q, B, N>::IndCalcB),  90750420,  96192120)
-	TB (kqbkb, (T32<Q, B, B>::IndCalcW), (T32<Q, B, B>::IndCalcB),  90750420,  99709380)
-	TB (kqbkr, (T32<Q, B, R>::IndCalcW), (T32<Q, B, R>::IndCalcB),  90750420,  98951760)
-	TB (kqbkq, (T32<Q, B, Q>::IndCalcW), (T32<Q, B, Q>::IndCalcB),  90750420,  93824100)
-	TB (kqrkp, (T32<Q, R, P>::IndCalcW), (T32<Q, R, P>::IndCalcB), 281568240, 298890240)
-	TB (kqrkn, (T32<Q, R, N>::IndCalcW), (T32<Q, R, N>::IndCalcB),  90038460,  96192120)
-	TB (kqrkb, (T32<Q, R, B>::IndCalcW), (T32<Q, R, B>::IndCalcB),  90038460,  99709380)
-	TB (kqrkr, (T32<Q, R, R>::IndCalcW), (T32<Q, R, R>::IndCalcB),  90038460,  98951760)
-	TB (kqrkq, (T32<Q, R, Q>::IndCalcW), (T32<Q, R, Q>::IndCalcB),  90038460,  93824100)
-	TB (kqqkp, (T32<Q, Q, P>::IndCalcW), (T32<Q, Q, P>::IndCalcB), 131170128, 149445120)
-	TB (kqqkn, (T32<Q, Q, N>::IndCalcW), (T32<Q, Q, N>::IndCalcB),  41944320,  48096060)
-	TB (kqqkb, (T32<Q, Q, B>::IndCalcW), (T32<Q, Q, B>::IndCalcB),  41944320,  49854690)
-	TB (kqqkr, (T32<Q, Q, R>::IndCalcW), (T32<Q, Q, R>::IndCalcB),  41944320,  49475880)
-	TB (kqqkq, (T32<Q, Q, Q>::IndCalcW), (T32<Q, Q, Q>::IndCalcB),  41944320,  46912050)
+	TB(kppkn, (T32<P, P, N>::IndCalcW), (T32<P, P, N>::IndCalcB), 108400260, 115899744)
+	TB(kppkb, (T32<P, P, B>::IndCalcW), (T32<P, P, B>::IndCalcB), 108400260, 120132000)
+	TB(kppkr, (T32<P, P, R>::IndCalcW), (T32<P, P, R>::IndCalcB), 108400260, 119209296)
+	TB(kppkq, (T32<P, P, Q>::IndCalcW), (T32<P, P, Q>::IndCalcB), 108400260, 113036880)
+	TB(knpkp, (T32<N, P, P>::IndCalcW), (T32<N, P, P>::IndCalcB), 219921779, 231758952)
+	TB(knpkn, (T32<N, P, N>::IndCalcW), (T32<N, P, N>::IndCalcB), 278914860, 295914240)
+	TB(knpkb, (T32<N, P, B>::IndCalcW), (T32<N, P, B>::IndCalcB), 278914860, 306720000)
+	TB(knpkr, (T32<N, P, R>::IndCalcW), (T32<N, P, R>::IndCalcB), 278914860, 304369920)
+	TB(knpkq, (T32<N, P, Q>::IndCalcW), (T32<N, P, Q>::IndCalcB), 278914860, 288610560)
+	TB(knnkp, (T32<N, N, P>::IndCalcW), (T32<N, N, P>::IndCalcB), 137991648, 149445120)
+	TB(knnkn, (T32<N, N, N>::IndCalcW), (T32<N, N, N>::IndCalcB),  44118240,  48096060)
+	TB(knnkb, (T32<N, N, B>::IndCalcW), (T32<N, N, B>::IndCalcB),  44118240,  49854690)
+	TB(knnkr, (T32<N, N, R>::IndCalcW), (T32<N, N, R>::IndCalcB),  44118240,  49475880)
+	TB(knnkq, (T32<N, N, Q>::IndCalcW), (T32<N, N, Q>::IndCalcB),  44118240,  46912050)
+	TB(kbpkp, (T32<B, P, P>::IndCalcW), (T32<B, P, P>::IndCalcB), 227896016, 231758952)
+	TB(kbpkn, (T32<B, P, N>::IndCalcW), (T32<B, P, N>::IndCalcB), 289027680, 295914240)
+	TB(kbpkb, (T32<B, P, B>::IndCalcW), (T32<B, P, B>::IndCalcB), 289027680, 306720000)
+	TB(kbpkr, (T32<B, P, R>::IndCalcW), (T32<B, P, R>::IndCalcB), 289027680, 304369920)
+	TB(kbpkq, (T32<B, P, Q>::IndCalcW), (T32<B, P, Q>::IndCalcB), 289027680, 288610560)
+	TB(kbnkp, (T32<B, N, P>::IndCalcW), (T32<B, N, P>::IndCalcB), 290989584, 298890240)
+	TB(kbnkn, (T32<B, N, N>::IndCalcW), (T32<B, N, N>::IndCalcB),  93037200,  96192120)
+	TB(kbnkb, (T32<B, N, B>::IndCalcW), (T32<B, N, B>::IndCalcB),  93037200,  99709380)
+	TB(kbnkr, (T32<B, N, R>::IndCalcW), (T32<B, N, R>::IndCalcB),  93037200,  98951760)
+	TB(kbnkq, (T32<B, N, Q>::IndCalcW), (T32<B, N, Q>::IndCalcB),  93037200,  93824100)
+	TB(kbbkp, (T32<B, B, P>::IndCalcW), (T32<B, B, P>::IndCalcB), 148223520, 149445120)
+	TB(kbbkn, (T32<B, B, N>::IndCalcW), (T32<B, B, N>::IndCalcB),  47393100,  48096060)
+	TB(kbbkb, (T32<B, B, B>::IndCalcW), (T32<B, B, B>::IndCalcB),  47393100,  49854690)
+	TB(kbbkr, (T32<B, B, R>::IndCalcW), (T32<B, B, R>::IndCalcB),  47393100,  49475880)
+	TB(kbbkq, (T32<B, B, Q>::IndCalcW), (T32<B, B, Q>::IndCalcB),  47393100,  46912050)
+	TB(krpkp, (T32<R, P, P>::IndCalcW), (T32<R, P, P>::IndCalcB), 226121876, 231758952)
+	TB(krpkn, (T32<R, P, N>::IndCalcW), (T32<R, P, N>::IndCalcB), 286777440, 295914240)
+	TB(krpkb, (T32<R, P, B>::IndCalcW), (T32<R, P, B>::IndCalcB), 286777440, 306720000)
+	TB(krpkr, (T32<R, P, R>::IndCalcW), (T32<R, P, R>::IndCalcB), 286777440, 304369920)
+	TB(krpkq, (T32<R, P, Q>::IndCalcW), (T32<R, P, Q>::IndCalcB), 286777440, 288610560)
+	TB(krnkp, (T32<R, N, P>::IndCalcW), (T32<R, N, P>::IndCalcB), 288692928, 298890240)
+	TB(krnkn, (T32<R, N, N>::IndCalcW), (T32<R, N, N>::IndCalcB),  92308740,  96192120)
+	TB(krnkb, (T32<R, N, B>::IndCalcW), (T32<R, N, B>::IndCalcB),  92308740,  99709380)
+	TB(krnkr, (T32<R, N, R>::IndCalcW), (T32<R, N, R>::IndCalcB),  92308740,  98951760)
+	TB(krnkq, (T32<R, N, Q>::IndCalcW), (T32<R, N, Q>::IndCalcB),  92308740,  93824100)
+	TB(krbkp, (T32<R, B, P>::IndCalcW), (T32<R, B, P>::IndCalcB), 299203200, 298890240)
+	TB(krbkn, (T32<R, B, N>::IndCalcW), (T32<R, B, N>::IndCalcB),  95673600,  96192120)
+	TB(krbkb, (T32<R, B, B>::IndCalcW), (T32<R, B, B>::IndCalcB),  95673600,  99709380)
+	TB(krbkr, (T32<R, B, R>::IndCalcW), (T32<R, B, R>::IndCalcB),  95673600,  98951760)
+	TB(krbkq, (T32<R, B, Q>::IndCalcW), (T32<R, B, Q>::IndCalcB),  95673600,  93824100)
+	TB(krrkp, (T32<R, R, P>::IndCalcW), (T32<R, R, P>::IndCalcB), 145901232, 149445120)
+	TB(krrkn, (T32<R, R, N>::IndCalcW), (T32<R, R, N>::IndCalcB),  46658340,  48096060)
+	TB(krrkb, (T32<R, R, B>::IndCalcW), (T32<R, R, B>::IndCalcB),  46658340,  49854690)
+	TB(krrkr, (T32<R, R, R>::IndCalcW), (T32<R, R, R>::IndCalcB),  46658340,  49475880)
+	TB(krrkq, (T32<R, R, Q>::IndCalcW), (T32<R, R, Q>::IndCalcB),  46658340,  46912050)
+	TB(kqpkp, (T32<Q, P, P>::IndCalcW), (T32<Q, P, P>::IndCalcB), 214481388, 231758952)
+	TB(kqpkn, (T32<Q, P, N>::IndCalcW), (T32<Q, P, N>::IndCalcB), 272015040, 295914240)
+	TB(kqpkb, (T32<Q, P, B>::IndCalcW), (T32<Q, P, B>::IndCalcB), 272015040, 306720000)
+	TB(kqpkr, (T32<Q, P, R>::IndCalcW), (T32<Q, P, R>::IndCalcB), 272015040, 304369920)
+	TB(kqpkq, (T32<Q, P, Q>::IndCalcW), (T32<Q, P, Q>::IndCalcB), 272015040, 288610560)
+	TB(kqnkp, (T32<Q, N, P>::IndCalcW), (T32<Q, N, P>::IndCalcB), 273904512, 298890240)
+	TB(kqnkn, (T32<Q, N, N>::IndCalcW), (T32<Q, N, N>::IndCalcB),  87576960,  96192120)
+	TB(kqnkb, (T32<Q, N, B>::IndCalcW), (T32<Q, N, B>::IndCalcB),  87576960,  99709380)
+	TB(kqnkr, (T32<Q, N, R>::IndCalcW), (T32<Q, N, R>::IndCalcB),  87576960,  98951760)
+	TB(kqnkq, (T32<Q, N, Q>::IndCalcW), (T32<Q, N, Q>::IndCalcB),  87576960,  93824100)
+	TB(kqbkp, (T32<Q, B, P>::IndCalcW), (T32<Q, B, P>::IndCalcB), 283818240, 298890240)
+	TB(kqbkn, (T32<Q, B, N>::IndCalcW), (T32<Q, B, N>::IndCalcB),  90750420,  96192120)
+	TB(kqbkb, (T32<Q, B, B>::IndCalcW), (T32<Q, B, B>::IndCalcB),  90750420,  99709380)
+	TB(kqbkr, (T32<Q, B, R>::IndCalcW), (T32<Q, B, R>::IndCalcB),  90750420,  98951760)
+	TB(kqbkq, (T32<Q, B, Q>::IndCalcW), (T32<Q, B, Q>::IndCalcB),  90750420,  93824100)
+	TB(kqrkp, (T32<Q, R, P>::IndCalcW), (T32<Q, R, P>::IndCalcB), 281568240, 298890240)
+	TB(kqrkn, (T32<Q, R, N>::IndCalcW), (T32<Q, R, N>::IndCalcB),  90038460,  96192120)
+	TB(kqrkb, (T32<Q, R, B>::IndCalcW), (T32<Q, R, B>::IndCalcB),  90038460,  99709380)
+	TB(kqrkr, (T32<Q, R, R>::IndCalcW), (T32<Q, R, R>::IndCalcB),  90038460,  98951760)
+	TB(kqrkq, (T32<Q, R, Q>::IndCalcW), (T32<Q, R, Q>::IndCalcB),  90038460,  93824100)
+	TB(kqqkp, (T32<Q, Q, P>::IndCalcW), (T32<Q, Q, P>::IndCalcB), 131170128, 149445120)
+	TB(kqqkn, (T32<Q, Q, N>::IndCalcW), (T32<Q, Q, N>::IndCalcB),  41944320,  48096060)
+	TB(kqqkb, (T32<Q, Q, B>::IndCalcW), (T32<Q, Q, B>::IndCalcB),  41944320,  49854690)
+	TB(kqqkr, (T32<Q, Q, R>::IndCalcW), (T32<Q, Q, R>::IndCalcB),  41944320,  49475880)
+	TB(kqqkq, (T32<Q, Q, Q>::IndCalcW), (T32<Q, Q, Q>::IndCalcB),  41944320,  46912050)
 
 #if defined (T41_INCLUDE)
-	TB (kpppk, (T41<P, P, P>::IndCalcW), (T41<P, P, P>::IndCalcB),  26061704,  28388716)
-	TB (knppk, (T41<N, P, P>::IndCalcW), (T41<N, P, P>::IndCalcB), 102898651, 114742320)
-	TB (knnpk, (T41<N, N, P>::IndCalcW), (T41<N, N, P>::IndCalcB), 130135501, 153741960)
-	TB (knnnk, (T41<N, N, N>::IndCalcW), (T41<N, N, N>::IndCalcB),  13486227,  17472840)
-	TB (kbppk, (T41<B, P, P>::IndCalcW), (T41<B, P, P>::IndCalcB), 106602156, 114742320)
-	TB (kbnpk, (T41<B, N, P>::IndCalcW), (T41<B, N, P>::IndCalcB), 274352939, 307483920)
-	TB (kbnnk, (T41<B, N, N>::IndCalcW), (T41<B, N, N>::IndCalcB),  43406294, 52418520)
-	TB (kbbpk, (T41<B, B, P>::IndCalcW), (T41<B, B, P>::IndCalcB), 139715040, 153741960)
-	TB (kbbnk, (T41<B, B, N>::IndCalcW), (T41<B, B, N>::IndCalcB),  44983618,  52418520)
-	TB (kbbbk, (T41<B, B, B>::IndCalcW), (T41<B, B, B>::IndCalcB),  15010230,  17472840)
-	TB (krppk, (T41<R, P, P>::IndCalcW), (T41<R, P, P>::IndCalcB), 105758666, 114742320)
-	TB (krnpk, (T41<R, N, P>::IndCalcW), (T41<R, N, P>::IndCalcB), 272153675, 307483920)
-	TB (krnnk, (T41<R, N, N>::IndCalcW), (T41<R, N, N>::IndCalcB),  43056198,  52418520)
-	TB (krbpk, (T41<R, B, P>::IndCalcW), (T41<R, B, P>::IndCalcB), 281991360, 307483920)
-	TB (krbnk, (T41<R, B, N>::IndCalcW), (T41<R, B, N>::IndCalcB),  90787358, 104837040)
-	TB (krbbk, (T41<R, B, B>::IndCalcW), (T41<R, B, B>::IndCalcB),  46242089,  52418520)
-	TB (krrpk, (T41<R, R, P>::IndCalcW), (T41<R, R, P>::IndCalcB), 137491197, 153741960)
-	TB (krrnk, (T41<R, R, N>::IndCalcW), (T41<R, R, N>::IndCalcB),  44265261,  52418520)
-	TB (krrbk, (T41<R, R, B>::IndCalcW), (T41<R, R, B>::IndCalcB),  45873720,  52418520)
-	TB (krrrk, (T41<R, R, R>::IndCalcW), (T41<R, R, R>::IndCalcB),  14644690,  17472840)
-	TB (kqppk, (T41<Q, P, P>::IndCalcW), (T41<Q, P, P>::IndCalcB), 100347220, 114742320)
-	TB (kqnpk, (T41<Q, N, P>::IndCalcW), (T41<Q, N, P>::IndCalcB), 258294639, 307483920)
-	TB (kqnnk, (T41<Q, N, N>::IndCalcW), (T41<Q, N, N>::IndCalcB),  40873646,  52418520)
-	TB (kqbpk, (T41<Q, B, P>::IndCalcW), (T41<Q, B, P>::IndCalcB), 267576632, 307483920)
-	TB (kqbnk, (T41<Q, B, N>::IndCalcW), (T41<Q, B, N>::IndCalcB),  86166717, 104837040)
-	TB (kqbbk, (T41<Q, B, B>::IndCalcW), (T41<Q, B, B>::IndCalcB),  43879679,  52418520)
-	TB (kqrpk, (T41<Q, R, P>::IndCalcW), (T41<Q, R, P>::IndCalcB), 265421907, 307483920)
-	TB (kqrnk, (T41<Q, R, N>::IndCalcW), (T41<Q, R, N>::IndCalcB),  85470603, 104837040)
-	TB (kqrbk, (T41<Q, R, B>::IndCalcW), (T41<Q, R, B>::IndCalcB),  88557959, 104837040)
-	TB (kqrrk, (T41<Q, R, R>::IndCalcW), (T41<Q, R, R>::IndCalcB),  43157690,  52418520)
-	TB (kqqpk, (T41<Q, Q, P>::IndCalcW), (T41<Q, Q, P>::IndCalcB), 123688859, 153741960)
-	TB (kqqnk, (T41<Q, Q, N>::IndCalcW), (T41<Q, Q, N>::IndCalcB),  39840787,  52418520)
-	TB (kqqbk, (T41<Q, Q, B>::IndCalcW), (T41<Q, Q, B>::IndCalcB),  41270973,  52418520)
-	TB (kqqrk, (T41<Q, Q, R>::IndCalcW), (T41<Q, Q, R>::IndCalcB),  40916820,  52418520)
-	TB (kqqqk, (T41<Q, Q, Q>::IndCalcW), (T41<Q, Q, Q>::IndCalcB),  12479974,  17472840)
+	TB(kpppk, (T41<P, P, P>::IndCalcW), (T41<P, P, P>::IndCalcB),  26061704,  28388716)
+	TB(knppk, (T41<N, P, P>::IndCalcW), (T41<N, P, P>::IndCalcB), 102898651, 114742320)
+	TB(knnpk, (T41<N, N, P>::IndCalcW), (T41<N, N, P>::IndCalcB), 130135501, 153741960)
+	TB(knnnk, (T41<N, N, N>::IndCalcW), (T41<N, N, N>::IndCalcB),  13486227,  17472840)
+	TB(kbppk, (T41<B, P, P>::IndCalcW), (T41<B, P, P>::IndCalcB), 106602156, 114742320)
+	TB(kbnpk, (T41<B, N, P>::IndCalcW), (T41<B, N, P>::IndCalcB), 274352939, 307483920)
+	TB(kbnnk, (T41<B, N, N>::IndCalcW), (T41<B, N, N>::IndCalcB),  43406294, 52418520)
+	TB(kbbpk, (T41<B, B, P>::IndCalcW), (T41<B, B, P>::IndCalcB), 139715040, 153741960)
+	TB(kbbnk, (T41<B, B, N>::IndCalcW), (T41<B, B, N>::IndCalcB),  44983618,  52418520)
+	TB(kbbbk, (T41<B, B, B>::IndCalcW), (T41<B, B, B>::IndCalcB),  15010230,  17472840)
+	TB(krppk, (T41<R, P, P>::IndCalcW), (T41<R, P, P>::IndCalcB), 105758666, 114742320)
+	TB(krnpk, (T41<R, N, P>::IndCalcW), (T41<R, N, P>::IndCalcB), 272153675, 307483920)
+	TB(krnnk, (T41<R, N, N>::IndCalcW), (T41<R, N, N>::IndCalcB),  43056198,  52418520)
+	TB(krbpk, (T41<R, B, P>::IndCalcW), (T41<R, B, P>::IndCalcB), 281991360, 307483920)
+	TB(krbnk, (T41<R, B, N>::IndCalcW), (T41<R, B, N>::IndCalcB),  90787358, 104837040)
+	TB(krbbk, (T41<R, B, B>::IndCalcW), (T41<R, B, B>::IndCalcB),  46242089,  52418520)
+	TB(krrpk, (T41<R, R, P>::IndCalcW), (T41<R, R, P>::IndCalcB), 137491197, 153741960)
+	TB(krrnk, (T41<R, R, N>::IndCalcW), (T41<R, R, N>::IndCalcB),  44265261,  52418520)
+	TB(krrbk, (T41<R, R, B>::IndCalcW), (T41<R, R, B>::IndCalcB),  45873720,  52418520)
+	TB(krrrk, (T41<R, R, R>::IndCalcW), (T41<R, R, R>::IndCalcB),  14644690,  17472840)
+	TB(kqppk, (T41<Q, P, P>::IndCalcW), (T41<Q, P, P>::IndCalcB), 100347220, 114742320)
+	TB(kqnpk, (T41<Q, N, P>::IndCalcW), (T41<Q, N, P>::IndCalcB), 258294639, 307483920)
+	TB(kqnnk, (T41<Q, N, N>::IndCalcW), (T41<Q, N, N>::IndCalcB),  40873646,  52418520)
+	TB(kqbpk, (T41<Q, B, P>::IndCalcW), (T41<Q, B, P>::IndCalcB), 267576632, 307483920)
+	TB(kqbnk, (T41<Q, B, N>::IndCalcW), (T41<Q, B, N>::IndCalcB),  86166717, 104837040)
+	TB(kqbbk, (T41<Q, B, B>::IndCalcW), (T41<Q, B, B>::IndCalcB),  43879679,  52418520)
+	TB(kqrpk, (T41<Q, R, P>::IndCalcW), (T41<Q, R, P>::IndCalcB), 265421907, 307483920)
+	TB(kqrnk, (T41<Q, R, N>::IndCalcW), (T41<Q, R, N>::IndCalcB),  85470603, 104837040)
+	TB(kqrbk, (T41<Q, R, B>::IndCalcW), (T41<Q, R, B>::IndCalcB),  88557959, 104837040)
+	TB(kqrrk, (T41<Q, R, R>::IndCalcW), (T41<Q, R, R>::IndCalcB),  43157690,  52418520)
+	TB(kqqpk, (T41<Q, Q, P>::IndCalcW), (T41<Q, Q, P>::IndCalcB), 123688859, 153741960)
+	TB(kqqnk, (T41<Q, Q, N>::IndCalcW), (T41<Q, Q, N>::IndCalcB),  39840787,  52418520)
+	TB(kqqbk, (T41<Q, Q, B>::IndCalcW), (T41<Q, Q, B>::IndCalcB),  41270973,  52418520)
+	TB(kqqrk, (T41<Q, Q, R>::IndCalcW), (T41<Q, Q, R>::IndCalcB),  40916820,  52418520)
+	TB(kqqqk, (T41<Q, Q, Q>::IndCalcW), (T41<Q, Q, Q>::IndCalcB),  12479974,  17472840)
 #endif
-	};
+};
 
 #undef	P
 #undef	N
@@ -3235,32 +3041,29 @@ CTbDesc	rgtbdDesc[cTb] =
 //	Used to classify on-board position
 
 union CUTbReference		// Hungarian: utbr
-	{
+{
 	int				m_iDesc;			// Negative if have to inverse
 	int				m_cPieces;
-	CUTbReference	*m_utbReference;
-	};
+	CUTbReference* m_utbReference;
+};
 
 //	Root of the search tree
 
-static CUTbReference rgutbReference [MAX_NON_KINGS + 2];
+static CUTbReference rgutbReference[MAX_NON_KINGS + 2];
 
 // Convert TB name (e.g. KQKR) into set of counters
 
-static const char *PchSetHalfCounters
-	(
-	int			*piCounters,
-	const char	*pch
-	)
-	{
-	memset (piCounters, 0, 5 * sizeof (int));
-	while ('\0' != *pch && 'k' != *pch)
-		{
+static const char* PchSetHalfCounters
+(
+	int* piCounters,
+	const char* pch
+) {
+	memset(piCounters, 0, 5 * sizeof(int));
+	while ('\0' != *pch && 'k' != *pch) {
 		piece pi;
 
 		pi = x_piecePawn;	// To make compiler happy
-		switch (*pch)
-			{
+		switch (*pch) {
 		case 'p':
 			pi = x_piecePawn;
 			break;
@@ -3277,36 +3080,34 @@ static const char *PchSetHalfCounters
 			pi = x_pieceQueen;
 			break;
 		default:
-			assert (0);
-			}
-		piCounters [pi-1] ++;
-		pch ++;
+			assert(0);
 		}
-		return pch;
-	};
+		piCounters[pi - 1]++;
+		pch++;
+	}
+	return pch;
+};
 
 static void VSetCounters
-	(
-	int			*piCounters,
-	const char	*pch
-	)
-	{
-	assert ('k' == *pch);
-	pch = PchSetHalfCounters (piCounters, pch+1);
-	assert ('k' == *pch);
-	pch = PchSetHalfCounters (piCounters+5, pch+1);
-	assert ('\0' == *pch);
-	}
+(
+	int* piCounters,
+	const char* pch
+) {
+	assert('k' == *pch);
+	pch = PchSetHalfCounters(piCounters, pch + 1);
+	assert('k' == *pch);
+	pch = PchSetHalfCounters(piCounters + 5, pch + 1);
+	assert('\0' == *pch);
+}
 
 //	Following functions return TB index
 //	They differ by input arguments
 
 int IDescFindFromCounters
-	(
-	int	*piCount
-	)
-	{
-	CUTbReference *putbr = rgutbReference;
+(
+	int* piCount
+) {
+	CUTbReference* putbr = rgutbReference;
 
 	if (piCount[0] > putbr->m_cPieces)
 		goto not_found;
@@ -3339,54 +3140,50 @@ int IDescFindFromCounters
 		return putbr[1 + piCount[9]].m_iDesc;
 not_found:
 	return 0;
-	}
+}
 
 int	IDescFind
-	(
-	square	*p_piW,	// IN | Pointer to array of white pieces (king excluded)
-	square	*p_piB,	// IN | Pointer to array of black pieces (king excluded)
+(
+	square* p_piW,	// IN | Pointer to array of white pieces (king excluded)
+	square* p_piB,	// IN | Pointer to array of black pieces (king excluded)
 	int		cWhite,	// IN | Counter of white pieces (king excluded)
 	int		cBlack	// IN | Counter of black pieces (king excluded)
-	)
-	{
+) {
 	int	rgiCount[10];
 
 	// Set pieces counters
 	rgiCount[0] =
-	rgiCount[1] =
-	rgiCount[2] =
-	rgiCount[3] =
-	rgiCount[4] =
-	rgiCount[5] =
-	rgiCount[6] =
-	rgiCount[7] =
-	rgiCount[8] =
-	rgiCount[9] = 0;
-	while (cWhite)
-		{
-		rgiCount[(*p_piW)-1] ++;
-		p_piW ++;
-		cWhite --;
-		}
-	while (cBlack)
-		{
-		rgiCount[5-1+(*p_piB)] ++;
-		p_piB ++;
-		cBlack --;
-		}
-	return IDescFindFromCounters (rgiCount);
+		rgiCount[1] =
+		rgiCount[2] =
+		rgiCount[3] =
+		rgiCount[4] =
+		rgiCount[5] =
+		rgiCount[6] =
+		rgiCount[7] =
+		rgiCount[8] =
+		rgiCount[9] = 0;
+	while (cWhite) {
+		rgiCount[(*p_piW) - 1]++;
+		p_piW++;
+		cWhite--;
 	}
+	while (cBlack) {
+		rgiCount[5 - 1 + (*p_piB)]++;
+		p_piB++;
+		cBlack--;
+	}
+	return IDescFindFromCounters(rgiCount);
+}
 
 int	IDescFindByName
-	(
-	char	*pchName
-	)
-	{
+(
+	char* pchName
+) {
 	int	rgiCount[10];
 
-	VSetCounters (rgiCount, pchName);
-	return IDescFindFromCounters (rgiCount);
-	}
+	VSetCounters(rgiCount, pchName);
+	return IDescFindFromCounters(rgiCount);
+}
 
 //-----------------------------------------------------------------------------
 //
@@ -3394,91 +3191,82 @@ int	IDescFindByName
 
 //	Set of functions to create search table
 
-static CUTbReference *PutbrCreateSubtable
-	(
+static CUTbReference* PutbrCreateSubtable
+(
 	int	cPieces,	//	IN | # of pieces ramaining on board
 	int	iDepth		//	IN | Recursion depth (# of piece classes left)
-	)
-	{
-	CUTbReference *putbr;
+) {
+	CUTbReference* putbr;
 
-	putbr = (CUTbReference *) PvMalloc ((cPieces + 2) * sizeof (CUTbReference));
+	putbr = (CUTbReference*)PvMalloc((cPieces + 2) * sizeof(CUTbReference));
 	putbr[0].m_cPieces = cPieces;
-	if (0 == iDepth)
-		{
-		for (int i = 0; i <= cPieces; i ++)
-			putbr[i+1].m_iDesc = 0;
-		}
-	else
-		{
-		for (int i = 0; i <= cPieces; i ++)
-			putbr[i+1].m_utbReference = PutbrCreateSubtable (cPieces-i, iDepth-1);
-		}
-	return putbr;
+	if (0 == iDepth) {
+		for (int i = 0; i <= cPieces; i++)
+			putbr[i + 1].m_iDesc = 0;
 	}
+	else {
+		for (int i = 0; i <= cPieces; i++)
+			putbr[i + 1].m_utbReference = PutbrCreateSubtable(cPieces - i, iDepth - 1);
+	}
+	return putbr;
+}
 
 static bool fTbTableCreated = false;
 
-static void VCreateEmptyTbTable (void)
-	{
+static void VCreateEmptyTbTable(void) {
 	if (fTbTableCreated)
 		return;
 	fTbTableCreated = true;
 	rgutbReference[0].m_cPieces = MAX_NON_KINGS;
-	for (int i = 0; i <= MAX_NON_KINGS; i ++)
-		rgutbReference[i+1].m_utbReference = PutbrCreateSubtable (MAX_NON_KINGS - i, 8);
-	}
+	for (int i = 0; i <= MAX_NON_KINGS; i++)
+		rgutbReference[i + 1].m_utbReference = PutbrCreateSubtable(MAX_NON_KINGS - i, 8);
+}
 
 // Insert TB (e.g. KQKR) into search table
 
 static bool FRegisterHalf
-	(
+(
 	int		iTb,
-	int		*piCount
-	)
-	{
-	CUTbReference	*putbr;
+	int* piCount
+) {
+	CUTbReference* putbr;
 
 	putbr = rgutbReference;
-	for (int i = 0; i < 9; i ++)
-		{
+	for (int i = 0; i < 9; i++) {
 		if (piCount[i] > putbr->m_cPieces)
 			return false;
 		putbr = putbr[1 + piCount[i]].m_utbReference;
-		}
+	}
 	if (piCount[9] > putbr->m_cPieces)
 		return false;
 	putbr[1 + piCount[9]].m_iDesc = iTb;
 	return true;
-	}
+}
 
 // Insert TB (both, e.g. KQKR and KRKQ) into search table
 
 static bool FRegisterTb
-	(
-	CTbDesc	*ptbDesc
-	)
-	{
+(
+	CTbDesc* ptbDesc
+) {
 	int		rgiCount[10];
 	bool	fInserted;
 
-	VSetCounters (rgiCount, ptbDesc->m_rgchName);
-	fInserted = FRegisterHalf (ptbDesc->m_iTbId, rgiCount);
-	if (fInserted)
-		{
-		for (int i = 0; i < 5; i ++)
-			{
+	VSetCounters(rgiCount, ptbDesc->m_rgchName);
+	fInserted = FRegisterHalf(ptbDesc->m_iTbId, rgiCount);
+	if (fInserted) {
+		for (int i = 0; i < 5; i++) {
 			int	iTemp;
-			
+
 			iTemp = rgiCount[i];
-			rgiCount[i] = rgiCount[i+5];
-			rgiCount[i+5] = iTemp;
-			}
-		fInserted = FRegisterHalf (-ptbDesc->m_iTbId, rgiCount);
-		assert (fInserted);
+			rgiCount[i] = rgiCount[i + 5];
+			rgiCount[i + 5] = iTemp;
 		}
-	return fInserted;
+		fInserted = FRegisterHalf(-ptbDesc->m_iTbId, rgiCount);
+		assert(fInserted);
 	}
+	return fInserted;
+}
 
 // File mapping - Win32 code only
 
@@ -3486,65 +3274,59 @@ static bool FRegisterTb
 
 #include <windows.h>
 
-static BYTE * PbMapFileForRead
-	(
-	char	*szName,
-	HANDLE	*phFile,
-	HANDLE	*phFileMapping
-	)
-	{
+static BYTE* PbMapFileForRead
+(
+	char* szName,
+	HANDLE* phFile,
+	HANDLE* phFileMapping
+) {
 	HANDLE	hFile;
 	HANDLE	hFileMapping;
 	LPVOID	lpFileBase;
 
-	hFile = CreateFile (szName, GENERIC_READ, FILE_SHARE_READ,
-						NULL, OPEN_EXISTING,
-						FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS, NULL);
-	if (INVALID_HANDLE_VALUE == hFile)
-		{
+	hFile = CreateFile(szName, GENERIC_READ, FILE_SHARE_READ,
+		NULL, OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS, NULL);
+	if (INVALID_HANDLE_VALUE == hFile) {
 		printf("*** Couldn't open file %s with CreateFile()\n", szName);
-		exit (1);
-		}
-	hFileMapping = CreateFileMapping (hFile, NULL, PAGE_READONLY, 0, 0, NULL);
-	if (0 == hFileMapping)
-		{
-		CloseHandle (hFile);
-		printf ("*** Couldn't open file %s mapping with CreateFileMapping()\n", szName);
-		exit (1);
-		}
-	lpFileBase = MapViewOfFile (hFileMapping, FILE_MAP_READ, 0, 0, 0);
-	if (0 == lpFileBase)
-		{
-		CloseHandle (hFileMapping);
-		CloseHandle (hFile);
-		printf ("*** Couldn't map view of file %s with MapViewOfFile()\n", szName);
-		exit (1);
-		}
+		exit(1);
+	}
+	hFileMapping = CreateFileMapping(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
+	if (0 == hFileMapping) {
+		CloseHandle(hFile);
+		printf("*** Couldn't open file %s mapping with CreateFileMapping()\n", szName);
+		exit(1);
+	}
+	lpFileBase = MapViewOfFile(hFileMapping, FILE_MAP_READ, 0, 0, 0);
+	if (0 == lpFileBase) {
+		CloseHandle(hFileMapping);
+		CloseHandle(hFile);
+		printf("*** Couldn't map view of file %s with MapViewOfFile()\n", szName);
+		exit(1);
+	}
 	if (NULL != phFile)
 		*phFile = hFile;
 	if (NULL != phFileMapping)
 		*phFileMapping = hFileMapping;
-	return (BYTE*) lpFileBase;
-	}
+	return (BYTE*)lpFileBase;
+}
 
 static void	VUnmapFile
-	(
-	BYTE	*pbFileBase,
+(
+	BYTE* pbFileBase,
 	HANDLE	hFile,
 	HANDLE	hFileMapping
-	)
-	{
+) {
 	BOOL fFailed;
 
-	fFailed = (0 == UnmapViewOfFile (pbFileBase)) |
-			  (0 == CloseHandle (hFileMapping)) |
-			  (0 == CloseHandle (hFile));
-	if (fFailed) 
-		{
-		printf ("*** Couldn't unmap file\n");
-		exit (1);
-		}
+	fFailed = (0 == UnmapViewOfFile(pbFileBase)) |
+		(0 == CloseHandle(hFileMapping)) |
+		(0 == CloseHandle(hFile));
+	if (fFailed) {
+		printf("*** Couldn't unmap file\n");
+		exit(1);
 	}
+}
 
 #endif
 
@@ -3560,317 +3342,291 @@ static void	VUnmapFile
 #define	TB_DIRECTORY_ENTRY(index)	(((index) >> LOG2_TB_CB_CACHE_CHUNK) % TB_DIRECTORY_SIZE)
 
 struct CTbCache			//Hungarian: tbc
-	{
+{
 	volatile	int			m_iTb;
 	volatile	color		m_color;
-				INDEX		m_indStart;
-	volatile	CTbCache	*m_ptbcNext;	// Next element in double-linked general LRU list
-	volatile	CTbCache	*m_ptbcPrev;	// Previous element in double-linked general LRU list
-	volatile	CTbCache	*m_ptbcTbNext;	// Next element in double-linked cache bucket LRU list
-	volatile	CTbCache	*m_ptbcTbPrev;	// Previous element in double-linked cache bucket LRU list
-				BYTE		*m_pbData;
-	};
+	INDEX		m_indStart;
+	volatile	CTbCache* m_ptbcNext;	// Next element in double-linked general LRU list
+	volatile	CTbCache* m_ptbcPrev;	// Previous element in double-linked general LRU list
+	volatile	CTbCache* m_ptbcTbNext;	// Next element in double-linked cache bucket LRU list
+	volatile	CTbCache* m_ptbcTbPrev;	// Previous element in double-linked cache bucket LRU list
+	BYTE* m_pbData;
+};
 
-static CTbCache	*ptbcTbCache;	// Cache memory
+static CTbCache* ptbcTbCache;	// Cache memory
 static ULONG	ctbcTbCache;	// Cache size (in entries)
 
-static volatile CTbCache	*ptbcHead;		// Head of that list
-static volatile CTbCache	*ptbcTail;		// Last element in that list
-static volatile CTbCache	*ptbcFree;		// First free cache header
+static volatile CTbCache* ptbcHead;		// Head of that list
+static volatile CTbCache* ptbcTail;		// Last element in that list
+static volatile CTbCache* ptbcFree;		// First free cache header
 
 static INLINE void VTbCloseFile
-	(
+(
 	int		iTb,
 	color	side
-	)
-	{
-	if (NULL != rgtbdDesc[iTb].m_rgfpFiles[side])
-		{
-		Lock (rgtbdDesc[iTb].m_rglockFiles[side]);
-		fclose (rgtbdDesc[iTb].m_rgfpFiles[side]);
+) {
+	if (NULL != rgtbdDesc[iTb].m_rgfpFiles[side]) {
+		Lock(rgtbdDesc[iTb].m_rglockFiles[side]);
+		fclose(rgtbdDesc[iTb].m_rgfpFiles[side]);
 		rgtbdDesc[iTb].m_rgfpFiles[side] = NULL;
-		UnLock (rgtbdDesc[iTb].m_rglockFiles[side]);
-		}
+		UnLock(rgtbdDesc[iTb].m_rglockFiles[side]);
 	}
+}
 
-void VTbCloseFiles (void)
-	{
+void VTbCloseFiles(void) {
 	// Initialized?
 	if (0 == ctbcTbCache)
 		return;
 
 	// Walk through TB cache and close all opened files
-	for (int iTb = 1; iTb < cTb; iTb ++)
-		{
-		VTbCloseFile (iTb, x_colorWhite);
-		VTbCloseFile (iTb, x_colorBlack);
-		}
+	for (int iTb = 1; iTb < cTb; iTb++) {
+		VTbCloseFile(iTb, x_colorWhite);
+		VTbCloseFile(iTb, x_colorBlack);
 	}
+}
 
-void VTbClearCache (void)
-	{
-	CTbCache *ptbc;
-	BYTE *pb;
+void VTbClearCache(void) {
+	CTbCache* ptbc;
+	BYTE* pb;
 	ULONG i;
 
 	// Initialized?
 	if (0 == ctbcTbCache)
 		return;
 	VTbCloseFiles();
-	
+
 	// Initialize all lists
-	pb = (BYTE *) & ptbcTbCache [ctbcTbCache];
-	for (i = 0, ptbc = ptbcTbCache; i < ctbcTbCache; i ++, ptbc ++)
-		{
-		ptbc->m_pbData = pb + i*TB_CB_CACHE_CHUNK;
+	pb = (BYTE*)&ptbcTbCache[ctbcTbCache];
+	for (i = 0, ptbc = ptbcTbCache; i < ctbcTbCache; i++, ptbc++) {
+		ptbc->m_pbData = pb + i * TB_CB_CACHE_CHUNK;
 		ptbc->m_ptbcTbPrev =
-		ptbc->m_ptbcTbNext =
-		ptbc->m_ptbcPrev = NULL;
+			ptbc->m_ptbcTbNext =
+			ptbc->m_ptbcPrev = NULL;
 		ptbc->m_ptbcNext = (ptbc + 1);
-		}
+	}
 	ptbc[-1].m_ptbcNext = NULL;
 
 	// Clear references from TBs
-	for (int iTb = 1; iTb < cTb; iTb ++)
-		{
+	for (int iTb = 1; iTb < cTb; iTb++) {
 		if (NULL != rgtbdDesc[iTb].m_prgtbcbBuckets[x_colorWhite])
-			memset (rgtbdDesc[iTb].m_prgtbcbBuckets[x_colorWhite], 0,
-					TB_DIRECTORY_SIZE * sizeof (CTbCacheBucket));
+			memset(rgtbdDesc[iTb].m_prgtbcbBuckets[x_colorWhite], 0,
+				TB_DIRECTORY_SIZE * sizeof(CTbCacheBucket));
 		if (NULL != rgtbdDesc[iTb].m_prgtbcbBuckets[x_colorBlack])
-			memset (rgtbdDesc[iTb].m_prgtbcbBuckets[x_colorBlack], 0,
-					TB_DIRECTORY_SIZE * sizeof (CTbCacheBucket));
-		}
+			memset(rgtbdDesc[iTb].m_prgtbcbBuckets[x_colorBlack], 0,
+				TB_DIRECTORY_SIZE * sizeof(CTbCacheBucket));
+	}
 
 	// Set globals
 	ptbcHead = ptbcTail = NULL;
 	ptbcFree = ptbcTbCache;
-	}
+}
 
 int FTbSetCacheSize
-	(
-	void	*pv,
+(
+	void* pv,
 	ULONG	cbSize
-	)
-	{
+) {
 	VTbCloseFiles();
 	ctbcTbCache = 0;
 	ptbcHead = NULL;
-	if (cbSize < sizeof (CTbCache))
+	if (cbSize < sizeof(CTbCache))
 		return false;
-	ptbcTbCache = (CTbCache*) pv;
-	ctbcTbCache = cbSize / (sizeof (CTbCache) + TB_CB_CACHE_CHUNK);
+	ptbcTbCache = (CTbCache*)pv;
+	ctbcTbCache = cbSize / (sizeof(CTbCache) + TB_CB_CACHE_CHUNK);
 	VTbClearCache();
 	return true;
-	}
+}
 
 // Table registered
 
 #define	FRegistered(iTb, side)	(NULL != rgtbdDesc[iTb].m_rgpchFileName[side])
 int FRegisteredFun
-	(
+(
 	int		iTb,
 	color	side
-	)
-	{
-	return FRegistered (iTb, side);
-	}
+) {
+	return FRegistered(iTb, side);
+}
 
 // Return function that calculates the necessary index:
 
 #define PfnIndCalc(iTb, side)	(rgtbdDesc[iTb].m_rgpfnCalcIndex[side])
 PfnCalcIndex PfnIndCalcFun
-	(
+(
 	int iTb,
 	int	side
-	)
-	{
-	return PfnIndCalc (iTb, side);
-	}
+) {
+	return PfnIndCalc(iTb, side);
+}
 
 // Read whole file into memory
 
 int FReadTableToMemory
-	(
+(
 	int		iTb,	// IN | Tablebase
 	color	side,	// IN | Side to move
-	BYTE	*pb		// IN | Either buffer or NULL
-	)
-	{
-	char	*pszName;
+	BYTE* pb		// IN | Either buffer or NULL
+) {
+	char* pszName;
 	INDEX	cb;
-	FILE	*fp;
+	FILE* fp;
 
-	if (!FRegistered (iTb, side))
+	if (!FRegistered(iTb, side))
 		return false;
 	pszName = rgtbdDesc[iTb].m_rgpchFileName[side];
-	fp = fopen (pszName, "rb");
+	fp = fopen(pszName, "rb");
 	if (NULL == fp)
 		return false;
 
 	// Find database size
 #if defined (NEW)
 	cb = rgtbdDesc[iTb].m_rgcbLength[side];
-	if (0 != cb)
-		{
+	if (0 != cb) {
 #endif
-		if (0 != fseek (fp, 0L, SEEK_END))
-			{
-			printf ("*** Seek in %s failed\n", pszName);
-			exit (1);
-			}
-		cb = ftell (fp);
-		if (-1 == cb)
-			{
-			printf ("*** Cannot find length of %s\n", pszName);
-			exit (1);
-			}
-		if (0 != fseek (fp, 0L, SEEK_SET))
-			{
-			printf ("*** Seek in %s failed\n", pszName);
-			exit (1);
-			}
-#if defined (NEW)
+		if (0 != fseek(fp, 0L, SEEK_END)) {
+			printf("*** Seek in %s failed\n", pszName);
+			exit(1);
 		}
+		cb = ftell(fp);
+		if (-1 == cb) {
+			printf("*** Cannot find length of %s\n", pszName);
+			exit(1);
+		}
+		if (0 != fseek(fp, 0L, SEEK_SET)) {
+			printf("*** Seek in %s failed\n", pszName);
+			exit(1);
+		}
+#if defined (NEW)
+	}
 #endif
-	
+
 	// If buffer not specified, allocate memory for it
 	if (NULL == pb)
-		pb = (BYTE*) PvMalloc (cb);
+		pb = (BYTE*)PvMalloc(cb);
 
 	// Read file into memory
-	if (cb != (INDEX) fread (pb, 1, cb, fp))
-		{
-		printf ("*** Read from %s failed\n", pszName);
-		exit (1);
-		}
-	fclose (fp);
+	if (cb != (INDEX)fread(pb, 1, cb, fp)) {
+		printf("*** Read from %s failed\n", pszName);
+		exit(1);
+	}
+	fclose(fp);
 
 	// All done
 	rgtbdDesc[iTb].m_rgpbRead[side] = pb;
 	return true;
-	}
+}
 
 #if defined (_WIN32)
 
 // Map whole file into memory
 
 int FMapTableToMemory
-	(
+(
 	int		iTb,	// IN | Tablebase
 	color	side	// IN | Side to move
-	)
-	{
-	char *pszName;
+) {
+	char* pszName;
 
-	if (!FRegistered (iTb, side))
+	if (!FRegistered(iTb, side))
 		return false;
 	pszName = rgtbdDesc[iTb].m_rgpchFileName[side];
-	if (NULL == rgtbdDesc[iTb].m_rgpbRead[side])
-		{
-		rgtbdDesc[iTb].m_rgpbRead[side] = PbMapFileForRead (pszName, NULL, NULL);
+	if (NULL == rgtbdDesc[iTb].m_rgpbRead[side]) {
+		rgtbdDesc[iTb].m_rgpbRead[side] = PbMapFileForRead(pszName, NULL, NULL);
 		if (fVerbose)
-			printf ("%s mapped\n", pszName);
-		}
-	return true;
+			printf("%s mapped\n", pszName);
 	}
+	return true;
+}
 
 // Map whole file into memory
 
 int FMapTableToMemory
-	(
+(
 	int		iTb,			// IN  | Tablebase
 	color	side,			// IN  | Side to move
-	HANDLE	*phFile,		// OUT | File handle will be written here
-	HANDLE	*phFileMapping	// OUT | File mapping handle will be written here
-	)
-	{
-	char *pszName;
+	HANDLE* phFile,		// OUT | File handle will be written here
+	HANDLE* phFileMapping	// OUT | File mapping handle will be written here
+) {
+	char* pszName;
 
-	if (!FRegistered (iTb, side))
+	if (!FRegistered(iTb, side))
 		return false;
 	pszName = rgtbdDesc[iTb].m_rgpchFileName[side];
-	if (NULL == rgtbdDesc[iTb].m_rgpbRead[side])
-		{
-		rgtbdDesc[iTb].m_rgpbRead[side] = PbMapFileForRead (pszName, phFile, phFileMapping);
+	if (NULL == rgtbdDesc[iTb].m_rgpbRead[side]) {
+		rgtbdDesc[iTb].m_rgpbRead[side] = PbMapFileForRead(pszName, phFile, phFileMapping);
 		if (fVerbose)
-			printf ("%s mapped\n", pszName);
-		}
-	return true;
+			printf("%s mapped\n", pszName);
 	}
+	return true;
+}
 
 // Unmap whole file from memory
 
 int FUnMapTableFromMemory
-	(
+(
 	int		iTb,			// IN | Tablebase
 	color	side,			// IN | Side to move
 	HANDLE	hFile,			// IN | File handle will be written here
 	HANDLE	hFileMapping	// IN | File mapping handle will be written here
-	)
-	{
-	char *pszName;
+) {
+	char* pszName;
 
-	if (!FRegistered (iTb, side))
+	if (!FRegistered(iTb, side))
 		return false;
 	pszName = rgtbdDesc[iTb].m_rgpchFileName[side];
-	if (NULL != rgtbdDesc[iTb].m_rgpbRead[side])
-		{
-		VUnmapFile (rgtbdDesc[iTb].m_rgpbRead[side], hFile, hFileMapping);
+	if (NULL != rgtbdDesc[iTb].m_rgpbRead[side]) {
+		VUnmapFile(rgtbdDesc[iTb].m_rgpbRead[side], hFile, hFileMapping);
 		rgtbdDesc[iTb].m_rgpbRead[side] = NULL;
 		if (fVerbose)
-			printf ("%s unmapped\n", pszName);
-		}
-	return true;
+			printf("%s unmapped\n", pszName);
 	}
+	return true;
+}
 
 #endif
 
 // Probe TB
 
 int TbtProbeTable
-	(
+(
 	int		iTb,
 	int	side,
 	unsigned long	indOffset
-	)
-	{
-	CTbDesc	*ptbd;
+) {
+	CTbDesc* ptbd;
 	int		iDirectory;
-	volatile CTbCache	*ptbc;
-	volatile CTbCache	*ptbcTbFirst;
+	volatile CTbCache* ptbc;
+	volatile CTbCache* ptbcTbFirst;
 
-	assert (iTb > 0 && iTb < cTb);
-	ptbd = & rgtbdDesc[iTb];
+	assert(iTb > 0 && iTb < cTb);
+	ptbd = &rgtbdDesc[iTb];
 
 #if defined (NEW)
 	// If we know TB size, it's better for offset be smaller
-	assert (!FRegistered (iTb, side) || indOffset < ptbd->m_rgcbLength[side]);
+	assert(!FRegistered(iTb, side) || indOffset < ptbd->m_rgcbLength[side]);
 #endif
 
 	// Entire file read/mapped to memory?
 	if (NULL != ptbd->m_rgpbRead[side])
-		return (tb_t) ptbd->m_rgpbRead[side][indOffset];
+		return (tb_t)ptbd->m_rgpbRead[side][indOffset];
 
 	// Cache initialized? TB registered?
 	if (0 == ctbcTbCache || NULL == ptbd->m_prgtbcbBuckets[side])
 		return bev_broken;
 
 	// Calculate cache bucket
-	iDirectory = TB_DIRECTORY_ENTRY (indOffset);
+	iDirectory = TB_DIRECTORY_ENTRY(indOffset);
 
 	// Head of the cache bucket LRU list
-	Lock (ptbd->m_prgtbcbBuckets[side][iDirectory].m_lock);
+	Lock(ptbd->m_prgtbcbBuckets[side][iDirectory].m_lock);
 	ptbcTbFirst = ptbd->m_prgtbcbBuckets[side][iDirectory].m_ptbcFirst;
 
 	// First, search entry in the cache
-	for (ptbc = ptbcTbFirst; NULL != ptbc; ptbc = ptbc->m_ptbcTbNext)
-		{
-		if ((indOffset >= ptbc->m_indStart) && (indOffset < ptbc->m_indStart + TB_CB_CACHE_CHUNK))
-			{
+	for (ptbc = ptbcTbFirst; NULL != ptbc; ptbc = ptbc->m_ptbcTbNext) {
+		if ((indOffset >= ptbc->m_indStart) && (indOffset < ptbc->m_indStart + TB_CB_CACHE_CHUNK)) {
 			// Found - move cache entry to the head of the general LRU list
-			Lock (lockLRU);
-			if (ptbc != ptbcHead)
-				{
+			Lock(lockLRU);
+			if (ptbc != ptbcHead) {
 				// Remove it from its current position
 				ptbc->m_ptbcPrev->m_ptbcNext = ptbc->m_ptbcNext;
 				if (NULL == ptbc->m_ptbcNext)
@@ -3882,11 +3638,10 @@ int TbtProbeTable
 				ptbc->m_ptbcNext = ptbcHead;
 				ptbcHead->m_ptbcPrev = ptbc;
 				ptbcHead = ptbc;
-				}
-			UnLock (lockLRU);
+			}
+			UnLock(lockLRU);
 			// Move cache entry to the head of the cache bucket LRU list
-			if (ptbc != ptbcTbFirst)
-				{
+			if (ptbc != ptbcTbFirst) {
 				// Remove it from list
 				ptbc->m_ptbcTbPrev->m_ptbcTbNext = ptbc->m_ptbcTbNext;
 				if (NULL != ptbc->m_ptbcTbNext)
@@ -3896,14 +3651,14 @@ int TbtProbeTable
 				ptbc->m_ptbcTbNext = ptbcTbFirst;
 				ptbcTbFirst->m_ptbcTbPrev = ptbc;
 				ptbd->m_prgtbcbBuckets[side][iDirectory].m_ptbcFirst = ptbc;
-				}
+			}
 			int	tb;
 
-			tb = (tb_t) (ptbc->m_pbData[(ULONG)(indOffset-ptbc->m_indStart)]);
-			UnLock (ptbd->m_prgtbcbBuckets[side][iDirectory].m_lock);
+			tb = (tb_t)(ptbc->m_pbData[(ULONG)(indOffset - ptbc->m_indStart)]);
+			UnLock(ptbd->m_prgtbcbBuckets[side][iDirectory].m_lock);
 			return tb;
-			}
 		}
+	}
 	// Not in the cache - have to read it from disk.
 	// I decided to write simple code - so sometimes it's possible that
 	// 2 threads will simultaneously read exactly the same chunk into 2
@@ -3912,38 +3667,35 @@ int TbtProbeTable
 	// the end of general LRU list and will be reused.
 
 	// Unlock cache bucket, so other threads can continue execution
-	UnLock (ptbd->m_prgtbcbBuckets[side][iDirectory].m_lock);
+	UnLock(ptbd->m_prgtbcbBuckets[side][iDirectory].m_lock);
 	// First, find cache entry we can use
-	Lock (lockLRU);
+	Lock(lockLRU);
 	// Get it either from a free list, or reuse last element of the LRU list
-	if (NULL != ptbcFree)
-		{
+	if (NULL != ptbcFree) {
 		ptbc = ptbcFree;
 		ptbcFree = ptbc->m_ptbcNext;
-		UnLock (lockLRU);
-		}
-	else
-		{
+		UnLock(lockLRU);
+	}
+	else {
 		int		iTailDirectory;
 		int		iTailTb;
 		color	colorTail;
 
-		assert (NULL != ptbcTail);
+		assert(NULL != ptbcTail);
 #if defined (SMP)
 		// "Optimistic" model - assuming that there is low content
 		// (not hundreds of threads)
-		for (;;)
-			{
+		for (;;) {
 			ptbc = ptbcTail;
 			iTailTb = ptbc->m_iTb;
-			iTailDirectory = TB_DIRECTORY_ENTRY (ptbc->m_indStart);
+			iTailDirectory = TB_DIRECTORY_ENTRY(ptbc->m_indStart);
 			colorTail = ptbc->m_color;
 			// To avoid deadlocks, have to first acquire cache bucket's lock,
 			// and only then general LRU lock. So, free general LRU lock and
 			// acquire 2 locks in a proper order.
-			UnLock (lockLRU);
-			Lock (rgtbdDesc[iTailTb].m_prgtbcbBuckets[colorTail][iTailDirectory].m_lock);
-			Lock (lockLRU);
+			UnLock(lockLRU);
+			Lock(rgtbdDesc[iTailTb].m_prgtbcbBuckets[colorTail][iTailDirectory].m_lock);
+			Lock(lockLRU);
 			// Have structures been modified while we re-acquired locks? 
 			// (to be more precise, it's Ok, if structures were modified,
 			// but cache entry again become the last element of the list,
@@ -3951,15 +3703,15 @@ int TbtProbeTable
 			// proper locks).
 			if (ptbc == ptbcTail && ptbc->m_iTb == iTailTb &&
 				ptbc->m_color == colorTail &&
-				TB_DIRECTORY_ENTRY (ptbc->m_indStart) == iTailDirectory)
+				TB_DIRECTORY_ENTRY(ptbc->m_indStart) == iTailDirectory)
 				break;
 			// Sorry - try once again...
-			UnLock (rgtbdDesc[iTailTb].m_prgtbcbBuckets[colorTail][iTailDirectory].m_lock);
-			}
+			UnLock(rgtbdDesc[iTailTb].m_prgtbcbBuckets[colorTail][iTailDirectory].m_lock);
+		}
 #else
 		ptbc = ptbcTail;
 		iTailTb = ptbc->m_iTb;
-		iTailDirectory = TB_DIRECTORY_ENTRY (ptbc->m_indStart);
+		iTailDirectory = TB_DIRECTORY_ENTRY(ptbc->m_indStart);
 		colorTail = ptbc->m_color;
 #endif
 
@@ -3969,8 +3721,8 @@ int TbtProbeTable
 			ptbcHead = NULL;
 		else
 			ptbcTail->m_ptbcNext = NULL;
-		UnLock (lockLRU);
-		
+		UnLock(lockLRU);
+
 		// Remove it from cache bucket list
 		if (NULL != ptbc->m_ptbcTbNext)
 			ptbc->m_ptbcTbNext->m_ptbcTbPrev = ptbc->m_ptbcTbPrev;
@@ -3978,33 +3730,31 @@ int TbtProbeTable
 			rgtbdDesc[iTailTb].m_prgtbcbBuckets[colorTail][iTailDirectory].m_ptbcFirst = ptbc->m_ptbcTbNext;
 		else
 			ptbc->m_ptbcTbPrev->m_ptbcTbNext = ptbc->m_ptbcTbNext;
-		UnLock (rgtbdDesc[iTailTb].m_prgtbcbBuckets[colorTail][iTailDirectory].m_lock);
-		}
+		UnLock(rgtbdDesc[iTailTb].m_prgtbcbBuckets[colorTail][iTailDirectory].m_lock);
+	}
 
 	// Ok, now we have "orphan" cache entry - it's excluded from all lists,
 	// so other threads will never touch it.
 	ptbc->m_iTb = iTb;
 	ptbc->m_color = side;
-	ptbc->m_indStart = indOffset / (INDEX) (TB_CB_CACHE_CHUNK) * TB_CB_CACHE_CHUNK;
+	ptbc->m_indStart = indOffset / (INDEX)(TB_CB_CACHE_CHUNK)*TB_CB_CACHE_CHUNK;
 
 	// Now read it from the disk
-	FILE	*fp;
+	FILE* fp;
 	size_t	cb;
 
 	// First, check: is necessary file opened?
 	// As files are not thread-safe, lock file
-	Lock (ptbd->m_rglockFiles[side]);
+	Lock(ptbd->m_rglockFiles[side]);
 	fp = ptbd->m_rgfpFiles[side];
-	if (NULL == fp)
-		{
+	if (NULL == fp) {
 		// Not - try to open it
-		fp = fopen (ptbd->m_rgpchFileName[side], "rb");
-		if (NULL == fp)
-			{
+		fp = fopen(ptbd->m_rgpchFileName[side], "rb");
+		if (NULL == fp) {
 			// Failed. Close all the opened files and retry
-			UnLock (ptbd->m_rglockFiles[side]);
-			VTbCloseFiles ();
-			Lock (ptbd->m_rglockFiles[side]);
+			UnLock(ptbd->m_rglockFiles[side]);
+			VTbCloseFiles();
+			Lock(ptbd->m_rglockFiles[side]);
 			// Theoretically, it's possible that other threads opened a lot of
 			// files in the interval between VTbCloseFiles() and Lock(). If
 			// so, we'll fail - I don't like to have one more global lock
@@ -4013,28 +3763,27 @@ int TbtProbeTable
 			// simultaneously open files and high number of threads - unlikely
 			// combination.
 			fp = ptbd->m_rgfpFiles[side];
-			if (NULL == fp)
-				{
-				fp = fopen (ptbd->m_rgpchFileName[side], "rb");
+			if (NULL == fp) {
+				fp = fopen(ptbd->m_rgpchFileName[side], "rb");
 				if (NULL == fp)
 					goto ERROR_LABEL;
-				}
 			}
 		}
+	}
 
 	// File opened. Now seek and read necessary chunk
-	if (fseek (fp, (long) ptbc->m_indStart, SEEK_SET))
+	if (fseek(fp, (long)ptbc->m_indStart, SEEK_SET))
 		goto ERROR_LABEL;
-	cb = fread (ptbc->m_pbData, 1, TB_CB_CACHE_CHUNK, fp);
-	if (cb != TB_CB_CACHE_CHUNK && ferror (fp))
+	cb = fread(ptbc->m_pbData, 1, TB_CB_CACHE_CHUNK, fp);
+	if (cb != TB_CB_CACHE_CHUNK && ferror(fp))
 		goto ERROR_LABEL;
-	assert (cb > (indOffset-ptbc->m_indStart));
+	assert(cb > (indOffset - ptbc->m_indStart));
 	ptbd->m_rgfpFiles[side] = fp;
-	UnLock (ptbd->m_rglockFiles[side]);
+	UnLock(ptbd->m_rglockFiles[side]);
 
 	// Read - now acquire locks and insert cache entry in both lists
-	Lock (ptbd->m_prgtbcbBuckets[side][iDirectory].m_lock);
-	Lock (lockLRU);
+	Lock(ptbd->m_prgtbcbBuckets[side][iDirectory].m_lock);
+	Lock(lockLRU);
 
 	// Insert cache entry into general LRU list
 	ptbc->m_ptbcPrev = NULL;
@@ -4055,214 +3804,196 @@ int TbtProbeTable
 	// All done
 	int tb;
 
-	tb = (tb_t) (ptbc->m_pbData[(ULONG)(indOffset-ptbc->m_indStart)]);
+	tb = (tb_t)(ptbc->m_pbData[(ULONG)(indOffset - ptbc->m_indStart)]);
 	// Release locks
-	UnLock (ptbd->m_prgtbcbBuckets[side][iDirectory].m_lock);
-	UnLock (lockLRU);
+	UnLock(ptbd->m_prgtbcbBuckets[side][iDirectory].m_lock);
+	UnLock(lockLRU);
 	return tb;
 
 	// I/O error. Here I don't want to halt the program, because that can
 	// happen in the middle of the important game. Just return failure.
 ERROR_LABEL:
-	UnLock (ptbd->m_rglockFiles[side]);
-	Lock (lockLRU);
+	UnLock(ptbd->m_rglockFiles[side]);
+	Lock(lockLRU);
 	ptbd->m_rgpchFileName[side] = NULL;
 	ptbc->m_ptbcNext = ptbcFree;
 	ptbcFree = ptbc;
-	UnLock (lockLRU);
+	UnLock(lockLRU);
 	return bev_broken;
-	}
+}
 
 // 16-bit version (recommended)
 
 extern "C" int TB_FASTCALL L_TbtProbeTable
-	(
+(
 	int		iTb,
 	color	side,
 	INDEX	indOffset
-	)
-	{
+) {
 	int	tbtScore;
 
 #if !defined (KPPKP_16BIT)
 	if (tbid_kppkp == iTb && x_colorBlack == side &&
 		(indOffset == 0x0362BC7C || indOffset == 0x0362DE44 || indOffset == 0x03637648 ||
-		 indOffset == 0x03639810 || indOffset == 0x038D4F29 || indOffset == 0x040A2CAB ||
-		 indOffset == 0x043C778C))
+			indOffset == 0x03639810 || indOffset == 0x038D4F29 || indOffset == 0x040A2CAB ||
+			indOffset == 0x043C778C))
 		return -32639;
-	tbtScore = TbtProbeTable (iTb, side, indOffset);
-	tbtScore = S_to_L (tbtScore);
+	tbtScore = TbtProbeTable(iTb, side, indOffset);
+	tbtScore = S_to_L(tbtScore);
 #else
-	if (tbid_kppkp != iTb)
-		{
+	if (tbid_kppkp != iTb) {
 		// All tables but kppkp are 8-bit tables
-		tbtScore = TbtProbeTable (iTb, side, indOffset);
-		tbtScore = S_to_L (tbtScore);
-		}
-	else
-		{
+		tbtScore = TbtProbeTable(iTb, side, indOffset);
+		tbtScore = S_to_L(tbtScore);
+	}
+	else {
 		// Special handling of kppkp - it's 16-bit table
 		// Inefficient, but very simple, code
 		int	iLo;
 		int	iHi;
-		
+
 		indOffset *= 2;
-		iLo = TbtProbeTable (iTb, side, indOffset);
-		iHi = TbtProbeTable (iTb, side, indOffset+1);
+		iLo = TbtProbeTable(iTb, side, indOffset);
+		iHi = TbtProbeTable(iTb, side, indOffset + 1);
 		tbtScore = (bev_broken == iHi) ? L_bev_broken : (iHi << 8) + (iLo & 0xFF);
-		}
+	}
 #endif
 	return tbtScore;
-	}
+}
 
 //-----------------------------------------------------------------------------
 //
 //	Global initialization
 
 int FCheckExistance
-	(
-	char	*pszPath,
+(
+	char* pszPath,
 	int		iTb,
 	color	side
-	)
-	{
-	FILE			*fp;
-	char			*pchCopy;
-	const char			*pchExt = PchExt (side);
+) {
+	FILE* fp;
+	char* pchCopy;
+	const char* pchExt = PchExt(side);
 	char			rgchTbName[256];
-	CTbCacheBucket	*prgtbcbBuckets;
+	CTbCacheBucket* prgtbcbBuckets;
 	INDEX			cb;
 
-	if (FRegistered (iTb, side) || NULL != rgtbdDesc[iTb].m_rgpbRead[side])
+	if (FRegistered(iTb, side) || NULL != rgtbdDesc[iTb].m_rgpbRead[side])
 		return true;
 
-	strcpy (rgchTbName, pszPath);
-	if (0 != pszPath[0])
-		{
+	strcpy(rgchTbName, pszPath);
+	if (0 != pszPath[0]) {
 #if defined (_WIN32)
-		strcat (rgchTbName, "\\");
+		strcat(rgchTbName, "\\");
 #else	// UNDONE: What do with MAC?
-		strcat (rgchTbName, "/");
+		strcat(rgchTbName, "/");
 #endif
-		}
-	strcat (rgchTbName, rgtbdDesc[iTb].m_rgchName);
-	strcat (rgchTbName, pchExt);
-	fp = fopen (rgchTbName, "rb");
+	}
+	strcat(rgchTbName, rgtbdDesc[iTb].m_rgchName);
+	strcat(rgchTbName, pchExt);
+	fp = fopen(rgchTbName, "rb");
 #if !defined (NEW) && !defined (_WIN32)
 	// For case-sensitive systems, have to try once more
-	if (NULL == fp)
-		{
-		for (int i = strchr(rgchTbName,'.')-rgchTbName-1; i>=0 && isalpha(rgchTbName[i]); i--)
-			rgchTbName[i] = toupper (rgchTbName[i]);
-		fp = fopen (rgchTbName, "rb");
-		}
+	if (NULL == fp) {
+		for (int i = strchr(rgchTbName, '.') - rgchTbName - 1; i >= 0 && isalpha(rgchTbName[i]); i--)
+			rgchTbName[i] = toupper(rgchTbName[i]);
+		fp = fopen(rgchTbName, "rb");
+	}
 #endif
 	if (NULL == fp)
 		return false;
-	if (0 != fseek (fp, 0L, SEEK_END))
-		{
-		printf ("*** Seek in %s failed\n", rgchTbName);
-		exit (1);
-		}
-	cb = (INDEX) ftell (fp);
+	if (0 != fseek(fp, 0L, SEEK_END)) {
+		printf("*** Seek in %s failed\n", rgchTbName);
+		exit(1);
+	}
+	cb = (INDEX)ftell(fp);
 #if defined (NEW)
-	if (0 != rgtbdDesc[iTb].m_rgcbLength[side] && cb != rgtbdDesc[iTb].m_rgcbLength[side])
-		{
-		printf ("*** %s corrupted\n", rgchTbName);
-		exit (1);
-		}
+	if (0 != rgtbdDesc[iTb].m_rgcbLength[side] && cb != rgtbdDesc[iTb].m_rgcbLength[side]) {
+		printf("*** %s corrupted\n", rgchTbName);
+		exit(1);
+	}
 #endif
 	rgtbdDesc[iTb].m_rgcbLength[side] = cb;
-	fclose (fp);
-	if (FRegisterTb (& (rgtbdDesc[iTb])))
-		{
-		pchCopy = (char*) PvMalloc (strlen(rgchTbName)+1);
-		strcpy (pchCopy, rgchTbName);
+	fclose(fp);
+	if (FRegisterTb(&(rgtbdDesc[iTb]))) {
+		pchCopy = (char*)PvMalloc(strlen(rgchTbName) + 1);
+		strcpy(pchCopy, rgchTbName);
 		rgtbdDesc[iTb].m_rgpchFileName[side] = pchCopy;
-		prgtbcbBuckets = (CTbCacheBucket*) PvMalloc (TB_DIRECTORY_SIZE*sizeof(CTbCacheBucket));
-		memset (prgtbcbBuckets, 0, TB_DIRECTORY_SIZE*sizeof(CTbCacheBucket));
+		prgtbcbBuckets = (CTbCacheBucket*)PvMalloc(TB_DIRECTORY_SIZE * sizeof(CTbCacheBucket));
+		memset(prgtbcbBuckets, 0, TB_DIRECTORY_SIZE * sizeof(CTbCacheBucket));
 #if defined (SMP)
-		for (int i = 0; i < TB_DIRECTORY_SIZE; i ++)
-			LockInit (prgtbcbBuckets[i].m_lock);
+		for (int i = 0; i < TB_DIRECTORY_SIZE; i++)
+			LockInit(prgtbcbBuckets[i].m_lock);
 #endif
 		rgtbdDesc[iTb].m_prgtbcbBuckets[side] = prgtbcbBuckets;
 		if (fVerbose)
-			printf ("%s registered\n", pchCopy);
+			printf("%s registered\n", pchCopy);
 		return true;
-		}
-	return false;
 	}
+	return false;
+}
 
 int IInitializeTb
-	(
-	const char *pszPath
-	)
-	{
+(
+	const char* pszPath
+) {
 	char	szTemp[1024];
 	color	sd;
 	int		iTb, iMaxTb, i;
 	cbAllocated = 0;
 	// If there are open files, close those
-	VTbCloseFiles ();
+	VTbCloseFiles();
 #if defined (SMP)
 	// Init all locks
-	LockInit (lockLRU);
-	for (iTb = 1; iTb < cTb; iTb ++)
-		{
-		LockInit (rgtbdDesc[iTb].m_rglockFiles[x_colorWhite]);
-		LockInit (rgtbdDesc[iTb].m_rglockFiles[x_colorBlack]);
-		}
+	LockInit(lockLRU);
+	for (iTb = 1; iTb < cTb; iTb++) {
+		LockInit(rgtbdDesc[iTb].m_rglockFiles[x_colorWhite]);
+		LockInit(rgtbdDesc[iTb].m_rglockFiles[x_colorBlack]);
+	}
 #endif
 #if defined (NEW)
 	// Create enumeration tables
-	VInitEnumerations ();
+	VInitEnumerations();
 #endif
 	// Create empty TB search table
-	VCreateEmptyTbTable ();
+	VCreateEmptyTbTable();
 	// Free memory from TB table
-	for (iTb = 1; iTb < cTb; iTb ++)
-		{
-		for (sd = x_colorWhite; sd <= x_colorBlack; sd = (color) (sd + 1))
-			{
+	for (iTb = 1; iTb < cTb; iTb++) {
+		for (sd = x_colorWhite; sd <= x_colorBlack; sd = (color)(sd + 1)) {
 			if (NULL != rgtbdDesc[iTb].m_prgtbcbBuckets[sd] &&
-				NULL == rgtbdDesc[iTb].m_rgpbRead[sd])
-				{
-				free (rgtbdDesc[iTb].m_prgtbcbBuckets[sd]);
+				NULL == rgtbdDesc[iTb].m_rgpbRead[sd]) {
+				free(rgtbdDesc[iTb].m_prgtbcbBuckets[sd]);
 				rgtbdDesc[iTb].m_prgtbcbBuckets[sd] = NULL;
-				}
-			if (NULL != rgtbdDesc[iTb].m_rgpchFileName[sd])
-				{
-				free (rgtbdDesc[iTb].m_rgpchFileName[sd]);
+			}
+			if (NULL != rgtbdDesc[iTb].m_rgpchFileName[sd]) {
+				free(rgtbdDesc[iTb].m_rgpchFileName[sd]);
 				rgtbdDesc[iTb].m_rgpchFileName[sd] = NULL;
-				}
 			}
 		}
+	}
 	// Search for existing TBs
 	iMaxTb = 0;
-	for (;;)
-		{
+	for (;;) {
 		for (i = 0; pszPath[i] != '\0' && pszPath[i] != ',' && pszPath[i] != ';'
 #if !defined (_WIN32)
-			 && pszPath[i] != ':'
+			&& pszPath[i] != ':'
 #endif
-			 ; i ++)
-			{
+			; i++) {
 			szTemp[i] = pszPath[i];
-			}
-			
+		}
+
 		szTemp[i] = '\0';
-		for (iTb = 1; iTb < cTb; iTb ++)
-			{
-			if (FCheckExistance (szTemp, iTb, x_colorWhite))
+		for (iTb = 1; iTb < cTb; iTb++) {
+			if (FCheckExistance(szTemp, iTb, x_colorWhite))
 				iMaxTb = iTb;
-			if (FCheckExistance (szTemp, iTb, x_colorBlack))
+			if (FCheckExistance(szTemp, iTb, x_colorBlack))
 				iMaxTb = iTb;
-			}
+		}
 		pszPath += i;
 		if ('\0' == *pszPath)
 			break;
-		pszPath ++;
-		}
+		pszPath++;
+	}
 	if (iMaxTb >= tbid_kppkp)
 		return 5;
 	else if (iMaxTb >= tbid_kpkp)
@@ -4270,8 +4001,8 @@ int IInitializeTb
 	else if (iMaxTb >= tbid_kpk)
 		return 3;
 	return 0;
-	}
-int IInitializeTb(char *pszPath);
-int IDescFindFromCounters(int *); 
-PfnCalcIndex PfnIndCalcFun(int iTb, int side); 
+}
+int IInitializeTb(char* pszPath);
+int IDescFindFromCounters(int*);
+PfnCalcIndex PfnIndCalcFun(int iTb, int side);
 int TbtProbeTable(int iTb, color side, INDEX indOffset);

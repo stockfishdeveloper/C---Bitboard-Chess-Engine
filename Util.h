@@ -3,7 +3,9 @@
 #include "Bitboard.h"
 #include "Search.h"
 int lsb(Bitboard b);
-enum Movetype { Capture, Promotion, Normal };
+enum Movetype {
+	Capture, Promotion, Normal
+};
 Movetype Get_Move_Type(Move& m);
 Bitboard Unconvert_Int(const int& number);
 void Benchmark();

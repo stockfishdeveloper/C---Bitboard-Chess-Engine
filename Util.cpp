@@ -1,32 +1,28 @@
 #include "Util.h"
 #include "Uci.h"
 
-int lsb(Bitboard bb)
-{
+int lsb(Bitboard bb) {
 	const Bitboard debruijn64 = 0x03f79d71b4cb0a89;
 	if (bb == 0) return 0;
 	return LSB_64_table[((bb ^ (bb - 1)) * debruijn64) >> 58];
 }
-Movetype Get_Move_Type(Move& m)
-{
-	if(m.Promotion)
+Movetype Get_Move_Type(Move& m) {
+	if (m.Promotion)
 		return Promotion;
-	if(m.C != NONE)
+	if (m.C != NONE)
 		return Capture;
 	else
 		return Normal;
 }
-Bitboard Unconvert_Int(const int& number)
-	{
-        return GeneralBoard[number];
-    }
-void Display_Move(Move m)
-{
+Bitboard Unconvert_Int(const int& number) {
+	return GeneralBoard[number];
+}
+void Display_Move(Move m) {
 	int least = lsb(m.From);
 	int least1 = lsb(m.To);
 	Log << PlayerMoves[least] << PlayerMoves[least1] << endl;
 }
- 
+
 /**
  * bitScanForward
  * @author Walter Faxon, slightly modified
@@ -80,20 +76,18 @@ string fen[37] = {
   // 7-man positions
   "8/R7/2q5/8/6k1/8/1P5p/K6R w - - 0 124", // Draw
 };
-void Benchmark()
-{
+void Benchmark() {
 	Timer time;
 	time.Start_Clock();
 	Bitboard nodes = 0;
-	for(int i = 0; i < 37; i++)
-	{
+	for (int i = 0; i < 37; i++) {
 		Parse_Fen(fen[i]);
 		cout << "\nPosition: " << i + 1 << "/37" << endl;
 		Search::Think(100000, 100000, 0, 0, 8);
 		nodes += Search::Nodes;
 	}
 	cout << "\n==========================="
-    << "\nTotal time (ms) : " << time.Get_Time()
-    << "\nNodes searched  : " << nodes
-    << "\nNodes/second    : " << 1000 * nodes / time.Get_Time() << endl;
+		<< "\nTotal time (ms) : " << time.Get_Time()
+		<< "\nNodes searched  : " << nodes
+		<< "\nNodes/second    : " << 1000 * nodes / time.Get_Time() << endl;
 }
