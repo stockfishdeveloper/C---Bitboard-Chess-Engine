@@ -574,3 +574,62 @@
 		if(BlackAttacks & board) return GeneralBoard[lookup];
 		return 0;
 	}
+
+	string Position::GetTextBoard() const {
+		string result = "";
+
+		std::vector<string> ranks;
+		string temp = "";
+
+		for (int i = 0; i < 64; i++) {
+			if (i == 0 || i % 8 == 0)
+				temp += "|";
+
+			// white pieces
+			if (White_Pawns & GeneralBoard[i])
+				temp += "P";
+			else if (White_Rooks & GeneralBoard[i])
+				temp += "R";
+			else if (White_Knights & GeneralBoard[i])
+				temp += "N";
+			else if (White_Bishops & GeneralBoard[i])
+				temp += "B";
+			else if (White_Queens & GeneralBoard[i])
+				temp += "Q";
+			else if (White_King & GeneralBoard[i])
+				temp += "K";
+
+			// black pieces
+			else if (Black_Pawns & GeneralBoard[i])
+				temp += "p";
+			else if (Black_Rooks & GeneralBoard[i])
+				temp += "r";
+			else if (Black_Knights & GeneralBoard[i])
+				temp += "n";
+			else if (Black_Bishops & GeneralBoard[i])
+				temp += "b";
+			else if (Black_Queens & GeneralBoard[i])
+				temp += "q";
+			else if (Black_King & GeneralBoard[i])
+				temp += "k";
+			else
+				temp += " ";
+
+			temp += "|";
+
+			if ((i + 1) % 8 == 0) {
+				temp += "\n";
+				ranks.push_back(temp);
+				temp = "";
+			}
+		}
+
+		ranks.push_back(" _ _ _ _ _ _ _ _\n");
+
+		reverse(ranks.begin(), ranks.end());
+
+		for (string s : ranks)
+			result += s;
+
+		return result;
+	}

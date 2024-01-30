@@ -1,5 +1,7 @@
 #ifndef Position_H_
 #define Position_H_
+#include <vector>
+#include <algorithm>
 #include "Bitboard.h"
 
 enum Piece { WP, WN, WB, WR, WQ, WK, BP, BN, BB, BR, BQ, BK, NONE };
@@ -60,6 +62,7 @@ class Position
 	int Non_Pawn_Material();
 	Bitboard* Get_Bitboard_From_Piece(Piece p);
 	Piece Get_Piece_From_Bitboard(Bitboard b);
+	string GetTextBoard() const;
 };
 int Get_Cp_Value(Piece piece);
 extern Position pos;

@@ -69,6 +69,10 @@ int CheckUci()
             TT.clear();
             InitCounterMove();
         }
+        else if (UciCommand == "print")
+        {
+            cout << pos.GetTextBoard();
+        }
         else if(UciCommand == "mate")
         {
         	int depth = 0;
@@ -542,6 +546,13 @@ int Moves_Command()
             cin.putback('p');
             return 0;
         }
+        string z = "pr";
+        if (First_Part == z)
+        {
+            cin.putback('r');
+            cin.putback('p');
+            return 0;
+        }
         string i = "is";
         if (First_Part == i)
         {
@@ -629,7 +640,7 @@ int Moves_Command()
         else
             Parse_Moves(First_Part, Second_Part);
         }
-    //Print_Board();
+
 	return 0;
 }
 
