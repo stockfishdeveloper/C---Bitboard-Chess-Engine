@@ -542,6 +542,13 @@ int Moves_Command()
             cin.putback('p');
             return 0;
         }
+        string i = "is";
+        if (First_Part == i)
+        {
+            cin.putback('s');
+            cin.putback('i');
+            return 0;
+        }
         string g = "be";
         if(First_Part == g)
         {
