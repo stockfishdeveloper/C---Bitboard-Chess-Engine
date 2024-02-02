@@ -9,17 +9,7 @@ and it has the bit set that the piece in the move moves to. It also takes a Move
 bool White_Is_Legal(Position& position, Move move) {
 	position.Make_Move(move);
 	int h = lsb(position.White_King);
-	Bitboard BAttacks = Bmagic(h, (position.White_Pieces | position.Black_Pieces));
-	Bitboard RAttacks = Rmagic(h, (position.White_Pieces | position.Black_Pieces));
-	Bitboard QAttacks = BAttacks | RAttacks;
-	if (QAttacks & (position.Black_Queens)) {
-		position.Undo_Move(move);
-		return false;
-	}
-	if (BAttacks & (position.Black_Bishops)) {
-		position.Undo_Move(move);
-		return false;
-	}
+
 	if (Knight_Lookup_Table[h] & position.Black_Knights) {
 		position.Undo_Move(move);
 		return false;
@@ -38,14 +28,32 @@ bool White_Is_Legal(Position& position, Move move) {
 		position.Undo_Move(move);
 		return false;
 	}
-	if (RAttacks & (position.Black_Rooks)) {
-		position.Undo_Move(move);
-		return false;
-	}
+
 	if (King_Lookup_Table[h] & position.Black_King) {
 		position.Undo_Move(move);
 		return false;
 	}
+
+	Bitboard BAttacks = Bmagic(h, (position.White_Pieces | position.Black_Pieces));
+
+	if (BAttacks & (position.Black_Bishops)) {
+		position.Undo_Move(move);
+		return false;
+	}
+
+	Bitboard RAttacks = Rmagic(h, (position.White_Pieces | position.Black_Pieces));
+
+	if (RAttacks & (position.Black_Rooks)) {
+		position.Undo_Move(move);
+		return false;
+	}
+
+	Bitboard QAttacks = BAttacks | RAttacks;
+	if (QAttacks & (position.Black_Queens)) {
+		position.Undo_Move(move);
+		return false;
+	}
+
 	position.Undo_Move(move);
 	return true;
 }
@@ -54,17 +62,7 @@ bool White_Is_Legal(Position& position, Move move) {
 bool Black_Is_Legal(Position& position, Move move) {
 	position.Make_Move(move);
 	int h = lsb(position.Black_King);
-	Bitboard BAttacks = Bmagic(h, (position.White_Pieces | position.Black_Pieces));
-	Bitboard RAttacks = Rmagic(h, (position.White_Pieces | position.Black_Pieces));
-	Bitboard QAttacks = BAttacks | RAttacks;
-	if (QAttacks & (position.White_Queens)) {
-		position.Undo_Move(move);
-		return false;
-	}
-	if (BAttacks & (position.White_Bishops)) {
-		position.Undo_Move(move);
-		return false;
-	}
+
 	if (Knight_Lookup_Table[h] & position.White_Knights) {
 		position.Undo_Move(move);
 		return false;
@@ -83,14 +81,30 @@ bool Black_Is_Legal(Position& position, Move move) {
 		position.Undo_Move(move);
 		return false;
 	}
-	if (RAttacks & (position.White_Rooks)) {
-		position.Undo_Move(move);
-		return false;
-	}
+
 	if (King_Lookup_Table[h] & position.White_King) {
 		position.Undo_Move(move);
 		return false;
 	}
+
+	Bitboard BAttacks = Bmagic(h, (position.White_Pieces | position.Black_Pieces));
+	if (BAttacks & (position.White_Bishops)) {
+		position.Undo_Move(move);
+		return false;
+	}
+
+	Bitboard RAttacks = Rmagic(h, (position.White_Pieces | position.Black_Pieces));
+	if (RAttacks & (position.White_Rooks)) {
+		position.Undo_Move(move);
+		return false;
+	}
+
+	Bitboard QAttacks = BAttacks | RAttacks;
+	if (QAttacks & (position.White_Queens)) {
+		position.Undo_Move(move);
+		return false;
+	}
+
 	position.Undo_Move(move);
 	return true;
 }
