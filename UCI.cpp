@@ -53,16 +53,7 @@ int CheckUci() {
 		}
 
 		else if (UciCommand == "startpos") {
-			//Set up the board internally
-			pos.Reset();
-			Search::Searching = false;
-			wtime = 0;
-			btime = 0;
-			Search::STOP_SEARCHING_NOW = false;
-			Search::Nodes = 0;
-			Search::Clear();
-			TT.clear();
-			InitCounterMove();
+			Startpos();
 		}
 		else if (UciCommand == "print") {
 			cout << pos.GetTextBoard();
@@ -100,6 +91,31 @@ int CheckUci() {
 			cout << "Total time (ms) : " << timer.Get_Time() << "\n";
 			cout << "Nodes searched  : " << nodes << "\n";
 			cout << "Nodes/second    : " << (nodes / (timer.Get_Time() + 1) * 1000) << "\n";
+		}
+
+		else if (UciCommand == "perftspeed") {
+			int Total_MS = 0;
+
+			for (int i = 0; i < 100; i++) {
+				Startpos();
+
+				cout << "\nRunning perft iteration #" << i + 1 << " of 100\n\n";
+
+				Timer timer;
+				timer.Start_Clock();
+				int depth = 6;
+				int nodes = Root_Perft(depth);
+				cout << "\n===========================\n";
+				cout << "Total time (ms) : " << timer.Get_Time() << "\n";
+				cout << "Nodes searched  : " << nodes << "\n";
+				cout << "Nodes/second    : " << (nodes / (timer.Get_Time() + 1) * 1000) << "\n";
+
+				Total_MS += timer.Get_Time();
+			}
+
+			cout << "\n===========================\n";
+			cout << "\n===========================\n";
+			cout << "Average perft 6 execution time over 20 runs: " << Total_MS / 20 << endl;
 		}
 
 		else if (Is_Fen) {
@@ -716,4 +732,17 @@ void Uci_Pv(int depth, int seldepth, Move best, int* matemoves, int time, int no
 	cout << "time " << time << " nodes " << nodes << " nps " << (1000 * (nodes / (time + 1))) << endl;
 	Log << "time " << time << " nodes " << nodes << " nps " << (1000 * (nodes / (time + 1))) << endl;
 	output.unlock();
+}
+
+void Startpos() {
+	//Set up the board internally
+	pos.Reset();
+	Search::Searching = false;
+	wtime = 0;
+	btime = 0;
+	Search::STOP_SEARCHING_NOW = false;
+	Search::Nodes = 0;
+	Search::Clear();
+	TT.clear();
+	InitCounterMove();
 }
