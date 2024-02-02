@@ -115,7 +115,7 @@ int CheckUci() {
 
 			cout << "\n===========================\n";
 			cout << "\n===========================\n";
-			cout << "Average perft 6 execution time over 20 runs: " << Total_MS / 20 << endl;
+			cout << "Average perft 6 execution time over 100 runs: " << Total_MS / 100 << endl;
 		}
 
 		else if (Is_Fen) {
