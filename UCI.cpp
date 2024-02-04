@@ -86,7 +86,7 @@ int CheckUci() {
 			timer.Start_Clock();
 			int depth = 0;
 			cin >> depth;
-			int nodes = Root_Perft(depth);
+			Bitboard nodes = Root_Perft(depth);
 			cout << "\n===========================\n";
 			cout << "Total time (ms) : " << timer.Get_Time() << "\n";
 			cout << "Nodes searched  : " << nodes << "\n";
@@ -104,7 +104,7 @@ int CheckUci() {
 				Timer timer;
 				timer.Start_Clock();
 				int depth = 6;
-				int nodes = Root_Perft(depth);
+				Bitboard nodes = Root_Perft(depth);
 				cout << "\n===========================\n";
 				cout << "Total time (ms) : " << timer.Get_Time() << "\n";
 				cout << "Nodes searched  : " << nodes << "\n";
@@ -287,7 +287,8 @@ int CheckUci() {
 
 
 int Parse_Fen(string Fen) {
-	//cout << Fen << endl;
+	pos.Reset();
+
 	string str = Fen;
 	string temp = str;
 	string hold[6];
@@ -306,7 +307,14 @@ int Parse_Fen(string Fen) {
 		hold[5] += str[i];
 
 	Search::Clear();
-	//pos.Reset();
+
+	// here we're checking for any EP squares called out in the FEN string
+	if (hold[3].find('-') == string::npos) {
+		for (int i = 0; i < 64; i++) {
+			if (hold[3].find(PlayerMoves[i]) != string::npos)
+				pos.EP_Square = GeneralBoard[i];
+		}
+	}
 
 	pos.White_Pieces = 0;
 	pos.Black_Pieces = 0;
@@ -353,15 +361,6 @@ int Parse_Fen(string Fen) {
 			pos.BlackCanCastleQ = true;
 	}
 
-	/*string En_Passant;
-	cin >> En_Passant;
-	Log << En_Passant << endl;
-	int Pawn_Moves;
-	cin >> Pawn_Moves;
-	Log << Pawn_Moves << endl;
-	int Move_Count;
-	cin >> Move_Count;
-	Log << Move_Count << endl;*/
 	return 0;
 }
 
@@ -492,7 +491,6 @@ int Read_Fen(char Current_Square) {
 }
 
 int Moves_Command() {
-	//pos.Reset();
 	char First_Part[5];
 	char Second_Part[5];
 	string Promotion_Type;
@@ -617,18 +615,27 @@ int Parse_Moves(string First, string Second, string PromotionType) {
 	Piece Captured = NONE;
 	bool Castling = (From & (pos.White_King | pos.Black_King)) && (From & 1152921504606846992) && (To & 4899916394579099716);
 	bool Promotion = ((From & pos.White_Pawns) && From & Seventh_Rank_White) || ((From & pos.Black_Pawns) && (From & Seventh_Rank_Black));
-	if (pos.Current_Turn == true) {
-		if (To & pos.Black_Pieces) {
-			Captured = pos.Get_Piece_From_Bitboard(To);
-			assert(Captured != NONE);
+
+	// here we check if the entered move is EP
+	bool ep = false;
+
+	if ((To & pos.EP_Square) && (From & (pos.White_Pawns | pos.Black_Pawns)))
+		ep = true;
+
+	if (From)
+
+		if (pos.Current_Turn == true) {
+			if (To & pos.Black_Pieces) {
+				Captured = pos.Get_Piece_From_Bitboard(To);
+				assert(Captured != NONE);
+			}
 		}
-	}
-	else {
-		if (To & pos.White_Pieces) {
-			Captured = pos.Get_Piece_From_Bitboard(To);
-			assert(Captured != NONE);
+		else {
+			if (To & pos.White_Pieces) {
+				Captured = pos.Get_Piece_From_Bitboard(To);
+				assert(Captured != NONE);
+			}
 		}
-	}
 	if (pos.Current_Turn == true) {
 		if (((pos.Black_Pawns << 8) & To) && (From & 1095216660480) && (pos.White_Pawns & From) && (!(pos.Black_Pieces & To))) {
 			pos.Black_Pawns ^= (To >> 8);
@@ -665,7 +672,10 @@ int Parse_Moves(string First, string Second, string PromotionType) {
 	if (p == WR && From == 128) pos.WhiteCanCastleK = false;
 	if (p == BR && From == 72057594037927936) pos.BlackCanCastleQ = false;
 	if (p == BR && From == 9223372036854775808) pos.BlackCanCastleK = false;
-	Move m(p, Captured, From, To, Castling, Promotion);
+
+	// THIS NEEDS TO BE CHECKED
+	// We need to check if this is an en passant move
+	Move m(p, Captured, From, To, Castling, Promotion, ep);
 	if (PromotionType != "") {
 		if (PromotionType.find("q") != string::npos)
 			m.PromotionType = pos.Current_Turn ? WQ : BQ;
@@ -691,7 +701,7 @@ string Engine_Info() {
 	stringstream ss, date(__DATE__); // From compiler, format is "Sep 21 2008"
 	result += "Chess ";
 	date >> month >> day >> year;
-	result += year.substr(2) + (to_string((1 + months.find(month) / 4)).length() < 2 ? "0" + to_string((1 + months.find(month) / 4)) : to_string((1 + months.find(month) / 4))) + day;
+	result += "20" + year.substr(2) + (to_string((1 + months.find(month) / 4)).length() < 2 ? "0" + to_string((1 + months.find(month) / 4)) : to_string((1 + months.find(month) / 4))) + (day.length() < 2 ? "0" + day : day);
 
 	return result;
 

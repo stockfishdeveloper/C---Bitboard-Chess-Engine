@@ -15,7 +15,7 @@ void Generate_White_Moves(const bool caps, Position& position) {
 			if (!caps) {
 				if (GeneralBoard[i] & 65280) {
 					if (!((GeneralBoard[i] << 8) & (position.White_Pieces | position.Black_Pieces))) {
-						Move m(WP, NONE, GeneralBoard[i], GeneralBoard[i] << 8, false, false);
+						Move m(WP, NONE, GeneralBoard[i], GeneralBoard[i] << 8, false, false, false);
 						if (inCheck || (m.From & blockers)) {
 							if (White_Is_Legal(position, m))
 								position.LegalMoves[position.numlegalmoves++] = m;
@@ -23,7 +23,7 @@ void Generate_White_Moves(const bool caps, Position& position) {
 						else
 							position.LegalMoves[position.numlegalmoves++] = m;
 						if (!((GeneralBoard[i] << 16) & (position.White_Pieces | position.Black_Pieces))) {
-							Move m(WP, NONE, GeneralBoard[i], GeneralBoard[i] << 16, false, false);
+							Move m(WP, NONE, GeneralBoard[i], GeneralBoard[i] << 16, false, false, false);
 							if (inCheck || (m.From & blockers)) {
 								if (White_Is_Legal(position, m))
 									position.LegalMoves[position.numlegalmoves++] = m;
@@ -35,7 +35,7 @@ void Generate_White_Moves(const bool caps, Position& position) {
 				}
 				else {
 					if ((!((GeneralBoard[i] << 8) & (position.White_Pieces | position.Black_Pieces))) && (!(GeneralBoard[i] & 71776119061217280))) {
-						Move m(WP, NONE, GeneralBoard[i], GeneralBoard[i] << 8, false, false);
+						Move m(WP, NONE, GeneralBoard[i], GeneralBoard[i] << 8, false, false, false);
 						if (inCheck || (m.From & blockers)) {
 							if (White_Is_Legal(position, m))
 								position.LegalMoves[position.numlegalmoves++] = m;
@@ -46,7 +46,7 @@ void Generate_White_Moves(const bool caps, Position& position) {
 				}
 			}
 			if ((GeneralBoard[i] & 71776119061217280) && (!(GeneralBoard[i] << 8 & (position.White_Pieces | position.Black_Pieces)))) {
-				Move m(WP, NONE, GeneralBoard[i], GeneralBoard[i] << 8, false, true);
+				Move m(WP, NONE, GeneralBoard[i], GeneralBoard[i] << 8, false, true, false);
 				for (int p = 1; p < 5; p++) {
 					m.PromotionType = Piece(int(WP) + p);
 					if (inCheck || (m.From & blockers)) {
@@ -59,7 +59,7 @@ void Generate_White_Moves(const bool caps, Position& position) {
 			}
 			if (!(GeneralBoard[i] & A_Pawn_Mask)) {
 				if ((GeneralBoard[i] << 7) & position.Black_Pieces && (GeneralBoard[i] & 71776119061217280)) {
-					Move m(WP, position.Get_Piece_From_Bitboard(GeneralBoard[i] << 7), GeneralBoard[i], GeneralBoard[i] << 7, false, true);
+					Move m(WP, position.Get_Piece_From_Bitboard(GeneralBoard[i] << 7), GeneralBoard[i], GeneralBoard[i] << 7, false, true, false);
 					{
 						for (int p = 1; p < 5; p++) {
 							m.PromotionType = Piece(int(WP) + p);
@@ -73,7 +73,18 @@ void Generate_White_Moves(const bool caps, Position& position) {
 					}
 				}
 				else if ((GeneralBoard[i] << 7) & position.Black_Pieces) {
-					Move m(WP, position.Get_Piece_From_Bitboard(GeneralBoard[i] << 7), GeneralBoard[i], GeneralBoard[i] << 7, false, false);
+					Move m(WP, position.Get_Piece_From_Bitboard(GeneralBoard[i] << 7), GeneralBoard[i], GeneralBoard[i] << 7, false, false, false);
+					if (inCheck || (m.From & blockers)) {
+						if (White_Is_Legal(position, m))
+							position.LegalMoves[position.numlegalmoves++] = m;
+					}
+					else
+						position.LegalMoves[position.numlegalmoves++] = m;
+				}
+
+				// if EP is possible capturing up to the left
+				if ((GeneralBoard[i] << 7) & position.EP_Square) {
+					Move m(WP, BP, GeneralBoard[i], GeneralBoard[i] << 7, false, false, true);
 					if (inCheck || (m.From & blockers)) {
 						if (White_Is_Legal(position, m))
 							position.LegalMoves[position.numlegalmoves++] = m;
@@ -84,7 +95,7 @@ void Generate_White_Moves(const bool caps, Position& position) {
 			}
 			if (!(GeneralBoard[i] & H_Pawn_Mask)) {
 				if ((GeneralBoard[i] << 9) & position.Black_Pieces && (GeneralBoard[i] & 71776119061217280)) {
-					Move m(WP, position.Get_Piece_From_Bitboard(GeneralBoard[i] << 9), GeneralBoard[i], GeneralBoard[i] << 9, false, true);
+					Move m(WP, position.Get_Piece_From_Bitboard(GeneralBoard[i] << 9), GeneralBoard[i], GeneralBoard[i] << 9, false, true, false);
 					for (int p = 1; p < 5; p++) {
 						m.PromotionType = Piece(int(WP) + p);
 						if (inCheck || (m.From & blockers)) {
@@ -96,7 +107,18 @@ void Generate_White_Moves(const bool caps, Position& position) {
 					}
 				}
 				else if ((GeneralBoard[i] << 9) & position.Black_Pieces) {
-					Move m(WP, position.Get_Piece_From_Bitboard(GeneralBoard[i] << 9), GeneralBoard[i], GeneralBoard[i] << 9, false, false);
+					Move m(WP, position.Get_Piece_From_Bitboard(GeneralBoard[i] << 9), GeneralBoard[i], GeneralBoard[i] << 9, false, false, false);
+					if (inCheck || (m.From & blockers)) {
+						if (White_Is_Legal(position, m))
+							position.LegalMoves[position.numlegalmoves++] = m;
+					}
+					else
+						position.LegalMoves[position.numlegalmoves++] = m;
+				}
+
+				// if EP is possible capturing up to the right
+				if ((GeneralBoard[i] << 9) & position.EP_Square) {
+					Move m(WP, BP, GeneralBoard[i], GeneralBoard[i] << 9, false, false, true);
 					if (inCheck || (m.From & blockers)) {
 						if (White_Is_Legal(position, m))
 							position.LegalMoves[position.numlegalmoves++] = m;
@@ -105,6 +127,7 @@ void Generate_White_Moves(const bool caps, Position& position) {
 						position.LegalMoves[position.numlegalmoves++] = m;
 				}
 			}
+
 			continue;
 		}
 		if (GeneralBoard[i] & position.White_Knights) {
@@ -116,7 +139,7 @@ void Generate_White_Moves(const bool caps, Position& position) {
 				short j = lsb(b);
 				b ^= GeneralBoard[j];
 				if (GeneralBoard[j] & position.Black_Pieces) {
-					Move m(WN, position.Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
+					Move m(WN, position.Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false, false);
 					if (inCheck || (m.From & blockers)) {
 						if (White_Is_Legal(position, m))
 							position.LegalMoves[position.numlegalmoves++] = m;
@@ -126,7 +149,7 @@ void Generate_White_Moves(const bool caps, Position& position) {
 				}
 				else {
 					if (!caps) {
-						Move m(WN, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
+						Move m(WN, NONE, GeneralBoard[i], GeneralBoard[j], false, false, false);
 						if (inCheck || (m.From & blockers)) {
 							if (White_Is_Legal(position, m))
 								position.LegalMoves[position.numlegalmoves++] = m;
@@ -147,7 +170,7 @@ void Generate_White_Moves(const bool caps, Position& position) {
 				short j = lsb(b);
 				b ^= GeneralBoard[j];
 				if (GeneralBoard[j] & position.Black_Pieces) {
-					Move m(WB, position.Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
+					Move m(WB, position.Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false, false);
 					if (inCheck || (m.From & blockers)) {
 						if (White_Is_Legal(position, m))
 							position.LegalMoves[position.numlegalmoves++] = m;
@@ -157,7 +180,7 @@ void Generate_White_Moves(const bool caps, Position& position) {
 				}
 				else {
 					if (!caps) {
-						Move m(WB, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
+						Move m(WB, NONE, GeneralBoard[i], GeneralBoard[j], false, false, false);
 						if (inCheck || (m.From & blockers)) {
 							if (White_Is_Legal(position, m))
 								position.LegalMoves[position.numlegalmoves++] = m;
@@ -178,7 +201,7 @@ void Generate_White_Moves(const bool caps, Position& position) {
 				short j = lsb(b);
 				b ^= GeneralBoard[j];
 				if (GeneralBoard[j] & position.Black_Pieces) {
-					Move m(WR, position.Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
+					Move m(WR, position.Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false, false);
 					if (inCheck || (m.From & blockers)) {
 						if (White_Is_Legal(position, m))
 							position.LegalMoves[position.numlegalmoves++] = m;
@@ -188,7 +211,7 @@ void Generate_White_Moves(const bool caps, Position& position) {
 				}
 				else {
 					if (!caps) {
-						Move m(WR, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
+						Move m(WR, NONE, GeneralBoard[i], GeneralBoard[j], false, false, false);
 						if (inCheck || (m.From & blockers)) {
 							if (White_Is_Legal(position, m))
 								position.LegalMoves[position.numlegalmoves++] = m;
@@ -209,7 +232,7 @@ void Generate_White_Moves(const bool caps, Position& position) {
 				short j = lsb(b);
 				b ^= GeneralBoard[j];
 				if (GeneralBoard[j] & position.Black_Pieces) {
-					Move m(WQ, position.Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
+					Move m(WQ, position.Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false, false);
 					if (inCheck || (m.From & blockers)) {
 						if (White_Is_Legal(position, m))
 							position.LegalMoves[position.numlegalmoves++] = m;
@@ -219,7 +242,7 @@ void Generate_White_Moves(const bool caps, Position& position) {
 				}
 				else {
 					if (!caps) {
-						Move m(WQ, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
+						Move m(WQ, NONE, GeneralBoard[i], GeneralBoard[j], false, false, false);
 						if (inCheck || (m.From & blockers)) {
 							if (White_Is_Legal(position, m))
 								position.LegalMoves[position.numlegalmoves++] = m;
@@ -240,13 +263,13 @@ void Generate_White_Moves(const bool caps, Position& position) {
 				short j = lsb(b);
 				b ^= GeneralBoard[j];
 				if (GeneralBoard[j] & position.Black_Pieces) {
-					Move m(WK, position.Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
+					Move m(WK, position.Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false, false);
 					if (White_Is_Legal(position, m))
 						position.LegalMoves[position.numlegalmoves++] = m;
 				}
 				else {
 					if (!caps) {
-						Move m(WK, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
+						Move m(WK, NONE, GeneralBoard[i], GeneralBoard[j], false, false, false);
 						if (White_Is_Legal(position, m))
 							position.LegalMoves[position.numlegalmoves++] = m;
 					}
@@ -259,11 +282,11 @@ void Generate_White_Moves(const bool caps, Position& position) {
 				Bitboard e1 = 16, f1 = 32, g1 = 64;
 				bool Rookonh1 = position.White_Rooks & 128;
 				if (first && !second && Rookonh1) {
-					Move m(WK, NONE, GeneralBoard[i], f1, false, false);
+					Move m(WK, NONE, GeneralBoard[i], f1, false, false, false);
 					bool safetomovetof1 = White_Is_Legal(position, m);
-					Move m1(WK, NONE, GeneralBoard[i], g1, false, false);
+					Move m1(WK, NONE, GeneralBoard[i], g1, false, false, false);
 					bool safetomovetog1 = White_Is_Legal(position, m1);
-					Move m2(WK, NONE, GeneralBoard[i], e1, false, false);
+					Move m2(WK, NONE, GeneralBoard[i], e1, false, false, false);
 					bool safetomovetoe1 = Search::Is_Mate(&position) >= 0;
 					if (safetomovetof1 && safetomovetog1 && safetomovetoe1) {
 						m1.Castling = true;
@@ -277,11 +300,11 @@ void Generate_White_Moves(const bool caps, Position& position) {
 				Bitboard e1 = 16, d1 = 8, c1 = 4;
 				bool Rookona1 = position.White_Rooks & 1;
 				if (first && !second && Rookona1) {
-					Move m(WK, NONE, GeneralBoard[i], d1, false, false);
+					Move m(WK, NONE, GeneralBoard[i], d1, false, false, false);
 					bool safetomovetod1 = White_Is_Legal(position, m);
-					Move m1(WK, NONE, GeneralBoard[i], c1, false, false);
+					Move m1(WK, NONE, GeneralBoard[i], c1, false, false, false);
 					bool safetomovetoc1 = White_Is_Legal(position, m1);
-					Move m2(WK, NONE, GeneralBoard[i], e1, false, false);
+					Move m2(WK, NONE, GeneralBoard[i], e1, false, false, false);
 					bool safetomovetoe1 = Search::Is_Mate(&position) >= 0;
 					if (safetomovetoc1 && safetomovetod1 && safetomovetoe1) {
 						m1.Castling = true;
@@ -302,7 +325,7 @@ void Generate_Black_Moves(const bool caps, Position& position) {
 			if (!caps) {
 				if (GeneralBoard[i] & 71776119061217280) {
 					if (!((GeneralBoard[i] >> 8) & (position.White_Pieces | position.Black_Pieces))) {
-						Move m(BP, NONE, GeneralBoard[i], GeneralBoard[i] >> 8, false, false);
+						Move m(BP, NONE, GeneralBoard[i], GeneralBoard[i] >> 8, false, false, false);
 						if (inCheck || (m.From & blockers)) {
 							if (Black_Is_Legal(position, m))
 								position.LegalMoves[position.numlegalmoves++] = m;
@@ -310,7 +333,7 @@ void Generate_Black_Moves(const bool caps, Position& position) {
 						else
 							position.LegalMoves[position.numlegalmoves++] = m;
 						if (!((GeneralBoard[i] >> 16) & (position.White_Pieces | position.Black_Pieces))) {
-							Move m(BP, NONE, GeneralBoard[i], GeneralBoard[i] >> 16, false, false);
+							Move m(BP, NONE, GeneralBoard[i], GeneralBoard[i] >> 16, false, false, false);
 							if (inCheck || (m.From & blockers)) {
 								if (Black_Is_Legal(position, m))
 									position.LegalMoves[position.numlegalmoves++] = m;
@@ -322,7 +345,7 @@ void Generate_Black_Moves(const bool caps, Position& position) {
 				}
 				else {
 					if ((!((GeneralBoard[i] >> 8) & (position.White_Pieces | position.Black_Pieces))) && (!(GeneralBoard[i] & 65280))) {
-						Move m(BP, NONE, GeneralBoard[i], GeneralBoard[i] >> 8, false, false);
+						Move m(BP, NONE, GeneralBoard[i], GeneralBoard[i] >> 8, false, false, false);
 						if (inCheck || (m.From & blockers)) {
 							if (Black_Is_Legal(position, m))
 								position.LegalMoves[position.numlegalmoves++] = m;
@@ -333,7 +356,7 @@ void Generate_Black_Moves(const bool caps, Position& position) {
 				}
 			}
 			if (GeneralBoard[i] & 65280 && (!(GeneralBoard[i] >> 8 & (position.White_Pieces | position.Black_Pieces)))) {
-				Move m(BP, NONE, GeneralBoard[i], GeneralBoard[i] >> 8, false, true);
+				Move m(BP, NONE, GeneralBoard[i], GeneralBoard[i] >> 8, false, true, false);
 				for (int p = 1; p < 5; p++) {
 					m.PromotionType = Piece(int(BP) + p);
 					if (inCheck || (m.From & blockers)) {
@@ -346,7 +369,7 @@ void Generate_Black_Moves(const bool caps, Position& position) {
 			}
 			if (!(GeneralBoard[i] & H_Pawn_Mask)) {
 				if (((GeneralBoard[i] >> 7) & position.White_Pieces) && (GeneralBoard[i] & 65280)) {
-					Move m(BP, position.Get_Piece_From_Bitboard(GeneralBoard[i] >> 7), GeneralBoard[i], GeneralBoard[i] >> 7, false, true);
+					Move m(BP, position.Get_Piece_From_Bitboard(GeneralBoard[i] >> 7), GeneralBoard[i], GeneralBoard[i] >> 7, false, true, false);
 					for (int p = 1; p < 5; p++) {
 						m.PromotionType = Piece(int(BP) + p);
 						if (inCheck || (m.From & blockers)) {
@@ -358,7 +381,18 @@ void Generate_Black_Moves(const bool caps, Position& position) {
 					}
 				}
 				else if ((GeneralBoard[i] >> 7) & position.White_Pieces) {
-					Move m(BP, position.Get_Piece_From_Bitboard(GeneralBoard[i] >> 7), GeneralBoard[i], GeneralBoard[i] >> 7, false, false);
+					Move m(BP, position.Get_Piece_From_Bitboard(GeneralBoard[i] >> 7), GeneralBoard[i], GeneralBoard[i] >> 7, false, false, false);
+					if (inCheck || (m.From & blockers)) {
+						if (Black_Is_Legal(position, m))
+							position.LegalMoves[position.numlegalmoves++] = m;
+					}
+					else
+						position.LegalMoves[position.numlegalmoves++] = m;
+				}
+
+				// if EP is possible capturing down to the right
+				if ((GeneralBoard[i] >> 7) & position.EP_Square) {
+					Move m(BP, WP, GeneralBoard[i], GeneralBoard[i] >> 7, false, false, true);
 					if (inCheck || (m.From & blockers)) {
 						if (Black_Is_Legal(position, m))
 							position.LegalMoves[position.numlegalmoves++] = m;
@@ -369,7 +403,7 @@ void Generate_Black_Moves(const bool caps, Position& position) {
 			}
 			if (!(GeneralBoard[i] & A_Pawn_Mask)) {
 				if (((GeneralBoard[i] >> 9) & position.White_Pieces) && (GeneralBoard[i] & 65280)) {
-					Move m(BP, position.Get_Piece_From_Bitboard(GeneralBoard[i] >> 9), GeneralBoard[i], GeneralBoard[i] >> 9, false, true);
+					Move m(BP, position.Get_Piece_From_Bitboard(GeneralBoard[i] >> 9), GeneralBoard[i], GeneralBoard[i] >> 9, false, true, false);
 					for (int p = 1; p < 5; p++) {
 						m.PromotionType = Piece(int(BP) + p);
 						if (inCheck || (m.From & blockers)) {
@@ -381,7 +415,18 @@ void Generate_Black_Moves(const bool caps, Position& position) {
 					}
 				}
 				else if ((GeneralBoard[i] >> 9) & position.White_Pieces) {
-					Move m(BP, position.Get_Piece_From_Bitboard(GeneralBoard[i] >> 9), GeneralBoard[i], GeneralBoard[i] >> 9, false, false);
+					Move m(BP, position.Get_Piece_From_Bitboard(GeneralBoard[i] >> 9), GeneralBoard[i], GeneralBoard[i] >> 9, false, false, false);
+					if (inCheck || (m.From & blockers)) {
+						if (Black_Is_Legal(position, m))
+							position.LegalMoves[position.numlegalmoves++] = m;
+					}
+					else
+						position.LegalMoves[position.numlegalmoves++] = m;
+				}
+
+				// if EP is possible capturing down to the left
+				if ((GeneralBoard[i] >> 9) & position.EP_Square) {
+					Move m(BP, WP, GeneralBoard[i], GeneralBoard[i] >> 9, false, false, true);
 					if (inCheck || (m.From & blockers)) {
 						if (Black_Is_Legal(position, m))
 							position.LegalMoves[position.numlegalmoves++] = m;
@@ -401,7 +446,7 @@ void Generate_Black_Moves(const bool caps, Position& position) {
 				short j = lsb(b);
 				b ^= GeneralBoard[j];
 				if (GeneralBoard[j] & position.White_Pieces) {
-					Move m(BN, position.Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
+					Move m(BN, position.Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false, false);
 					if (inCheck || (m.From & blockers)) {
 						if (Black_Is_Legal(position, m))
 							position.LegalMoves[position.numlegalmoves++] = m;
@@ -411,7 +456,7 @@ void Generate_Black_Moves(const bool caps, Position& position) {
 				}
 				else {
 					if (!caps) {
-						Move m(BN, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
+						Move m(BN, NONE, GeneralBoard[i], GeneralBoard[j], false, false, false);
 						if (inCheck || (m.From & blockers)) {
 							if (Black_Is_Legal(position, m))
 								position.LegalMoves[position.numlegalmoves++] = m;
@@ -433,7 +478,7 @@ void Generate_Black_Moves(const bool caps, Position& position) {
 				short j = lsb(b);
 				b ^= GeneralBoard[j];
 				if (GeneralBoard[j] & position.White_Pieces) {
-					Move m(BB, position.Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
+					Move m(BB, position.Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false, false);
 					if (inCheck || (m.From & blockers)) {
 						if (Black_Is_Legal(position, m))
 							position.LegalMoves[position.numlegalmoves++] = m;
@@ -443,7 +488,7 @@ void Generate_Black_Moves(const bool caps, Position& position) {
 				}
 				else {
 					if (!caps) {
-						Move m(BB, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
+						Move m(BB, NONE, GeneralBoard[i], GeneralBoard[j], false, false, false);
 						if (inCheck || (m.From & blockers)) {
 							if (Black_Is_Legal(position, m))
 								position.LegalMoves[position.numlegalmoves++] = m;
@@ -464,7 +509,7 @@ void Generate_Black_Moves(const bool caps, Position& position) {
 				short j = lsb(b);
 				b ^= GeneralBoard[j];
 				if (GeneralBoard[j] & position.White_Pieces) {
-					Move m(BR, position.Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
+					Move m(BR, position.Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false, false);
 					if (inCheck || (m.From & blockers)) {
 						if (Black_Is_Legal(position, m))
 							position.LegalMoves[position.numlegalmoves++] = m;
@@ -474,7 +519,7 @@ void Generate_Black_Moves(const bool caps, Position& position) {
 				}
 				else {
 					if (!caps) {
-						Move m(BR, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
+						Move m(BR, NONE, GeneralBoard[i], GeneralBoard[j], false, false, false);
 						if (inCheck || (m.From & blockers)) {
 							if (Black_Is_Legal(position, m))
 								position.LegalMoves[position.numlegalmoves++] = m;
@@ -495,7 +540,7 @@ void Generate_Black_Moves(const bool caps, Position& position) {
 				short j = lsb(b);
 				b ^= GeneralBoard[j];
 				if (GeneralBoard[j] & position.White_Pieces) {
-					Move m(BQ, position.Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
+					Move m(BQ, position.Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false, false);
 					if (inCheck || (m.From & blockers)) {
 						if (Black_Is_Legal(position, m))
 							position.LegalMoves[position.numlegalmoves++] = m;
@@ -505,7 +550,7 @@ void Generate_Black_Moves(const bool caps, Position& position) {
 				}
 				else {
 					if (!caps) {
-						Move m(BQ, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
+						Move m(BQ, NONE, GeneralBoard[i], GeneralBoard[j], false, false, false);
 						if (inCheck || (m.From & blockers)) {
 							if (Black_Is_Legal(position, m))
 								position.LegalMoves[position.numlegalmoves++] = m;
@@ -526,14 +571,14 @@ void Generate_Black_Moves(const bool caps, Position& position) {
 				short j = lsb(b);
 				b ^= GeneralBoard[j];
 				if (GeneralBoard[j] & position.White_Pieces) {
-					Move m(BK, position.Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false);
+					Move m(BK, position.Get_Piece_From_Bitboard(GeneralBoard[j]), GeneralBoard[i], GeneralBoard[j], false, false, false);
 					if (Black_Is_Legal(position, m)) {
 						position.LegalMoves[position.numlegalmoves++] = m;
 					}
 				}
 				else {
 					if (!caps) {
-						Move m(BK, NONE, GeneralBoard[i], GeneralBoard[j], false, false);
+						Move m(BK, NONE, GeneralBoard[i], GeneralBoard[j], false, false, false);
 						if (Black_Is_Legal(position, m)) {
 							position.LegalMoves[position.numlegalmoves++] = m;
 						}
@@ -547,11 +592,11 @@ void Generate_Black_Moves(const bool caps, Position& position) {
 				Bitboard e8 = 1152921504606846976, f8 = 2305843009213693952, g8 = 4611686018427387904;
 				bool Rookonh8 = (position.Black_Rooks & 9223372036854775808ULL);
 				if (first && !second && Rookonh8) {
-					Move m(BK, NONE, GeneralBoard[i], f8, false, false);
+					Move m(BK, NONE, GeneralBoard[i], f8, false, false, false);
 					bool safetomovetof8 = Black_Is_Legal(position, m);
-					Move m1(BK, NONE, GeneralBoard[i], g8, false, false);
+					Move m1(BK, NONE, GeneralBoard[i], g8, false, false, false);
 					bool safetomovetog8 = Black_Is_Legal(position, m1);
-					Move m2(BK, NONE, GeneralBoard[i], e8, false, false);
+					Move m2(BK, NONE, GeneralBoard[i], e8, false, false, false);
 					bool safetomovetoe8 = Search::Is_Mate(&position) >= 0;
 					if (safetomovetof8 && safetomovetog8 && safetomovetoe8) {
 						m1.Castling = true;
@@ -565,11 +610,11 @@ void Generate_Black_Moves(const bool caps, Position& position) {
 				Bitboard e8 = 1152921504606846976, d8 = 576460752303423488, c8 = 288230376151711744;
 				bool Rookona8 = (position.Black_Rooks & 72057594037927936);
 				if (first && !second && Rookona8) {
-					Move m(BK, NONE, GeneralBoard[i], d8, false, false);
+					Move m(BK, NONE, GeneralBoard[i], d8, false, false, false);
 					bool safetomovetod8 = Black_Is_Legal(position, m);
-					Move m1(BK, NONE, GeneralBoard[i], c8, false, false);
+					Move m1(BK, NONE, GeneralBoard[i], c8, false, false, false);
 					bool safetomovetoc8 = Black_Is_Legal(position, m1);
-					Move m2(BK, NONE, GeneralBoard[i], e8, false, false);
+					Move m2(BK, NONE, GeneralBoard[i], e8, false, false, false);
 					bool safetomovetoe8 = Search::Is_Mate(&position) >= 0;
 					if (safetomovetod8 && safetomovetoc8 && safetomovetoe8) {
 						m1.Castling = true;

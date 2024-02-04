@@ -11,15 +11,17 @@ Move::Move() {
 	Score = 0;
 	Castling = false;
 	Promotion = false;
+	EP = false;
 	PromotionType = NONE;
 }
-Move::Move(Piece piece, Piece captured, Bitboard from, Bitboard to, bool castling, bool promotion) {
+Move::Move(Piece piece, Piece captured, Bitboard from, Bitboard to, bool castling, bool promotion, bool ep) {
 	P = piece;
 	C = captured;
 	From = from;
 	To = to;
 	Castling = castling;
 	Promotion = promotion;
+	EP = ep;
 	PromotionType = NONE;
 	Score = 0;
 }
@@ -48,7 +50,8 @@ Position::Position() {
 	Black_Bishops = 0;
 	Black_Knights = 0;
 	Black_Pawns = 0;
-	//PLM = 0;
+	EP_Square = 0;
+	Prev_EP_Square = 0;
 	numlegalmoves = 0;
 	WhiteCanCastleK = false;
 	WhiteCanCastleQ = false;
@@ -77,7 +80,8 @@ Position::Position(Position* position) {
 	Black_Bishops = position->Black_Bishops;
 	Black_Knights = position->Black_Knights;
 	Black_Pawns = position->Black_Pawns;
-	//PLM = position->PLM;
+	EP_Square = position->EP_Square;
+	Prev_EP_Square = position->Prev_EP_Square;
 	WhiteCanCastleK = position->WhiteCanCastleK;
 	WhiteCanCastleQ = position->WhiteCanCastleQ;
 	BlackCanCastleK = position->BlackCanCastleK;
@@ -102,7 +106,8 @@ void Position::Reset() {
 	Black_Bishops = 2594073385365405696;
 	Black_Knights = 4755801206503243776;
 	Black_Pawns = 71776119061217280;
-	//PLM = 0;
+	EP_Square = 0;
+	Prev_EP_Square = 0;
 	WhiteCanCastleK = true;
 	WhiteCanCastleQ = true;
 	BlackCanCastleK = true;
@@ -183,7 +188,10 @@ Piece Position::Get_Piece_From_Bitboard(Bitboard b) {
 	return NONE;
 }
 void Position::Make_Move(Move m) {
-	//PLM = m.To;
+	// any time we are executing a move, the en passant square is empty
+	Prev_EP_Square = EP_Square;
+	EP_Square = 0;
+
 	if (m.Castling) {
 		if (m.To & 64) {
 			White_Rooks |= 32;
@@ -231,7 +239,9 @@ void Position::Make_Move(Move m) {
 		White_Pieces |= m.To;
 		White_Pieces ^= m.From;
 	}
-	if (m.C != NONE) {
+
+	// if this is a capture but not EP
+	if ((m.C != NONE) && !m.EP) {
 		bb = Get_Bitboard_From_Piece(m.C);
 		*bb ^= m.To;
 		if (m.C > WK)
@@ -245,9 +255,39 @@ void Position::Make_Move(Move m) {
 		bb = Get_Bitboard_From_Piece(m.P);
 		*bb ^= m.To;
 	}
+
+	// if the move is an en passant move
+	if (m.EP) {
+		// if we're capturing a black pawn
+		if (m.C > WK) {
+			Black_Pieces ^= m.To >> 8;
+			Black_Pawns ^= m.To >> 8;
+		}
+		// if we're capturing a white pawn
+		else {
+			White_Pieces ^= m.To << 8;
+			White_Pawns ^= m.To << 8;
+		}
+	}
+
+	// if the move is a two square pawn move, we need to set the EP square to behind it
+	// if a white pawn is moving from the second rank to the fourth...
+	if ((m.P == WP) && (m.From & 65280) && (m.To & 4278190080)) {
+		EP_Square = m.From << 8;
+	}
+
+	// if a black pawn is moving from the seventh rank to the fifth...
+	else if ((m.P == BP) && (m.From & 71776119061217280) && (m.To & 1095216660480)) {
+		EP_Square = m.From >> 8;
+	}
+
 	Current_Turn ^= 1;
 }
 void Position::Undo_Move(Move m) {
+	// any time we are undoing a move, the en passant square is empty
+	EP_Square = Prev_EP_Square;
+	Prev_EP_Square = 0;
+
 	if (m.Castling) {
 		if (m.To & 64) {
 			White_Rooks ^= 32;
@@ -295,7 +335,9 @@ void Position::Undo_Move(Move m) {
 		White_Pieces ^= m.To;
 		White_Pieces |= m.From;
 	}
-	if (m.C != NONE) {
+
+	// if this is a capture but not EP
+	if ((m.C != NONE) && !m.EP) {
 		bb = Get_Bitboard_From_Piece(m.C);
 		*bb |= m.To;
 		if (m.C > WK)
@@ -309,6 +351,24 @@ void Position::Undo_Move(Move m) {
 		bb = Get_Bitboard_From_Piece(m.P);
 		*bb ^= m.To;
 	}
+
+	// if the move is an en passant move
+	if (m.EP) {
+		// if we captured a black pawn
+		if (m.C > WK) {
+			Black_Pieces |= m.To >> 8;
+			Black_Pawns |= m.To >> 8;
+		}
+		// if we captured a white pawn
+		else {
+			White_Pieces |= m.To << 8;
+			White_Pawns |= m.To << 8;
+		}
+
+		// if we're undoing an EP move, the square we moved to will still be an EP square
+		EP_Square = m.To;
+	}
+
 	Current_Turn ^= 1;
 }
 int Get_Cp_Value(Piece piece) {

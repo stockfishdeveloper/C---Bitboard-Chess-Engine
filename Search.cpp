@@ -458,9 +458,12 @@ int Search::SEE(Position* position, Bitboard square) {
 	if (aggressor != NONE) {
 		//int prize = (Get_Cp_Value(victim) < Get_Cp_Value(aggressor));
 		//if(prize < 0) return prize;
+
+		// THIS NEEDS TO BE CHECKED
+		// We have to check if this is an en passant move here
 		Position posit(position);
 		Move m(aggressor, victim, b, square, false,
-			((aggressor == WP && square & Eigth_Rank_White) || (aggressor == BP && square & Eigth_Rank_Black)) ? true : false);
+			(((aggressor == WP && square & Eigth_Rank_White) || (aggressor == BP && square & Eigth_Rank_Black)) ? true : false), false);
 		if ((aggressor == WP && square & Eigth_Rank_White) || (aggressor == BP && square & Eigth_Rank_Black))
 			m.PromotionType = posit.Current_Turn == true ? WQ : BQ;
 		posit.Make_Move(m);

@@ -13,13 +13,14 @@ public:
 	int Score;
 	bool Castling;
 	bool Promotion;
+	bool EP;
 	Piece P;
 	Piece C;
 	Bitboard From;
 	Bitboard To;
 	Piece PromotionType;
 	Move();
-	Move(Piece piece, Piece captured, Bitboard from, Bitboard to, bool castling, bool promotion);
+	Move(Piece piece, Piece captured, Bitboard from, Bitboard to, bool castling, bool promotion, bool ep);
 	void Output();
 };
 
@@ -48,6 +49,8 @@ public:
 	Bitboard hashkey;
 	Bitboard WhiteAttacks;
 	Bitboard BlackAttacks;
+	Bitboard EP_Square;
+	Bitboard Prev_EP_Square;
 	Move LegalMoves[100];
 	Position();
 	~Position();

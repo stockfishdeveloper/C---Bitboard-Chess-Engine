@@ -1,6 +1,6 @@
 #include "Perft.h"
 #include "Search.h"
-int Root_Perft(int depth) {
+Bitboard Root_Perft(int depth) {
 	if (depth == 0) return 0;
 
 	cout << "\n";
@@ -9,7 +9,7 @@ int Root_Perft(int depth) {
 	pos.Current_Turn ? Generate_White_Moves(false, pos) : Generate_Black_Moves(false, pos);
 	for (int i = 0; i < pos.numlegalmoves; i++) {
 		pos.Make_Move(pos.LegalMoves[i]);
-				
+
 		Print_Move_List(i);
 
 		int f = nodes;
