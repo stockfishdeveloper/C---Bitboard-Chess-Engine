@@ -137,6 +137,10 @@ int Search::AlphaBeta(Position* posit, int alpha, int beta, int depth, LINE* pli
 		pline->cmove = 0;
 		return QuiescenceSearch(posit, alpha, beta, depth + 1);
 	}
+	if (STOP_SEARCHING_NOW) {
+		Time_Allocation = 0;
+		return alpha;
+	}
 	Position position(posit);
 	bool inCheck = Search::Is_Mate(&position) == -MATE;
 	LINE line;
