@@ -737,7 +737,7 @@ void GoCommand() {
 	Move blank;
 	blank = Search::Think(wtime, btime, h, j);
 	Search::Searching = false;
-	output.lock();
+
 	for (int h = 0; h < 64; h++) {
 		if (GeneralBoard[h] & blank.From) {
 			cout << "bestmove " << PlayerMoves[h];
@@ -760,6 +760,6 @@ void GoCommand() {
 				cout << endl;
 		}
 	}
-	output.unlock();
+
 	Search::Nodes = 0;
 }
