@@ -20,6 +20,7 @@ extern ofstream Log;
 extern int CheckUci();
 void Uci_Pv(int depth, int seldepth, Move best, int* matemoves, int time, int nodes);
 void Startpos();
+void GoCommand();
 int Parse_Fen(string Fen);
 int MakeMove(Move&);
 int Moves_Command();

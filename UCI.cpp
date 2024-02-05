@@ -226,6 +226,7 @@ int CheckUci() {
 			cout << "Score is " << TbtProbeTable(tbid, 1, tbindex) << endl;
 		}
 		else if (UciCommand == "go") {
+			// we need to take these inputs here so they don't get consumed and then GoCommand() is left waiting for input
 			string time_left_white = "";
 			string time_left_black = "";
 			cin >> time_left_white;
@@ -243,42 +244,12 @@ int CheckUci() {
 				wtime = btime;
 				btime = w;
 			}
-			Timer timer;
-			Search::Searching = true;
-			Search::Time_Allocation = 10000;
-			timer.Start_Clock();
-			int h = 0, j = 0;
-			Move blank;
-			blank = Search::Think(wtime, btime, h, j);
-			Search::Searching = false;
-			for (int h = 0; h < 64; h++) {
-				if (GeneralBoard[h] & blank.From) {
-					cout << "bestmove " << PlayerMoves[h];
-					Log << "<< bestmove " << PlayerMoves[h];
-				}
-			}
-			for (int h = 0; h < 64; h++) {
-				if (GeneralBoard[h] & blank.To) {
-					cout << PlayerMoves[h];
-					Log << PlayerMoves[h];
-					if ((blank.To & Eigth_Rank_White) && (blank.From & Seventh_Rank_White) && ((blank.P == WP))) {
-						cout << "q" << endl;
-						Log << "q" << endl;
-					}
-					else if ((blank.To & Eigth_Rank_Black) && (blank.From & Seventh_Rank_Black) && ((blank.P == BP))) {
-						cout << "q" << endl;
-						Log << "q" << endl;
-					}
-					else
-						cout << endl;
-				}
-			}
-			Search::Nodes = 0;
 
+			thread t(GoCommand);
+			t.detach();
 		}
 		else if (UciCommand == "moves") {
 			Moves_Command();
-			//Print_Board();
 		}
 	}
 
@@ -755,4 +726,40 @@ void Startpos() {
 	Search::Clear();
 	TT.clear();
 	InitCounterMove();
+}
+
+void GoCommand() {
+	Timer timer;
+	Search::Searching = true;
+	Search::Time_Allocation = 10000;
+	timer.Start_Clock();
+	int h = 0, j = 0;
+	Move blank;
+	blank = Search::Think(wtime, btime, h, j);
+	Search::Searching = false;
+	output.lock();
+	for (int h = 0; h < 64; h++) {
+		if (GeneralBoard[h] & blank.From) {
+			cout << "bestmove " << PlayerMoves[h];
+			Log << "<< bestmove " << PlayerMoves[h];
+		}
+	}
+	for (int h = 0; h < 64; h++) {
+		if (GeneralBoard[h] & blank.To) {
+			cout << PlayerMoves[h];
+			Log << PlayerMoves[h];
+			if ((blank.To & Eigth_Rank_White) && (blank.From & Seventh_Rank_White) && ((blank.P == WP))) {
+				cout << "q" << endl;
+				Log << "q" << endl;
+			}
+			else if ((blank.To & Eigth_Rank_Black) && (blank.From & Seventh_Rank_Black) && ((blank.P == BP))) {
+				cout << "q" << endl;
+				Log << "q" << endl;
+			}
+			else
+				cout << endl;
+		}
+	}
+	output.unlock();
+	Search::Nodes = 0;
 }
