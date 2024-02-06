@@ -57,6 +57,10 @@ Position::Position() {
 	WhiteCanCastleQ = false;
 	BlackCanCastleK = false;
 	BlackCanCastleQ = false;
+	PrevWhiteCanCastleK = false;
+	PrevWhiteCanCastleQ = false;
+	PrevBlackCanCastleK = false;
+	PrevBlackCanCastleQ = false;
 	Current_Turn = true;
 	hashkey = 0;
 	numlegalmoves = 0;
@@ -86,6 +90,10 @@ Position::Position(Position* position) {
 	WhiteCanCastleQ = position->WhiteCanCastleQ;
 	BlackCanCastleK = position->BlackCanCastleK;
 	BlackCanCastleQ = position->BlackCanCastleQ;
+	PrevWhiteCanCastleK = position->PrevWhiteCanCastleK;
+	PrevWhiteCanCastleQ = position->PrevWhiteCanCastleQ;
+	PrevBlackCanCastleK = position->PrevBlackCanCastleK;
+	PrevBlackCanCastleQ = position->PrevBlackCanCastleQ;
 	hashkey = position->hashkey;
 	numlegalmoves = 0;
 	WhiteAttacks = position->WhiteAttacks;
@@ -112,6 +120,10 @@ void Position::Reset() {
 	WhiteCanCastleQ = true;
 	BlackCanCastleK = true;
 	BlackCanCastleQ = true;
+	PrevWhiteCanCastleK = false;
+	PrevWhiteCanCastleQ = false;
+	PrevBlackCanCastleK = false;
+	PrevBlackCanCastleQ = false;
 	Current_Turn = true;
 	numlegalmoves = 0;
 	hashkey = 18446462598732906494ULL;
@@ -192,8 +204,15 @@ void Position::Make_Move(Move m) {
 	Prev_EP_Square = EP_Square;
 	EP_Square = 0;
 
+	// copy the castling rights before making a move
+	PrevWhiteCanCastleK = WhiteCanCastleK;
+	PrevWhiteCanCastleQ = WhiteCanCastleQ;
+	PrevBlackCanCastleK = BlackCanCastleK;
+	PrevBlackCanCastleQ = BlackCanCastleQ;
+
 	if (m.Castling) {
 		if (m.To & 64) {
+			WhiteCanCastleK = false;
 			White_Rooks |= 32;
 			White_Rooks ^= 128;
 			White_King |= 64;
@@ -202,6 +221,7 @@ void Position::Make_Move(Move m) {
 			White_Pieces |= 96;
 		}
 		else if (m.To & 4611686018427387904) {
+			BlackCanCastleK = false;
 			Black_Rooks |= 2305843009213693952;
 			Black_Rooks ^= 9223372036854775808ULL;
 			Black_King |= 4611686018427387904;
@@ -210,6 +230,7 @@ void Position::Make_Move(Move m) {
 			Black_Pieces |= 6917529027641081856;
 		}
 		else if (m.To & 4) {
+			WhiteCanCastleQ = false;
 			White_Rooks |= 8;
 			White_Rooks ^= 1;
 			White_King |= 4;
@@ -218,6 +239,7 @@ void Position::Make_Move(Move m) {
 			White_Pieces |= 12;
 		}
 		else if (m.To & 288230376151711744) {
+			BlackCanCastleQ = false;
 			Black_Rooks |= 576460752303423488;
 			Black_Rooks ^= 72057594037927936;
 			Black_King |= 288230376151711744;
@@ -228,6 +250,33 @@ void Position::Make_Move(Move m) {
 		Current_Turn ^= 1;
 		return;
 	}
+
+	// here we have to handle when to remove castling rights
+	// else if, since when we castle we remove the appropriate accesses already
+	// these are for non castling king or rook moves
+	else if (m.From & White_King) {
+		WhiteCanCastleK = false;
+		WhiteCanCastleQ = false;
+	}
+
+	else if (m.From & Black_King) {
+		BlackCanCastleK = false;
+		BlackCanCastleQ = false;
+	}
+
+	// if we're moving anything from a1 it means the rook is gone. if we're capturing to a1 the rook is also gone
+	if ((m.From & 1) || (m.To & 1))
+		WhiteCanCastleQ = false;
+
+	if ((m.From & 128) || (m.To & 128))
+		WhiteCanCastleK = false;
+
+	if ((m.From & 72057594037927936) || (m.To & 72057594037927936))
+		BlackCanCastleQ = false;
+
+	if ((m.From & 9223372036854775808) || (m.To & 9223372036854775808))
+		BlackCanCastleK = false;
+
 	Bitboard* bb = Get_Bitboard_From_Piece(m.P);
 	*bb ^= m.From;
 	*bb |= m.To;
@@ -288,8 +337,15 @@ void Position::Undo_Move(Move m) {
 	EP_Square = Prev_EP_Square;
 	Prev_EP_Square = 0;
 
+	// restore castling rights from previous position
+	WhiteCanCastleK = PrevWhiteCanCastleK;
+	WhiteCanCastleQ = PrevWhiteCanCastleQ;
+	BlackCanCastleK = PrevBlackCanCastleK;
+	BlackCanCastleQ = PrevBlackCanCastleQ;
+
 	if (m.Castling) {
 		if (m.To & 64) {
+			WhiteCanCastleK = true;
 			White_Rooks ^= 32;
 			White_Rooks |= 128;
 			White_King ^= 64;
@@ -298,6 +354,7 @@ void Position::Undo_Move(Move m) {
 			White_Pieces ^= 96;
 		}
 		else if (m.To & 4611686018427387904) {
+			BlackCanCastleK = true;
 			Black_Rooks ^= 2305843009213693952;
 			Black_Rooks |= 9223372036854775808ULL;
 			Black_King ^= 4611686018427387904;
@@ -306,6 +363,7 @@ void Position::Undo_Move(Move m) {
 			Black_Pieces ^= 6917529027641081856;
 		}
 		else if (m.To & 4) {
+			WhiteCanCastleQ = true;
 			White_Rooks ^= 8;
 			White_Rooks |= 1;
 			White_King ^= 4;
@@ -314,6 +372,7 @@ void Position::Undo_Move(Move m) {
 			White_Pieces ^= 12;
 		}
 		else if (m.To & 288230376151711744) {
+			BlackCanCastleQ = true;
 			Black_Rooks ^= 576460752303423488;
 			Black_Rooks |= 72057594037927936;
 			Black_King ^= 288230376151711744;

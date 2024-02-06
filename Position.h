@@ -30,6 +30,10 @@ public:
 	bool WhiteCanCastleQ;
 	bool BlackCanCastleK;
 	bool BlackCanCastleQ;
+	bool PrevWhiteCanCastleK;
+	bool PrevWhiteCanCastleQ;
+	bool PrevBlackCanCastleK;
+	bool PrevBlackCanCastleQ;
 	bool Current_Turn;
 	int numlegalmoves;
 	Bitboard White_Pieces;
