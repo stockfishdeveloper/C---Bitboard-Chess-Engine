@@ -86,11 +86,15 @@ int CheckUci() {
 			timer.Start_Clock();
 			int depth = 0;
 			cin >> depth;
-			Bitboard nodes = Root_Perft(depth);
+			Bitboard nodes = Root_Perft(depth, true);
 			cout << "\n===========================\n";
 			cout << "Total time (ms) : " << timer.Get_Time() << "\n";
 			cout << "Nodes searched  : " << nodes << "\n";
 			cout << "Nodes/second    : " << (nodes / (timer.Get_Time() + 1) * 1000) << "\n";
+		}
+
+		else if (UciCommand == "perftsuite") {
+			PerftSuite();
 		}
 
 		else if (UciCommand == "perftspeed") {
@@ -104,7 +108,7 @@ int CheckUci() {
 				Timer timer;
 				timer.Start_Clock();
 				int depth = 6;
-				Bitboard nodes = Root_Perft(depth);
+				Bitboard nodes = Root_Perft(depth, true);
 				cout << "\n===========================\n";
 				cout << "Total time (ms) : " << timer.Get_Time() << "\n";
 				cout << "Nodes searched  : " << nodes << "\n";
