@@ -85,11 +85,8 @@ void Generate_White_Moves(const bool caps, Position& position) {
 				// if EP is possible capturing up to the left
 				if ((GeneralBoard[i] << 7) & position.EP_Square) {
 					Move m(WP, BP, GeneralBoard[i], GeneralBoard[i] << 7, false, false, true);
-					if (inCheck || (m.From & blockers)) {
-						if (White_Is_Legal(position, m))
-							position.LegalMoves[position.numlegalmoves++] = m;
-					}
-					else
+
+					if (White_Is_Legal(position, m))
 						position.LegalMoves[position.numlegalmoves++] = m;
 				}
 			}
@@ -119,11 +116,8 @@ void Generate_White_Moves(const bool caps, Position& position) {
 				// if EP is possible capturing up to the right
 				if ((GeneralBoard[i] << 9) & position.EP_Square) {
 					Move m(WP, BP, GeneralBoard[i], GeneralBoard[i] << 9, false, false, true);
-					if (inCheck || (m.From & blockers)) {
-						if (White_Is_Legal(position, m))
-							position.LegalMoves[position.numlegalmoves++] = m;
-					}
-					else
+
+					if (White_Is_Legal(position, m))
 						position.LegalMoves[position.numlegalmoves++] = m;
 				}
 			}
@@ -393,11 +387,8 @@ void Generate_Black_Moves(const bool caps, Position& position) {
 				// if EP is possible capturing down to the right
 				if ((GeneralBoard[i] >> 7) & position.EP_Square) {
 					Move m(BP, WP, GeneralBoard[i], GeneralBoard[i] >> 7, false, false, true);
-					if (inCheck || (m.From & blockers)) {
-						if (Black_Is_Legal(position, m))
-							position.LegalMoves[position.numlegalmoves++] = m;
-					}
-					else
+
+					if (Black_Is_Legal(position, m))
 						position.LegalMoves[position.numlegalmoves++] = m;
 				}
 			}
@@ -427,11 +418,8 @@ void Generate_Black_Moves(const bool caps, Position& position) {
 				// if EP is possible capturing down to the left
 				if ((GeneralBoard[i] >> 9) & position.EP_Square) {
 					Move m(BP, WP, GeneralBoard[i], GeneralBoard[i] >> 9, false, false, true);
-					if (inCheck || (m.From & blockers)) {
-						if (Black_Is_Legal(position, m))
-							position.LegalMoves[position.numlegalmoves++] = m;
-					}
-					else
+
+					if (Black_Is_Legal(position, m))
 						position.LegalMoves[position.numlegalmoves++] = m;
 				}
 			}
