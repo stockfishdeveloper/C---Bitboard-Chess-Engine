@@ -322,12 +322,12 @@ int Search::Is_Mate(Position* position) {
 	Spare = position->White_Pawns;
 	Spare |= A_Pawn_Mask;
 	Spare ^= A_Pawn_Mask;
-	if ((Spare << 9) & position->Black_King)
+	if ((Spare << 7) & position->Black_King)
 		score = 1;
 	Bitboard Spare7 = position->White_Pawns;
 	Spare7 |= H_Pawn_Mask;
 	Spare7 ^= H_Pawn_Mask;
-	if ((Spare7 << 7) & position->Black_King)
+	if ((Spare7 << 9) & position->Black_King)
 		score = 1;
 	Bitboard White_Pawns2 = position->White_Pawns;
 	White_Pawns2 |= A_Pawn_Mask;
