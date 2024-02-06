@@ -23,6 +23,7 @@ ofstream Log("Log.txt");//For writing to a text file
 int wtime = 0;
 int btime = 0;
 int Time_Usage = 0;
+int MultiPV = 4;
 LINE PVline;
 
 int CheckUci() {
@@ -31,7 +32,7 @@ int CheckUci() {
 	while (cin >> UciCommand) {
 		Log << ">> " << UciCommand << endl;
 		if (UciCommand == "uci") {
-			string Uci_Out = "id name " + Engine_Info() + "\n" + "id author David Cimbalista\n" + "option name TimePerMove type spin default 3 min 1 max 5\n" + "option name NalimovPath type string default NULL\n" + "uciok\n";
+			string Uci_Out = "id name " + Engine_Info() + "\n" + "id author David Cimbalista\n" + "option name TimePerMove type spin default 3 min 1 max 5\n" + "option name NalimovPath type string default NULL\n" + "option name MultiPV type spin default 1 min 1 max 500\n" + "uciok\n";
 			cout << Uci_Out;
 			Log << Uci_Out;
 		}
@@ -681,10 +682,10 @@ string Engine_Info() {
 	return result;
 
 }
-void Uci_Pv(int depth, int seldepth, Move best, int* matemoves, int time, int nodes) {
+void Uci_Pv(int pvnumber, int depth, int seldepth, Move best, int* matemoves, int time, int nodes) {
 	output.lock();
-	cout << "info multipv 1 depth " << depth << " seldepth " << depth + seldepth << " score ";
-	Log << "<< info multipv 1 depth " << depth << " seldepth " << depth + seldepth << " score ";
+	cout << "info multipv " << pvnumber << " depth" << depth << " seldepth " << depth + seldepth << " score ";
+	Log << "info multipv " << pvnumber << " depth" << depth << " seldepth " << depth + seldepth << " score ";
 	if (best.Score == MATE) {
 		if (depth + 1 < *matemoves) {
 			cout << "mate " << ((depth + 1) / 2) - 1;

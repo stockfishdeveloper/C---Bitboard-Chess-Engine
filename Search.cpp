@@ -33,12 +33,17 @@ Move Search::Think(int wtime, int btime, int winc, int binc, int Maxdepth) {
 	vector<Move>rootstack;
 	int count = 0;
 	int matemoves = 1000;
+	vector<LINE> pvlines;
 	//InitCounterMove();
 	for (int q = 1; q < MAXDEPTH; q++) {
 		Search::Depth = q;
 		output.lock();
 		cout << "info depth " << Search::Depth << " nodes " << Search::Nodes << endl;
 		output.unlock();
+
+		if (q <= 3)
+			pvlines.push_back(line);
+
 		if (q == 1) {
 			pos.Current_Turn ? Generate_White_Moves(false, pos) : Generate_Black_Moves(false, pos);
 			if (pos.numlegalmoves == 1) {
@@ -105,9 +110,13 @@ Move Search::Think(int wtime, int btime, int winc, int binc, int Maxdepth) {
 				memcpy(::PVline.argmove + 1, line.argmove, line.cmove * sizeof(Move));
 				Best = rootstack[i];
 				Best.Score = score;
-				Uci_Pv(q, Seldepth, Best, &matemoves, timer.Get_Time(), Nodes);
+				//Uci_Pv(q, Seldepth, Best, &matemoves, timer.Get_Time(), Nodes);
 				rootAlpha = score;
 			}
+
+			if (i <= 3)
+				Uci_Pv(i + 1, q, Seldepth, Best, &matemoves, timer.Get_Time(), Nodes);
+
 			if ((timer.Get_Time() >= (Search::Time_Allocation / 30)) && q > 4) {
 				Search::STOP_SEARCHING_NOW = true;
 				return Best;
@@ -116,7 +125,7 @@ Move Search::Think(int wtime, int btime, int winc, int binc, int Maxdepth) {
 		TT.save(q, rootAlpha, Best, Alpha, Get_Current_Hash_Key(&pos));
 		rootAlpha = Best.Score - 50;
 		//rootBeta = Best.Score + 50;
-		Uci_Pv(q, Seldepth, Best, &matemoves, timer.Get_Time(), Nodes);
+		//Uci_Pv(q, Seldepth, Best, &matemoves, timer.Get_Time(), Nodes);
 		LINE* f = new LINE;
 		f->cmove = 0;
 		//::PVline = *f;
