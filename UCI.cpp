@@ -684,8 +684,8 @@ string Engine_Info() {
 }
 void Uci_Pv(int pvnumber, int depth, int seldepth, Move best, int* matemoves, int time, int nodes) {
 	output.lock();
-	cout << "info multipv " << pvnumber << " depth" << depth << " seldepth " << depth + seldepth << " score ";
-	Log << "info multipv " << pvnumber << " depth" << depth << " seldepth " << depth + seldepth << " score ";
+	cout << "info multipv " << pvnumber << " depth " << depth << " seldepth " << depth + seldepth << " score ";
+	Log << "info multipv " << pvnumber << " depth " << depth << " seldepth " << depth + seldepth << " score ";
 	if (best.Score == MATE) {
 		if (depth + 1 < *matemoves) {
 			cout << "mate " << ((depth + 1) / 2) - 1;
