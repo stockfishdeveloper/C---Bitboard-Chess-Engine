@@ -41,9 +41,6 @@ Move Search::Think(int wtime, int btime, int winc, int binc, int Maxdepth) {
 		cout << "info depth " << Search::Depth << " nodes " << Search::Nodes << endl;
 		output.unlock();
 
-		if (q <= 3)
-			pvlines.push_back(line);
-
 		if (q == 1) {
 			pos.Current_Turn ? Generate_White_Moves(false, pos) : Generate_Black_Moves(false, pos);
 			if (pos.numlegalmoves == 1) {
@@ -53,30 +50,14 @@ Move Search::Think(int wtime, int btime, int winc, int binc, int Maxdepth) {
 		if (q == 1) {
 			TTEntry* tt = TT.probe(Get_Current_Hash_Key(&pos));
 			for (int h = 0; h < pos.numlegalmoves; h++) {
-				//if(tt != NULL) if(tt->best.From == pos.LegalMoves[h].From && tt->best.To == pos.LegalMoves[h].To) pos.LegalMoves[h].Score += 1000;
-				//if(pos.LegalMoves[h].Promotion == true)
-					//pos.LegalMoves[h].Score += 50;
-				//if(pos.LegalMoves[h].C != NONE)
-					//pos.LegalMoves[h].Score += (Get_Move_Score(pos.LegalMoves[h]));
-				//if(pos.LegalMoves[h].C != NONE)
-					//pos.LegalMoves[h].Score += SEE(&pos, pos.LegalMoves[h].To);
-				//pos.LegalMoves[h].Score += Eval::EvalPSQTResult(&pos, pos.LegalMoves[h]);
-				//pos.LegalMoves[h].Score += CounterMove[q - 1][lsb(pos.LegalMoves[h].From)][lsb(pos.LegalMoves[h].To)];
 				rootstack.push_back(pos.LegalMoves[h]);
 				count++;
 			}
 		}
 		std::stable_sort(rootstack.begin(), rootstack.end(), [](const Move& lhs, const Move& rhs) { return (lhs.Score > rhs.Score); });
-		/*for(int i = 0; i < rootstack.size(); i++)
-		{
-			Log << rootstack[i].Score << " ";
-			Display_Move(rootstack[i]);
-		}
-		Log << "END" << endl;*/
+
 		bool inCheck = Search::Is_Mate(&pos) == -MATE;
 		for (unsigned int i = 0; i < rootstack.size(); i++) {
-			//cout << rootstack[i].Score << " ";
-			//Display_Move(rootstack[i]);
 			if (q >= 2 && timer.Get_Time() > 1000) {
 				output.lock();
 				cout << "info currmove " << PlayerMoves[(lsb(rootstack[i].From))] << PlayerMoves[(lsb(rootstack[i].To))];
@@ -90,15 +71,10 @@ Move Search::Think(int wtime, int btime, int winc, int binc, int Maxdepth) {
 			rootstack[i].Score = score;
 			pos.Undo_Move(rootstack[i]);
 			if (score >= rootBeta) {
-				//rootBeta = INF;
-				//rootAlpha = -INF;
 				score = -AlphaBeta(&pos, -INF, INF, (q - 1), &line, true, true);
 				rootstack[i].Score = score;
 			}
-			/*else if(score <= rootAlpha)
-			{
-				rootAlpha = -INF;
-			}*/
+
 			if (score > rootAlpha) {
 				LINE* f = new LINE;
 				f->cmove = 0;
@@ -114,14 +90,27 @@ Move Search::Think(int wtime, int btime, int winc, int binc, int Maxdepth) {
 				rootAlpha = score;
 			}
 
-			if (i <= 3)
-				Uci_Pv(i + 1, q, Seldepth, Best, &matemoves, timer.Get_Time(), Nodes);
+			LINE TempLine;
+			TempLine.argmove[0] = rootstack[i];
+			TempLine.score = score;
+			TempLine.cmove = line.cmove + 1;
+			memcpy(TempLine.argmove + 1, line.argmove, line.cmove * sizeof(Move));
+			pvlines.push_back(TempLine);
 
 			if ((timer.Get_Time() >= (Search::Time_Allocation / 30)) && q > 4) {
 				Search::STOP_SEARCHING_NOW = true;
 				return Best;
 			}
 		}
+
+		// sort all pvlines by score
+		std::stable_sort(pvlines.begin(), pvlines.end(), [](const LINE& lhs, const LINE& rhs) { return (lhs.score > rhs.score); });
+		// output all our multipv lines
+		Uci_Pv(q, Seldepth, Best, &matemoves, timer.Get_Time(), Nodes, pvlines);
+
+		// here we need to clear out the pvlines since we don't care about pv lines from previous depths
+		pvlines.clear();
+
 		TT.save(q, rootAlpha, Best, Alpha, Get_Current_Hash_Key(&pos));
 		rootAlpha = Best.Score - 50;
 		//rootBeta = Best.Score + 50;

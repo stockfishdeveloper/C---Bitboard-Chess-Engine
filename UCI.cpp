@@ -682,41 +682,43 @@ string Engine_Info() {
 	return result;
 
 }
-void Uci_Pv(int pvnumber, int depth, int seldepth, Move best, int* matemoves, int time, int nodes) {
+void Uci_Pv(int depth, int seldepth, Move best, int* matemoves, int time, int nodes, vector<LINE> PvLines) {
 	output.lock();
-	cout << "info multipv " << pvnumber << " depth " << depth << " seldepth " << depth + seldepth << " score ";
-	Log << "info multipv " << pvnumber << " depth " << depth << " seldepth " << depth + seldepth << " score ";
-	if (best.Score == MATE) {
-		if (depth + 1 < *matemoves) {
-			cout << "mate " << ((depth + 1) / 2) - 1;
-			Log << "mate " << ((depth + 1) / 2) - 1;
-			*matemoves = depth + 1;
+	for (int i = 0; i < (PvLines.size() < 10 ? PvLines.size() : 10); i++) {
+		cout << "info multipv " << i + 1 << " depth " << depth << " seldepth " << depth + seldepth << " score ";
+		Log << "info multipv " << i + 1 << " depth " << depth << " seldepth " << depth + seldepth << " score ";
+		if (PvLines[i].score == MATE) {
+			if (depth + 1 < *matemoves) {
+				cout << "mate " << ((depth + 1) / 2) - 1;
+				Log << "mate " << ((depth + 1) / 2) - 1;
+				*matemoves = depth + 1;
+			}
+			else {
+				cout << "mate " << (*matemoves / 2) - 1;
+				Log << "mate " << (*matemoves / 2) - 1;
+			}
+		}
+		else if (PvLines[i].score == -MATE) {
+			if (depth + 1 < *matemoves) {
+				cout << "mate " << -(((depth + 1) / 2) - 1);
+				Log << "mate " << -(((depth + 1) / 2) - 1);
+				*matemoves = depth + 1;
+			}
+			else {
+				cout << "mate " << -((*matemoves / 2) - 1);
+				Log << "mate " << -((*matemoves / 2) - 1);
+			}
 		}
 		else {
-			cout << "mate " << (*matemoves / 2) - 1;
-			Log << "mate " << (*matemoves / 2) - 1;
+			cout << "cp " << PvLines[i].score;
+			Log << "cp " << PvLines[i].score;
 		}
+		cout << " hashfull " << int((TT.count / 8388608.0) * 1000);
+		cout << " pv " << PvLines[i].Output();
+		Log << " pv " << PvLines[i].Output();
+		cout << "time " << time << " nodes " << nodes << " nps " << (1000 * (nodes / (time + 1))) << endl;
+		Log << "time " << time << " nodes " << nodes << " nps " << (1000 * (nodes / (time + 1))) << endl;
 	}
-	else if (best.Score == -MATE) {
-		if (depth + 1 < *matemoves) {
-			cout << "mate " << -(((depth + 1) / 2) - 1);
-			Log << "mate " << -(((depth + 1) / 2) - 1);
-			*matemoves = depth + 1;
-		}
-		else {
-			cout << "mate " << -((*matemoves / 2) - 1);
-			Log << "mate " << -((*matemoves / 2) - 1);
-		}
-	}
-	else {
-		cout << "cp " << best.Score;
-		Log << "cp " << best.Score;
-	}
-	cout << " hashfull " << int((TT.count / 8388608.0) * 1000);
-	cout << " pv " << ::PVline.Output() /*<< line.Output()*/;
-	Log << " pv " << ::PVline.Output() /*<< line.Output()*/;
-	cout << "time " << time << " nodes " << nodes << " nps " << (1000 * (nodes / (time + 1))) << endl;
-	Log << "time " << time << " nodes " << nodes << " nps " << (1000 * (nodes / (time + 1))) << endl;
 	output.unlock();
 }
 
